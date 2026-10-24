@@ -6,10 +6,12 @@ The visual direction is a calm reading workspace: warm off-white canvas, white c
 
 ## Implemented
 
-- A predictable five-part navigation: Overview, Practice, Insights, Quiz builder, Library & data.
+- A predictable five-part navigation: Overview, Practice, Insights, Quizzes, Library. Matching line icons accompany the written labels.
+- One main task per page. Overview combines the recommended session and three compact metrics, followed by a category map. Insights and Library show one selected view at a time through labeled native dropdowns.
+- Secondary actions live in clearly named menus. Category selection, advanced quiz settings, scenario details, and worked solutions expand on demand; active quiz filters remain visible in their collapsed summaries.
 - Restrained use of color. Green marks the main action and positive results; amber and red appear with written status labels.
 - Progressive detail: overview → category or thinking skill → scenario → practice variation. Daily activity bars expose the answers behind each day.
-- Four key metrics with explicit denominators. Accuracy is separated from estimated mastery and curriculum coverage.
+- Three compact metrics with explicit denominators where applicable. Accuracy is separated from estimated mastery and curriculum coverage.
 - Questions and answers use a line height of 2, preserved paragraph breaks, and comfortable reading widths. Dense data labels are separated from reading text.
 - Responsive reflow: desktop sidebar, compact horizontal navigation on smaller screens, and a single-column reading experience on phones.
 - Focus mode hides navigation without changing the active question. Theme preference persists locally.

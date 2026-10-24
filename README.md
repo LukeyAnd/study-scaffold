@@ -2,7 +2,7 @@
 
 A quiet, dependency-free study app that adapts as you practice. Open it in a browser, replace the question bank with your material, and share the folder with anyone.
 
-The interface uses a minimal SoS! wordmark, double-spaced typography, and circled information buttons for short bullet-point guidance.
+The interface uses a minimal SoS! wordmark, double-spaced typography, consistent line icons, and circled information buttons for short bullet-point guidance. Each page centers on one task; dropdowns and expandable sections reveal detail when needed.
 
 **[Open the app](https://lukeyand.github.io/study-scaffold/)** · **[Download the project](https://github.com/LukeyAnd/study-scaffold/archive/refs/heads/main.zip)** · **[Source](https://github.com/LukeyAnd/study-scaffold)**
 
@@ -14,9 +14,9 @@ The `exam-review-designer` skill helps an agent inspect course material, gather 
 
 1. Download the ZIP and extract it.
 2. Open **index.html** in a modern browser. No installation, API key, account, or internet connection is needed for the downloaded app.
-3. Start adaptive practice, or use **Quiz builder** to make a focused quiz or timed exam.
+3. Start adaptive practice, or open **Quizzes** to make a focused quiz or timed exam.
 
-Keep the files together. Moving between local files, browsers, and a hosted website can create separate browser-storage locations. Use **Library & data → Export progress / Import progress** to transfer progress. Your progress does not sync automatically.
+Keep the files together. Moving between local files, browsers, and a hosted website can create separate browser-storage locations. Open **Library**, choose **Data & backups**, and use **Export progress / Import progress** to transfer progress. Your progress does not sync automatically.
 
 For a consistent local web address, optionally install Node.js 20 or newer and run:
 
@@ -28,11 +28,11 @@ Open `http://127.0.0.1:4173`. There are no npm packages to install. If that port
 
 ## What is included
 
-- An uncluttered overview with category mastery, coverage, accuracy, and due reviews.
+- A consolidated overview with a recommended session, compact mastery/accuracy/coverage metrics, and an expandable category map.
 - Nine subject categories and six thinking-skill labels: calculation, reverse reasoning, error spotting, comparison, application, and concepts.
 - Adaptive practice that re-evaluates the next question after each answer.
 - Per-scenario review scheduling and an anti-repeat window that shrinks to fit the available pool.
-- Clickable mastery bars, skill breakdowns, daily activity charts, and answer history.
+- Selectable Insights views with clickable mastery bars, skill breakdowns, daily activity charts, and answer history.
 - Quizzes from recommended material, recent mistakes, due reviews, or a random selection.
 - Exam mode with an optional time limit and explanations withheld until the end.
 - Results with question-by-question review and a shortcut to retry missed scenarios.
