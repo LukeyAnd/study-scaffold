@@ -38,6 +38,16 @@ Attach your syllabus, objectives, exam guide, representative tasks, or relevant 
 
 The skill creates local outputs. It does not automatically publish private notes or generated questions. Public sharing requires authorization for the material being shared.
 
+## Hand the project to an agent
+
+For the full project, give the agent this starting instruction:
+
+> Read AGENTS.md first, then choose the relevant route in AGENT_GUIDE.md. Complete my requested change using the existing contracts and targeted checks. Keep the affected instructions current, rebuild downloads if they are part of delivery, and report actual verification and remaining limits.
+
+The installed skill's `SKILL.md` gives its own six-step reading and execution order. Generated reviews include a local `AGENTS.md` pointing to course context, sources, bank data, and runtime files; the framework's test/packaging tools are not claimed to exist in those smaller folders. Some hosts discover these files automatically; otherwise explicitly ask the agent to read them.
+
+For a WordPress Elementor destination, use the optional [Elementor runbook](ELEMENTOR.md) after the agent entry point. It describes an embed/staging workflow and storage checks; it does not install or publish to a WordPress site by itself.
+
 ## Research and reproducible builds
 
 Read [RESEARCH.md](RESEARCH.md) for the evidence, methodology, source register, and limits of the existing algorithm. The repository is the maintained source; skill-template snapshots are regenerated from the app and research file.

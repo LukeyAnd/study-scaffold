@@ -1,2 +1,2 @@
-2e29c02d621cf3c45544adb085ee6b617936ce875bcea6026820411e9f1f0be1  exam-review-designer.zip
-6dafca3120295e10cf8342b9eedb6b071a56cd8f26d39464de29244658ef5885  study-scaffold.zip
+2be90dc841621b766dac479f3dc1c8d204ab5cd1fab483117132499b7b630388  exam-review-designer.zip
+ce260bab70cd0ad0ed5db0151dd32d8cd8ad7726998df52a529f921c162a8edf  study-scaffold.zip

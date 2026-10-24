@@ -7,7 +7,13 @@ description: Build a source-aligned exam review from course materials, exam cons
 
 Build a review that matches what the learner needs to do on the exam. Use supplied material before asking questions, separate evidence from assumptions, and keep practice results distinct from claims of readiness.
 
-## Gather the missing context
+## 1. Choose the route and read in order
+
+For a course review: inspect supplied material and context → [references/intake.md](references/intake.md) for unresolved questions → [references/research-methodology.md](references/research-methodology.md) for practice design → [references/authoring.md](references/authoring.md) only when building the browser app → `scripts/create_review.py` to assemble it. The script can be executed without loading its implementation unless it needs diagnosis or modification.
+
+Read [references/intake-examples.md](references/intake-examples.md) only when an intake edge case applies. Use `assets/review-context.json` and `assets/review-plan-template.md` as working templates, not instructions to load every asset. `assets/study-app/` is the runnable template; inspect individual runtime files only when customizing or debugging them. For framework maintenance in the full repository, start with its root `AGENTS.md` and task-specific file map instead.
+
+## 2. Gather only missing context
 
 Read [references/intake.md](references/intake.md). Inspect supplied sources and existing context first. Ask only questions whose answers would change the review: subject/scope, exam task and rules, source material/version, time horizon and availability, or a consequential learner constraint.
 
@@ -15,7 +21,7 @@ Use a real question widget if the host provides one and its input type fits; oth
 
 Use `assets/review-context.json` to record resolved context, source locations, missing information, and explicit assumptions. Do not collect unrelated personal details. If the learner has no sources, ask for material or offer a clearly labeled general/provisional review. Do not claim course alignment from a course title alone. If the user already supplied enough context, begin without a questionnaire.
 
-## Design the review
+## 3. Build the source-linked review plan
 
 Read [references/research-methodology.md](references/research-methodology.md) before choosing the practice sequence. Build a compact blueprint of source-linked objectives, prerequisites, expected exam tasks, coverage/weights, and observed versus self-reported gaps. Choose categories from the course, not a fixed module count.
 
@@ -25,7 +31,7 @@ Match the actual response format. An essay, oral, coding, proof, or practical ex
 
 Write a review plan using `assets/review-plan-template.md`. Adapt scheduling to the exam horizon and real availability. Exact intervals and selection ratios are adjustable heuristics. Three immediate correct answers are not proof of delayed retention, and the app's mastery score is not a probability of passing.
 
-## Create the deliverable
+## 4. Create the agreed deliverable
 
 Honor the requested medium. For an offline browser tool, read [references/authoring.md](references/authoring.md), author a source-linked bank JSON, and use `scripts/create_review.py` with the bundled `assets/study-app` template. No network download or runtime account is required. This script needs Python 3.10+; without Python, copy the template and adapt the bank using the documented schema, or provide a chat/document review if that is the user's preferred medium.
 
@@ -35,10 +41,14 @@ Preserve automatic local workspace saves, dated backup import/export, and exact 
 
 Keep `review-context.json`, a source register, and `REVIEW_PLAN.md` with the generated review. Do not include private course files, student grades, or progress backups in a public ZIP without the user's authorization. Creating a local review is not permission to publish it or contact an instructor.
 
-## Verify and hand off
+The builder also writes a short `AGENTS.md` into the generated review, from `assets/review-agent-guide.md`. Keep that guide with the shared folder so the next agent can locate course context, sources, bank data, runtime files, and recovery guidance. If assembling manually without Python, adapt the same guide to the files actually delivered and remove links to absent files.
+
+## 5. Verify observable results
 
 Independently solve each item, check the source and version, examine ambiguity and distractors, and verify blueprint coverage. Run available bank/engine checks and inspect the generated interface if possible. A schema check does not verify subject correctness. If browser inspection is unavailable, state that limit rather than claiming visual verification.
 
-Deliver the runnable review or requested format, the plan and assumptions, and a brief explanation of what the adaptation does. Preserve the learner's selected medium and time constraints. Reuse existing authorization for routine local work; seek additional authorization only when an actual scope or permission boundary requires it.
+## 6. Hand off and keep instructions current
 
-For difficult intake cases, use [references/intake-examples.md](references/intake-examples.md).
+Deliver the runnable review or requested format, the plan and assumptions, checks actually performed, and any material gaps. Point the next agent to the generated `AGENTS.md`. Preserve the learner's selected medium and time constraints. Reuse existing authorization for routine local work; seek additional authorization only when an actual scope or permission boundary requires it.
+
+When changing inputs, output files, runtime capabilities, supported tool behavior, or verification commands, update this route and the affected reference/guide in the same change. Verify current official host documentation when discovery or tool behavior matters; do not assume every agent automatically reads the same filenames. This is a maintenance step when work occurs, not an instruction to schedule or perform future changes automatically.

@@ -10,13 +10,15 @@ The interface uses a minimal SoS! wordmark, double-spaced typography, consistent
 
 The `exam-review-designer` skill helps an agent inspect course material, gather missing context through question widgets or chat, map objectives, and build a source-linked review. Its self-contained ZIP includes the research, intake/plan templates, a Python builder, and the offline app template. The methodology distinguishes research findings from this app's adjustable heuristics. See the [download page](https://lukeyand.github.io/study-scaffold/downloads/) for both packages.
 
+**For AI agents:** start with [AGENTS.md](AGENTS.md), then use the task-specific reading order in [AGENT_GUIDE.md](AGENT_GUIDE.md). The skill has its own numbered workflow, and every generated course review includes an `AGENTS.md` with a local file map. Keep these routes current when the program or workflow changes.
+
 ## Get started
 
 1. Download the ZIP and extract it.
 2. Open **index.html** in a modern browser. No installation, API key, account, or internet connection is needed for the downloaded app.
 3. Start adaptive practice, or open **Quizzes** to make a focused quiz or timed exam.
 
-Keep the files together. Moving between local files, browsers, and a hosted website can create separate browser-storage locations. Open **Library**, choose **Data & backups**, and use **Export progress / Import progress** to transfer progress. Your progress does not sync automatically.
+Keep the files together. Moving between local files, browsers, and a hosted website can create separate browser-storage locations. Open **Library**, choose **Data & backups**, and use **Save backup file / Load backup** to transfer progress. Your progress does not sync automatically.
 
 For a consistent local web address, optionally install Node.js 20 or newer and run:
 

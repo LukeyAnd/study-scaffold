@@ -47,8 +47,12 @@ class SkillPackageTests(unittest.TestCase):
         for resource in re.findall(r'(?:src|href)="([^"]+)"', (output / "index.html").read_text(encoding="utf-8")):
             if not resource.startswith(("#", "http:", "https:")):
                 self.assertTrue((output / resource.split('?', 1)[0]).is_file(), f"Missing runtime asset: {resource}")
-        for name in ("SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE"):
+        for name in ("AGENTS.md", "SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE"):
             self.assertTrue((output / name).is_file(), name)
+        self.assertEqual((output / "AGENTS.md").read_bytes(), (SKILL / "assets" / "review-agent-guide.md").read_bytes())
+        for link in re.findall(r"\]\(([^)]+)\)", (output / "AGENTS.md").read_text(encoding="utf-8")):
+            if "://" not in link and not link.startswith("#"):
+                self.assertTrue((output / link.split("#")[0]).exists(), f"Broken generated agent route: {link}")
         node = os.environ.get("STUDY_NODE") or shutil.which("node")
         if not node:
             self.skipTest("Generated files checked; set STUDY_NODE to execute the generated bank through the engine.")
@@ -104,7 +108,7 @@ assert.equal(seen.size,2);"""
         with zipfile.ZipFile(ROOT / "downloads" / "exam-review-designer.zip") as archive:
             names = archive.namelist()
             self.assertEqual({Path(n).parts[0] for n in names}, {"exam-review-designer"})
-            for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/intake.md"):
+            for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "assets/review-agent-guide.md", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/intake.md"):
                 self.assertIn("exam-review-designer/" + name, names)
             for name in names:
                 self.assertNotIn("..", Path(name).parts)
@@ -113,6 +117,7 @@ assert.equal(seen.size,2);"""
         script = self.folder / "unpacked" / "exam-review-designer" / "scripts" / "create_review.py"
         subprocess.run([os.sys.executable, str(script), "--bank", str(self.bank_path), "--context", str(self.context_path), "--plan", str(self.plan_path), "--output", str(self.folder / "from-zip")], check=True, capture_output=True, text=True)
         self.assertTrue((self.folder / "from-zip" / "banks" / "course.js").is_file())
+        self.assertTrue((self.folder / "from-zip" / "AGENTS.md").is_file())
 
     def test_local_skill_references_resolve(self):
         for doc in [SKILL / "SKILL.md", *(SKILL / "references").glob("*.md")]:
@@ -120,10 +125,16 @@ assert.equal(seen.size,2);"""
                 if "://" not in link and not link.startswith("#"):
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken reference in {doc.name}: {link}")
 
+    def test_repository_agent_routes_resolve(self):
+        for doc in (ROOT / "AGENTS.md", ROOT / "AGENT_GUIDE.md", ROOT / "ELEMENTOR.md"):
+            for link in re.findall(r"\]\(([^)]+)\)", doc.read_text(encoding="utf-8")):
+                if "://" not in link and not link.startswith("#"):
+                    self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken agent route in {doc.name}: {link}")
+
     def test_app_zip_contains_methodology_and_no_learning_data_or_nested_archives(self):
         with zipfile.ZipFile(ROOT / "downloads" / "study-scaffold.zip") as archive:
             names = archive.namelist()
-            for name in ("index.html", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
+            for name in ("index.html", "AGENTS.md", "AGENT_GUIDE.md", "ELEMENTOR.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
                 self.assertIn("study-scaffold/" + name, names)
             self.assertFalse(any(n.endswith(".zip") or "/.git/" in n or "/__pycache__/" in n for n in names))
             self.assertFalse(any(Path(n).name.startswith(("study-progress-", "study-stored-")) for n in names))

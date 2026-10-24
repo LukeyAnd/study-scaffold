@@ -110,11 +110,13 @@ def create_review(bank_path, context_path, plan_path, output):
     require(not target.exists(), f"Output already exists; choose a new folder: {target}")
     require(not target.is_relative_to(SKILL_ROOT), "Write the review outside the installed skill folder.")
     template = SKILL_ROOT / "assets" / "study-app"
-    require(all((template / f).is_file() for f in TEMPLATE_FILES), "Bundled app template is incomplete. Download the complete skill ZIP.")
+    agent_guide = SKILL_ROOT / "assets" / "review-agent-guide.md"
+    require(all((template / f).is_file() for f in TEMPLATE_FILES) and agent_guide.is_file(), "Bundled app template is incomplete. Download the complete skill ZIP.")
     compiled = compile_bank(bank)
     target.mkdir(parents=True)
     for filename in TEMPLATE_FILES:
         shutil.copyfile(template / filename, target / filename)
+    shutil.copyfile(agent_guide, target / "AGENTS.md")
     (target / "banks").mkdir()
     (target / "banks" / "course.js").write_text(compiled, encoding="utf-8")
     (target / "bank.json").write_text(json.dumps(bank, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
