@@ -1,0 +1,11 @@
+{
+  "course": {"title": null, "level": null, "scope": [], "exclusions": []},
+  "exam": {"date": null, "timezone": null, "formats": [], "durationMinutes": null, "allowedResources": [], "rubricSourceId": null, "topicWeights": {}},
+  "study": {"availableMinutes": null, "availability": [], "reportedDifficulties": [], "performanceEvidence": [], "functionalPreferences": []},
+  "deliverable": {"medium": null, "destination": null, "publicSharingAuthorized": false},
+  "sources": [],
+  "objectives": [],
+  "assumptions": [],
+  "openQuestions": [],
+  "alignmentStatus": "pending-source-review"
+}

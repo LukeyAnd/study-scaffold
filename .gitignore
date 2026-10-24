@@ -9,3 +9,8 @@ Thumbs.db
 skill-observations/
 screenshots/
 .publish/
+__pycache__/
+*.pyc
+reviews/
+!downloads/*.zip
+.validation/

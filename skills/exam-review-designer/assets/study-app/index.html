@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A calm space for adaptive practice, spaced review, and focused exams. Your progress stays on your device.">
+  <meta name="theme-color" content="#f6f7f4">
+  <title>Study Scaffold — Make understanding stick.</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="banks/course.js"></script>
+  <script defer src="core.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true">s.</span><span>study scaffold<span class="brand-caption">A little practice. Lasting clarity.</span></span></a>
+      <div class="sidebar-label">YOUR WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <a href="#overview" data-route="overview"><span aria-hidden="true">◫</span> Overview</a>
+        <a href="#practice" data-route="practice"><span aria-hidden="true">▷</span> Practice</a>
+        <a href="#insights" data-route="insights"><span aria-hidden="true">▥</span> Insights</a>
+        <a href="#builder" data-route="builder"><span aria-hidden="true">⊞</span> Quiz builder</a>
+        <a href="#library" data-route="library"><span aria-hidden="true">≡</span> Library & data</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="online-dot" aria-hidden="true"></span> Local & private<p>No account. No tracking.<br>Your progress stays here.</p><button class="text-button" id="theme-button">Switch to dark theme</button></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar"><span id="breadcrumb">Your learning, in focus</span><div class="topbar-right"><a class="text-button" href="https://lukeyand.github.io/study-scaffold/downloads/" target="_blank" rel="noopener">Get the ZIPs</a><span class="bank-pill" id="bank-title">Study bank</span><button class="text-button" id="focus-button" aria-pressed="false">Focus mode</button></div></header>
+      <main id="main" tabindex="-1"></main>
+      <footer class="page-footer">Built for understanding, one question at a time.<span id="content-status"></span><nav class="footer-links" aria-label="Project resources"><a href="https://lukeyand.github.io/study-scaffold/downloads/" target="_blank" rel="noopener">Download app or agent skill</a><a href="https://github.com/LukeyAnd/study-scaffold/blob/main/RESEARCH.md" target="_blank" rel="noopener">Research & methodology</a></nav></footer>
+    </div>
+  </div>
+  <div id="notice" role="status" aria-live="polite" aria-atomic="true"></div>
+  <noscript>This study app needs JavaScript enabled. All practice runs locally in your browser.</noscript>
+</body>
+</html>

@@ -10,3 +10,5 @@ button,input,select{font:inherit}button,a,input,select{touch-action:manipulation
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
 @media print{.sidebar,.topbar,.page-footer,.heading-actions,.study-toolbar,.question-actions,#notice{display:none}.app-shell{display:block}body{background:#fff;color:#000}main{padding:0}.card{box-shadow:none;break-inside:avoid}.answer{break-inside:avoid}}
 @media(max-width:650px){.sidebar nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible;gap:3px}.sidebar nav a{white-space:normal;text-align:center;line-height:1.4;min-width:0;min-height:46px;padding:7px 3px;font-size:10px}.scenario-title{align-items:flex-start}.scenario-title h3{min-width:0;overflow-wrap:anywhere}.scenario-title .tag{flex-shrink:0}}
+.page-footer{flex-wrap:wrap}.footer-links{display:flex;gap:18px;flex-wrap:wrap;flex-basis:100%}.footer-links a{font-size:11px;min-height:32px;display:inline-flex;align-items:center}
+.bank-pill{min-width:0;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

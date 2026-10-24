@@ -4,6 +4,10 @@ A quiet, dependency-free study app that adapts as you practice. Open it in a bro
 
 **[Open the app](https://lukeyand.github.io/study-scaffold/)** · **[Download the project](https://github.com/LukeyAnd/study-scaffold/archive/refs/heads/main.zip)** · **[Source](https://github.com/LukeyAnd/study-scaffold)**
 
+**[Download app ZIP](https://lukeyand.github.io/study-scaffold/downloads/study-scaffold.zip)** · **[Download agent skill ZIP](https://lukeyand.github.io/study-scaffold/downloads/exam-review-designer.zip)** · **[Install the skill](INSTALL.md)** · **[Research & methodology](RESEARCH.md)**
+
+The `exam-review-designer` skill helps an agent inspect course material, gather missing context through question widgets or chat, map objectives, and build a source-linked review. Its self-contained ZIP includes the research, intake/plan templates, a Python builder, and the offline app template. The methodology distinguishes research findings from this app's adjustable heuristics. See the [download page](https://lukeyand.github.io/study-scaffold/downloads/) for both packages.
+
 ## Get started
 
 1. Download the ZIP and extract it.
@@ -107,15 +111,22 @@ tools/extract-bank.cjs     One-time adapter for the supplied original
 midterm_trainer.html       Unchanged supplied original, kept for reference
 DESIGN.md                  Design decisions and suggested next improvements
 REVIEW.md                  Code-review findings and implementation notes
+RESEARCH.md                Cited learning methodology and research limits
+INSTALL.md                 Skill installation and download guide
+skills/exam-review-designer/ Portable intake, authoring workflow, and app template
+downloads/                 App/skill ZIPs, checksums, and download page
 ```
 
 ## Verify changes
 
 ```sh
 npm test
+python -m unittest discover -s tests -p "*test.py"
 ```
 
 The suite exercises all 54 supplied generators across 100 random variations each, cooldowns, mastery regressions, confidence-sensitive scheduling, unique exam plans, strict review filters, backup validation, and bank replacement. No dependencies are required.
+
+The Python suite checks portable skill generation, source/objective validation, no-overwrite behavior, ZIP completeness, and synchronization of app/research snapshots. Python 3.10+ is needed for those checks. `python tools/package_release.py` rebuilds both ZIPs and synchronizes the skill's generated resources after source edits.
 
 ## Share it
 

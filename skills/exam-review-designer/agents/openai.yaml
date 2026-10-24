@@ -1,0 +1,4 @@
+interface:
+  display_name: "Exam Review Designer"
+  short_description: "Source-aligned quizzes and spaced exam review"
+  default_prompt: "Use $exam-review-designer to inspect my course materials, ask for missing exam context, and build a focused review."

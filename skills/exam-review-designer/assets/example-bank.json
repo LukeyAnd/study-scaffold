@@ -1,0 +1,22 @@
+{
+  "id": "arithmetic-demo-v1",
+  "title": "Arithmetic schema demonstration",
+  "reviewStatus": "Demonstration only — not a course review",
+  "topics": [{"id": "percentages", "name": "Percentages"}],
+  "objectives": [{"id": "percent-of-quantity", "description": "Calculate a percentage of a quantity"}],
+  "sources": [{"id": "demo", "title": "Authored arithmetic demonstration", "locator": "This example file: worked arithmetic", "version": "1"}],
+  "glossary": {"Percent": "A number of parts out of one hundred."},
+  "questions": [{
+    "id": "percent-of-quantity-family",
+    "format": "mcq",
+    "topic": "percentages",
+    "objectiveIds": ["percent-of-quantity"],
+    "angle": "Percentage of a quantity",
+    "skill": "Calculation",
+    "sourceRefs": [{"sourceId": "demo", "locator": "Worked example: 20% of 50 = 10; transfer variation: 25% of 80 = 20"}],
+    "variants": [
+      {"prompt": "What is 20% of 50?", "correct": "10", "distractors": ["5", "20", "40"], "concept": "Convert the percent to a decimal and multiply by the quantity.", "math": "0.20 × 50 = 10", "whyWrong": ["This is 10% of 50.", "This confuses the percentage with the resulting quantity.", "This is 80% of 50."]},
+      {"prompt": "What is 25% of 80?", "correct": "20", "distractors": ["2", "25", "60"], "concept": "A quarter of a quantity is 25% of it.", "math": "0.25 × 80 = 20", "whyWrong": ["This is 2.5% of 80.", "This confuses the percentage with the resulting quantity.", "This is 75% of 80."]}
+    ]
+  }]
+}
