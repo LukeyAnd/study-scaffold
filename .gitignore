@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.zip
+*.log
+study-progress-*.json
+study-stored-*.json
+.DS_Store
+Thumbs.db
+skill-observations/
+screenshots/
+.publish/
