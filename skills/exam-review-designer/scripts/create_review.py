@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_FILES = ("index.html", "app.js", "core.js", "styles.css", "favicon.svg")
+TEMPLATE_FILES = ("index.html", "app.js", "core.js", "help.js", "styles.css", "favicon.svg")
 ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}\Z")
 
 

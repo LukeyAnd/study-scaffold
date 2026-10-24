@@ -29,6 +29,8 @@ Write a review plan using `assets/review-plan-template.md`. Adapt scheduling to 
 
 Honor the requested medium. For an offline browser tool, read [references/authoring.md](references/authoring.md), author a source-linked bank JSON, and use `scripts/create_review.py` with the bundled `assets/study-app` template. No network download or runtime account is required. This script needs Python 3.10+; without Python, copy the template and adapt the bank using the documented schema, or provide a chat/document review if that is the user's preferred medium.
 
+Preserve the browser template's minimal SoS! wordmark and double-spaced typography. Put interface guidance in circled information buttons with brief bullet lists; avoid explanatory subtitles beneath headings. Keep questions, answer feedback, form labels, and important errors visible.
+
 Keep `review-context.json`, a source register, and `REVIEW_PLAN.md` with the generated review. Do not include private course files, student grades, or progress backups in a public ZIP without the user's authorization. Creating a local review is not permission to publish it or contact an instructor.
 
 ## Verify and hand off

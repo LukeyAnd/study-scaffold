@@ -1,6 +1,8 @@
-# Study Scaffold
+# SoS!
 
 A quiet, dependency-free study app that adapts as you practice. Open it in a browser, replace the question bank with your material, and share the folder with anyone.
+
+The interface uses a minimal SoS! wordmark, double-spaced typography, and circled information buttons for short bullet-point guidance.
 
 **[Open the app](https://lukeyand.github.io/study-scaffold/)** · **[Download the project](https://github.com/LukeyAnd/study-scaffold/archive/refs/heads/main.zip)** · **[Source](https://github.com/LukeyAnd/study-scaffold)**
 

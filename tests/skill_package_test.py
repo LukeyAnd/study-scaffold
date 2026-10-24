@@ -43,6 +43,10 @@ class SkillPackageTests(unittest.TestCase):
         self.assertTrue((output / "index.html").is_file())
         self.assertIn('src="banks/course.js"', (output / "index.html").read_text(encoding="utf-8"))
         self.assertNotIn("banks/tax.js", (output / "index.html").read_text(encoding="utf-8"))
+        # A copied template must include every local runtime asset referenced by its shell.
+        for resource in re.findall(r'(?:src|href)="([^"]+)"', (output / "index.html").read_text(encoding="utf-8")):
+            if not resource.startswith(("#", "http:", "https:")):
+                self.assertTrue((output / resource).is_file(), f"Missing runtime asset: {resource}")
         for name in ("SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE"):
             self.assertTrue((output / name).is_file(), name)
         node = os.environ.get("STUDY_NODE") or shutil.which("node")

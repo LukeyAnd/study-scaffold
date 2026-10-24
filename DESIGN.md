@@ -1,5 +1,7 @@
 # Design decisions
 
+The current identity is **SoS!**, rendered as a spare italic serif wordmark with no tagline. Interface typography uses a line height of 2, with generous card and control spacing. Essential interface explanations live behind keyboard- and touch-accessible circled information buttons, presented as short bullet lists. Descriptive subtitles beneath headings are removed; questions, substantive answer feedback, labels, and actionable errors remain visible.
+
 The visual direction is a calm reading workspace: warm off-white canvas, white cards, deep forest-green actions, soft borders, and generous space between tasks. Serif page headings distinguish orientation from the system-sans body text. Fonts are local system fonts, avoiding remote dependencies and loading shifts.
 
 ## Implemented
