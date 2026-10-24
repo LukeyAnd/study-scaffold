@@ -4,6 +4,8 @@ Evidence checked: **October 23, 2026**, with the response-timing policy revisite
 
 The methodology has two parts: evidence-informed learning decisions, and practical design choices for gathering context and creating a usable review. Exact session lengths, question counts, selection weights, and readiness thresholds below are **product defaults, not findings established by the cited research**.
 
+Source intake and factual checking are specified separately in `SOURCE_GUIDE.md` (the skill copy is `references/source-quality.md`). That workflow starts from each learner's own scope and assigned materials, recommends targeted uploads, defaults to supplied-only research, records governing versions/conflicts, and requires an inspectable question audit. These are quality-control policies, not a claim that the app automatically certifies answers. Optional example banks do not determine another course's content or categories.
+
 ## Evidence that changes the design
 
 | Finding and boundary | Decision for a review tool | Evidence |

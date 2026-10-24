@@ -8,6 +8,7 @@ The visual direction is a calm reading workspace: warm off-white canvas, white c
 
 - A predictable five-part navigation: Overview, Practice, Insights, Quizzes, Library. Matching line icons accompany the written labels.
 - A top-level Class dropdown groups courses by subject. All classes exposes a subject filter, module previews and course import without another permanent navigation item. Create with AI keeps optional context/import details collapsed.
+- Fresh users start by building from their own materials. Example classes are collapsed and do not become the implicit review. Returning users retain their selected class and saved session. The prompt builder exposes a concise upload guide and explicit source policy; Library can show the author-supplied source register without claiming its facts were checked.
 - One main task per page. Overview combines the recommended session and three compact metrics, followed by a category map. Insights and Library show one selected view at a time through labeled native dropdowns.
 - Secondary actions live in clearly named menus. Category selection, advanced quiz settings, scenario details, and worked solutions expand on demand; active quiz filters remain visible in their collapsed summaries.
 - Restrained use of color. Green marks the main action and positive results; amber and red appear with written status labels.

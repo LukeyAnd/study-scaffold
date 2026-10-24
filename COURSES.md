@@ -2,6 +2,8 @@
 
 Use the **Class** dropdown; **All classes…** opens the subject filter and module previews. Included examples are Accounting → Tax midterm (nine modules) and Mathematics → Everyday math (two starter modules). Each class keeps its own mastery, history, unfinished session, results, and dated restore points. Switching saves the current workspace before loading the next. The original tax ID remains `tax-midterm-v1`.
 
+Fresh users start at **Create my review**, with example classes collapsed. Build from your own exam scope, assigned sources and expected tasks. The prompt builder's **What to upload** section recommends an exam guide/objectives, substantive notes or textbook sections, solutions/rubrics, representative questions, and optional attempts/feedback. **Source policy** defaults to supplied materials only; supplementary authoritative research is an explicit choice. See [SOURCE_GUIDE.md](SOURCE_GUIDE.md).
+
 The last class is remembered when browser preferences are available; `?course=ID` selects a class that exists on the device. A URL alone does not transfer private course content.
 
 ## Create with AI
@@ -16,6 +18,8 @@ Open **Options → Create with AI**, or use that action from All classes. The ge
 Specify topics/material and a question-family count. Optional context can identify exam format, source files, timing, and constraints. Copy/download the prompt and use it with your preferred AI and source material. For additions, also download the class-context JSON: it supplies modules, source/objective IDs, existing question IDs, and saved course JSON when available. Context may contain private questions; it is not uploaded automatically.
 
 The prompt asks for source inspection, consequential missing-context questions, objective mapping, independent solution checks, corrective feedback, and three distinct distractors. Its schema example is not verified course content. AI output still needs subject review; MCQs do not reproduce every written/oral/practical exam.
+
+The prompt also requests `QUESTION_AUDIT.md` with exact source/version evidence and actual answer/variant/distractor checks. Keep it with the authored review; importing a JSON file does not constitute content approval. **Library → Sources & review** displays references and coverage supplied by the author, not a verification certificate.
 
 ## Course import and storage
 

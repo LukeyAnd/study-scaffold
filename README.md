@@ -1,6 +1,6 @@
 # SoS!
 
-A quiet, dependency-free study app that adapts as you practice. Open it in a browser, replace the question bank with your material, and share the folder with anyone.
+A quiet, dependency-free study framework built around your own course materials. Turn your sources and exam requirements into a tailored review, verify the questions, and practice adaptively in a browser.
 
 The interface uses a minimal SoS! wordmark, double-spaced typography, consistent line icons, and circled information buttons for short bullet-point guidance. Each page centers on one task; dropdowns and expandable sections reveal detail when needed.
 
@@ -14,11 +14,13 @@ The `exam-review-designer` skill helps an agent inspect course material, gather 
 
 ## Get started
 
+Start with **Create my review**, then use **What to upload** in the prompt builder. An exam guide/objectives, relevant assigned notes/textbook excerpts, and the exam format are a useful starting point; worked solutions, rubrics and representative questions improve the fit. See [SOURCE_GUIDE.md](SOURCE_GUIDE.md) for source authority, research policy and question-level accuracy checks. The tax and math banks are optional examples, not the framework's curriculum.
+
 Choose a subject/class from the **Class** dropdown; **All classes…** shows its modules and imports. **Options → Create with AI** generates a prompt for a new course or additions-only file, so material can be added without rewriting the app. See [COURSES.md](COURSES.md).
 
 1. Download the ZIP and extract it.
 2. Open **index.html** in a modern browser. No installation, API key, account, or internet connection is needed for the downloaded app.
-3. Start adaptive practice, or open **Quizzes** to make a focused quiz or timed exam.
+3. Build/import your own review, or expand **Explore example classes** to try the interface. Then start adaptive practice or open **Quizzes**.
 
 Keep the files together. Moving between local files, browsers, and a hosted website can create separate browser-storage locations. Open **Library**, choose **Data & backups**, and use **Save backup file / Load backup** to transfer progress. Your progress does not sync automatically.
 
@@ -35,7 +37,7 @@ Open `http://127.0.0.1:4173`. There are no npm packages to install. If that port
 - A consolidated overview with a recommended session, compact mastery/accuracy/coverage metrics, and an expandable category map.
 - Subject/class selection with independent sessions and a local course library; validated course import and append-only additions.
 - A local prompt generator with source/ID context export for the learner's preferred AI tool.
-- Nine subject categories and six thinking-skill labels: calculation, reverse reasoning, error spotting, comparison, application, and concepts.
+- Modules drawn from your supplied scope; optional examples demonstrate nine tax modules and two math modules. Thinking-skill labels include calculation, reverse reasoning, error spotting, comparison, application, and concepts.
 - Adaptive practice that re-evaluates the next question after each answer.
 - Per-scenario review scheduling and an anti-repeat window that shrinks to fit the available pool.
 - Selectable Insights views with clickable mastery bars, skill breakdowns, daily activity charts, and answer history.

@@ -33,3 +33,11 @@ test('prompt outputs distinguish a full new bank from an append-only patch',()=>
  const fresh=P.build({mode:'new',subject:'Science',title:'Biology',scope:'Cells',count:6});assert.match(fresh,/bank.json/);assert.match(fresh,/Class: Biology/);assert.throws(()=>P.build({mode:'new',count:0}));
  const context=P.context(entry);assert.deepEqual(context.existingQuestionIds,raw.questions.map(q=>q.id));assert.equal(context.courseFile,raw);
 });
+test('source-first prompts default to supplied evidence and require an honest item audit',()=>{
+ const config={mode:'new',subject:'History',title:'World history',scope:'Assigned unit',count:5,sourceInventory:'Unit guide.pdf; Chapter 3 notes.pdf'};
+ const prompt=P.build(config);
+ assert.ok(prompt.includes(config.sourceInventory));assert.match(prompt,/SOURCE POLICY: Supplied materials only/);assert.match(prompt,/Do not browse/);assert.match(prompt,/QUESTION_AUDIT\.md/);assert.match(prompt,/Do not invent an expert sign-off|do not invent an expert sign-off/);assert.match(prompt,/out of the scored bank/);
+ const supplement=P.build({...config,sourcePolicy:'supplement'});assert.match(supplement,/supplemental research is permitted/);assert.doesNotMatch(supplement,/Do not browse for or silently substitute/);
+ assert.throws(()=>P.build({...config,sourcePolicy:'anything'}),/source policy/);
+ assert.equal(P.uploads.length,5);assert.ok(P.uploads.every(item=>item.name&&item.purpose));
+});

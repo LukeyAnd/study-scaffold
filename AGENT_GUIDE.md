@@ -6,7 +6,7 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 
 | Requested outcome | Read first | Then inspect only what is relevant |
 | --- | --- | --- |
-| Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | Follow its numbered reading order; use supplied materials before intake |
+| Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
 | Change appearance or interaction | [DESIGN.md](DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
 | Change adaptive selection or scheduling | [RESEARCH.md](RESEARCH.md) | [core.js](core.js), [engine tests](tests/engine.test.cjs); [app.js](app.js) only for the affected flow |
 | Change saves, resume, timing, or backups | [STORAGE.md](STORAGE.md) | [storage.js](storage.js), [core.js](core.js), affected parts of [app.js](app.js), [storage tests](tests/storage.test.cjs) |

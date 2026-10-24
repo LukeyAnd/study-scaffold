@@ -7,6 +7,8 @@ description: Build a source-aligned exam review from course materials, exam cons
 
 Build a review that matches what the learner needs to do on the exam. Use supplied material before asking questions, separate evidence from assumptions, and keep practice results distinct from claims of readiness.
 
+This is a subject-independent framework. Bundled question banks are software examples, not a default curriculum or authority. Read [references/source-quality.md](references/source-quality.md) for upload recommendations, source authority/version decisions, and the content-checking workflow before authoring or revising scored material.
+
 ## 1. Choose the route and read in order
 
 For a course review: inspect supplied material and context → [references/intake.md](references/intake.md) for unresolved questions → [references/research-methodology.md](references/research-methodology.md) for practice design → [references/authoring.md](references/authoring.md) when creating/importing course JSON or adding material → `scripts/create_review.py` to assemble a standalone review if requested. The script can be executed without loading its implementation unless it needs diagnosis or modification.
@@ -20,6 +22,8 @@ Read [references/intake.md](references/intake.md). Inspect supplied sources and 
 Use a real question widget if the host provides one and its input type fits; otherwise use concise ordinary chat. Batch a few related questions, generally no more than three at once. Request files in normal chat when widgets accept only text. Do not fabricate tool calls or treat a preselected option as an answer. Continue useful source inspection while waiting; do not invent unresolved facts.
 
 Use `assets/review-context.json` to record resolved context, source locations, missing information, and explicit assumptions. Do not collect unrelated personal details. If the learner has no sources, ask for material or offer a clearly labeled general/provisional review. Do not claim course alignment from a course title alone. If the user already supplied enough context, begin without a questionnaire.
+
+Default to supplied sources only. Record whether authoritative supplemental research is permitted; distinguish it from the governing course material. Inspect the actual source passage and version, resolve consequential conflicts, and withhold disputed or unsupported items. Model memory or agreement between AI answers is not source evidence.
 
 ## 3. Build the source-linked review plan
 
@@ -48,6 +52,8 @@ The builder also writes a short `AGENTS.md` into the generated review, from `ass
 ## 5. Verify observable results
 
 Independently solve each item, check the source and version, examine ambiguity and distractors, and verify blueprint coverage. Run available bank/engine checks and inspect the generated interface if possible. A schema check does not verify subject correctness. If browser inspection is unavailable, state that limit rather than claiming visual verification.
+
+Fill `QUESTION_AUDIT.md` using `assets/question-audit-template.md`: question/variant ID, objective, exact source locator/version, solution and distractor checks, checker/method, and unresolved issues. The builder emits an unreviewed template, not approval. Distinguish model self-check from human/independent review; never fabricate sign-off. Keep unresolved items out of the scored bank and report coverage gaps.
 
 ## 6. Hand off and keep instructions current
 

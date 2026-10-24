@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
 TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg")
-TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
+TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
 SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills", "downloads")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".yaml", ".yml"}
 
@@ -29,7 +29,7 @@ def sync_skill():
             data = re.sub(rb'\s*<script defer src="banks/example\.js(?:\?[^\"]*)?"></script>', b'', data)
         if not (target / name).exists() or (target / name).read_bytes() != data:
             (target / name).write_bytes(data)
-    for source, dest in ((ROOT / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):
+    for source, dest in ((ROOT / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "SOURCE_GUIDE.md", SKILL / "references" / "source-quality.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
 

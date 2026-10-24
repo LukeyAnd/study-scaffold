@@ -112,12 +112,14 @@ def create_review(bank_path, context_path, plan_path, output):
     require(not target.is_relative_to(SKILL_ROOT), "Write the review outside the installed skill folder.")
     template = SKILL_ROOT / "assets" / "study-app"
     agent_guide = SKILL_ROOT / "assets" / "review-agent-guide.md"
-    require(all((template / f).is_file() for f in TEMPLATE_FILES) and agent_guide.is_file(), "Bundled app template is incomplete. Download the complete skill ZIP.")
+    audit_template = SKILL_ROOT / "assets" / "question-audit-template.md"
+    require(all((template / f).is_file() for f in TEMPLATE_FILES) and agent_guide.is_file() and audit_template.is_file(), "Bundled app template is incomplete. Download the complete skill ZIP.")
     compiled = compile_bank(bank)
     target.mkdir(parents=True)
     for filename in TEMPLATE_FILES:
         shutil.copyfile(template / filename, target / filename)
     shutil.copyfile(agent_guide, target / "AGENTS.md")
+    shutil.copyfile(audit_template, target / "QUESTION_AUDIT.md")
     (target / "banks").mkdir()
     (target / "banks" / "course.js").write_text(compiled, encoding="utf-8")
     (target / "bank.json").write_text(json.dumps(bank, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -126,7 +128,7 @@ def create_review(bank_path, context_path, plan_path, output):
     (target / "SOURCES.md").write_text("# Source register\n\n" + "\n\n".join(f"## {s['id']}: {s['title']}\n\n{s['locator']}\n\nVersion: {s.get('version', 'not specified')}" for s in bank["sources"]) + "\n", encoding="utf-8")
     (target / "README.md").write_text(
         "# Your exam review\n\nOpen index.html in a browser with the files kept together. No installation or internet connection is needed.\n\n"
-        "Read REVIEW_PLAN.md for the scope, assumptions, schedule, and assessment limits. Source locations appear in explanations and SOURCES.md.\n\n"
+        "Read REVIEW_PLAN.md for the scope, assumptions, schedule, and assessment limits. Source locations appear in explanations and SOURCES.md. QUESTION_AUDIT.md starts unreviewed; fill it with actual content checks before claiming question accuracy.\n\n"
         "This app scores four-option MCQs. Use companion tasks for written/oral assessment. Learning scores are heuristics, not pass probabilities.\n\n"
         "Progress and the unfinished session save in this browser. Open Library, choose Data & backups, and save a dated JSON backup before changing devices or locations. Response time is recorded automatically; no confidence rating is needed.\n\n"
         "This folder includes course context and a source-linked question bank. Check it for private or restricted material before sharing.\n",

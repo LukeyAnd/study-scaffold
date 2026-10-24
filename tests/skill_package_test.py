@@ -47,9 +47,10 @@ class SkillPackageTests(unittest.TestCase):
         for resource in re.findall(r'(?:src|href)="([^"]+)"', (output / "index.html").read_text(encoding="utf-8")):
             if not resource.startswith(("#", "http:", "https:")):
                 self.assertTrue((output / resource.split('?', 1)[0]).is_file(), f"Missing runtime asset: {resource}")
-        for name in ("AGENTS.md", "SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE"):
+        for name in ("AGENTS.md", "QUESTION_AUDIT.md", "SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE"):
             self.assertTrue((output / name).is_file(), name)
         self.assertEqual((output / "AGENTS.md").read_bytes(), (SKILL / "assets" / "review-agent-guide.md").read_bytes())
+        self.assertEqual((output / "QUESTION_AUDIT.md").read_bytes(), (SKILL / "assets" / "question-audit-template.md").read_bytes())
         for link in re.findall(r"\]\(([^)]+)\)", (output / "AGENTS.md").read_text(encoding="utf-8")):
             if "://" not in link and not link.startswith("#"):
                 self.assertTrue((output / link.split("#")[0]).exists(), f"Broken generated agent route: {link}")
@@ -98,6 +99,7 @@ assert.equal(seen.size,2);"""
 
     def test_template_and_research_snapshots_match_canonical_sources(self):
         self.assertEqual((SKILL / "references" / "research-methodology.md").read_bytes(), (ROOT / "RESEARCH.md").read_bytes())
+        self.assertEqual((SKILL / "references" / "source-quality.md").read_bytes(), (ROOT / "SOURCE_GUIDE.md").read_bytes())
         for name in builder.TEMPLATE_FILES:
             expected = (ROOT / name).read_bytes()
             if name == "index.html":
@@ -109,7 +111,7 @@ assert.equal(seen.size,2);"""
         with zipfile.ZipFile(ROOT / "downloads" / "exam-review-designer.zip") as archive:
             names = archive.namelist()
             self.assertEqual({Path(n).parts[0] for n in names}, {"exam-review-designer"})
-            for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "assets/review-agent-guide.md", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/intake.md"):
+            for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "assets/review-agent-guide.md", "assets/question-audit-template.md", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/source-quality.md", "references/intake.md"):
                 self.assertIn("exam-review-designer/" + name, names)
             for name in names:
                 self.assertNotIn("..", Path(name).parts)
@@ -135,7 +137,7 @@ assert.equal(seen.size,2);"""
     def test_app_zip_contains_methodology_and_no_learning_data_or_nested_archives(self):
         with zipfile.ZipFile(ROOT / "downloads" / "study-scaffold.zip") as archive:
             names = archive.namelist()
-            for name in ("index.html", "AGENTS.md", "AGENT_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
+            for name in ("index.html", "AGENTS.md", "AGENT_GUIDE.md", "SOURCE_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
                 self.assertIn("study-scaffold/" + name, names)
             self.assertFalse(any(n.endswith(".zip") or "/.git/" in n or "/__pycache__/" in n for n in names))
             self.assertFalse(any(Path(n).name.startswith(("study-progress-", "study-stored-")) for n in names))

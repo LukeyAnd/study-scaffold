@@ -7,6 +7,7 @@ This is a generated, local-first SoS! review. Follow the user's requested outcom
 1. [README.md](README.md): how to launch this particular review and its limits.
 2. [review-context.json](review-context.json): resolved scope, exam constraints, assumptions, and open questions. Reuse these facts; ask only about gaps that affect the requested work.
 3. [REVIEW_PLAN.md](REVIEW_PLAN.md), then [SOURCES.md](SOURCES.md): intended coverage, practice sequence, and source locations. Inspect the actual relevant source before asserting course correctness; a listed source is not proof of access.
+   Read [QUESTION_AUDIT.md](QUESTION_AUDIT.md) for checks actually performed. The builder's initial template is unreviewed; fill it from actual source/solution/distractor checks rather than treating its existence as approval.
 4. Choose the matching route below. Read only those files and the relevant source sections.
 
 ## Choose the file to change

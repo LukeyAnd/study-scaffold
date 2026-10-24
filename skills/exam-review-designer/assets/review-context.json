@@ -4,6 +4,8 @@
   "study": {"availableMinutes": null, "availability": [], "reportedDifficulties": [], "performanceEvidence": [], "functionalPreferences": []},
   "deliverable": {"medium": null, "destination": null, "publicSharingAuthorized": false},
   "sources": [],
+  "sourcePolicy": {"mode": "supplied-only", "governingSources": [], "versions": [], "accessGaps": [], "conflicts": []},
+  "questionReview": {"auditFile": "QUESTION_AUDIT.md", "status": "not-reviewed", "checkMethods": [], "withheldItems": []},
   "objectives": [],
   "assumptions": [],
   "openQuestions": [],

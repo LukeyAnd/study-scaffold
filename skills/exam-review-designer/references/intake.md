@@ -4,6 +4,8 @@ The goal is sufficient information for a useful review, not a long onboarding fo
 
 ## A small adaptive conversation
 
+Read [source-quality.md](source-quality.md) for source-pack suggestions and authority checks. Start with scope plus relevant substantive material and exam format; do not require every suggested upload for a small task. Recommend worked solutions/rubrics and representative questions when they would change the review. Ask for actual readable source excerpts, not merely a title. Keep source policy (supplied-only by default), governing version, access gaps, and conflicts in the context record.
+
 Ask only unresolved high-value questions. Example first batch when almost nothing is known:
 
 1. **Scope and material:** “What course and topics are on this exam? Please attach the exam guide, objectives, or representative material you want me to use.” Ask for attachments in ordinary chat, not a text-only widget.
