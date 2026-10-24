@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_FILES = ("index.html", "app.js", "core.js", "help.js", "styles.css", "favicon.svg")
+TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "help.js", "styles.css", "favicon.svg")
 ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}\Z")
 
 
@@ -125,7 +125,7 @@ def create_review(bank_path, context_path, plan_path, output):
         "# Your exam review\n\nOpen index.html in a browser with the files kept together. No installation or internet connection is needed.\n\n"
         "Read REVIEW_PLAN.md for the scope, assumptions, schedule, and assessment limits. Source locations appear in explanations and SOURCES.md.\n\n"
         "This app scores four-option MCQs. Use companion tasks for written/oral assessment. Learning scores are heuristics, not pass probabilities.\n\n"
-        "Progress stays in the browser; export it from Library & data before changing devices or locations.\n\n"
+        "Progress and the unfinished session save in this browser. Open Library, choose Data & backups, and save a dated JSON backup before changing devices or locations. Response time is recorded automatically; no confidence rating is needed.\n\n"
         "This folder includes course context and a source-linked question bank. Check it for private or restricted material before sharing.\n",
         encoding="utf-8")
     shutil.copyfile(SKILL_ROOT / "LICENSE", target / "LICENSE")

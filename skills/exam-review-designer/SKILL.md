@@ -31,6 +31,8 @@ Honor the requested medium. For an offline browser tool, read [references/author
 
 Preserve the browser template's minimal SoS! wordmark, double-spaced typography, and consistent icons with visible labels. Keep each page centered on one task, using labeled dropdowns and expandable sections for secondary views and settings. Put interface guidance in circled information buttons with brief bullet lists; avoid explanatory subtitles beneath headings. Keep questions, answer feedback, form labels, important errors, and summaries of active filters visible.
 
+Preserve automatic local workspace saves, dated backup import/export, and exact session recovery. The template requires no confidence rating. Active response timing is descriptive context; do not convert speed into assumed confidence or penalize slower readers. Explain that browser-local data is separate across origins/profiles and that downloaded JSON backups are needed to move progress or keep an independent copy.
+
 Keep `review-context.json`, a source register, and `REVIEW_PLAN.md` with the generated review. Do not include private course files, student grades, or progress backups in a public ZIP without the user's authorization. Creating a local review is not permission to publish it or contact an instructor.
 
 ## Verify and hand off

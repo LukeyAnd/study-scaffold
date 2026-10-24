@@ -4,6 +4,7 @@ dist/
 *.log
 study-progress-*.json
 study-stored-*.json
+sos-*.json
 .DS_Store
 Thumbs.db
 skill-observations/

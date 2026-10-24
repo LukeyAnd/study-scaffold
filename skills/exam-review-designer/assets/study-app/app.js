@@ -1,6 +1,7 @@
-(function () {
+(async function () {
   'use strict';
   const E = StudyEngine;
+  const S = StudyStorage;
   const $ = (s, root = document) => root.querySelector(s);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   const main = $('#main');
@@ -10,7 +11,6 @@
   const decodeSegment = value => { try { return decodeURIComponent(value || ''); } catch (_) { return ''; } };
   let bank;
   try { bank = E.validateBank(globalThis.STUDY_BANK); } catch (error) { main.textContent = `Cannot load study bank: ${error.message}`; return; }
-  const key = `study-scaffold:${bank.id}:v1`;
   const byTopic = new Map(bank.topics.map(t => [t.id, bank.questions.filter(q => q.topic === t.id)]));
   const bySkill = new Map([...new Set(bank.questions.map(E.skill))].map(s => [s, bank.questions.filter(q => E.skill(q) === s)]));
   const qMap = new Map(bank.questions.map(q => [q.id, q]));
@@ -18,15 +18,38 @@
   let state = E.empty(bank.id), session = null, current = null, recent = [], results = null, clock = null, activeDay = null;
   let planPreview = [], builderTopic = null, practiceTopic = 'all', practiceSkill = 'all';
   let overviewCategory='all', insightsMode='categories', libraryMode='topics', scenarioFilter='all', resultFilter='all', builderSkill=null;
-  let noticeTimer, storageWarning = '';
-  try { const raw = localStorage.getItem(key); if (raw) state = E.validateState(JSON.parse(raw), bank); }
-  catch (error) { storageWarning = 'Saved data could not be loaded. Export the stored backup below before replacing it.'; }
+  let noticeTimer, storageWarning = '', storageLocked=false, activeSince=null, submitting=false, checkpoints=[];
+  const storage=await S.open(bank.id,()=>{storageWarning='Progress changed in another tab. Reload this tab before continuing.';notify(storageWarning);updateStorageStatus();});
+  let storedData=storage.initial;
+  try {
+    if(!storedData&&storage.legacy)storedData=JSON.parse(storage.legacy);
+    if(storedData)applyWorkspace(storedData);
+  } catch(error) { storageLocked=true;storageWarning='Saved data could not be loaded. Export the stored backup before replacing it.'; }
   try { document.body.classList.toggle('dark', localStorage.getItem('study-scaffold:theme') === 'dark'); } catch (_) {}
   $('#bank-title').textContent = bank.title;
   $('#bank-title').title = bank.title;
   $('#content-status').textContent = bank.reviewStatus || 'Personal study workspace';
   function notify(message) { clearTimeout(noticeTimer); $('#notice').textContent = message; noticeTimer = setTimeout(() => $('#notice').textContent = '', 5000); }
-  function save() { try { localStorage.setItem(key, JSON.stringify(state)); storageWarning = ''; } catch (_) { storageWarning = 'Progress is in memory only. Storage is unavailable or full; export a backup before closing.'; notify(storageWarning); } }
+  function applyWorkspace(data) { const d=S.unpack(data,bank);state=d.state;session=d.session;current=d.current;recent=d.recent;results=d.results;activeSince=null;if(current&&!current.answered&&session&&!session.ended)current.pauses++; }
+  function flushTime() {if(activeSince!==null&&current){current.elapsedMs+=Math.max(0,performance.now()-activeSince);activeSince=null;} }
+  function syncTime() {
+    const wasActive=activeSince!==null;flushTime();
+    const active=current&&!current.answered&&session&&!session.ended&&location.hash==='#practice'&&document.visibilityState==='visible'&&document.hasFocus()&&!document.querySelector('.help-dialog[open]');
+    if(active)activeSince=performance.now();else if(wasActive&&current&&!current.answered)current.pauses++;
+  }
+  function capture() {flushTime();const data=S.snapshot(bank,state,session,current,recent,results);syncTime();return data;}
+  function updateStorageStatus() {
+    const el=$('#data-status');if(el)el.textContent=storageWarning||`${storage.mode}${storage.savedAt?' · Saved '+new Date(storage.savedAt).toLocaleString():''}`;
+  }
+  async function refreshCheckpoints() {
+    try {checkpoints=await storage.checkpoints();const select=$('#restore-date');if(select)select.innerHTML='<option value="">Choose a saved date</option>'+checkpoints.map((d,i)=>`<option value="${i}">${esc(new Date(d.savedAt).toLocaleString())}</option>`).join('');}catch(_){notify('Restore points could not be loaded. Export your current progress.');}
+  }
+  async function save(daily=false) {
+    if(storageLocked||storage.conflict)return false;
+    try {const data=capture();await storage.save(data,daily);storedData=data;storageWarning='';updateStorageStatus();if(daily&&$('#restore-date'))await refreshCheckpoints();return true;}
+    catch(error){storageWarning=error.message;updateStorageStatus();notify(storageWarning);return false;}
+  }
+  function canEdit(){if(storageLocked||storage.conflict){notify(storageWarning||'Reload before continuing.');return false;}return true;}
   function btn(label, action, extra = '', primary = false) {
     const names={'start-adaptive':'play','start-focused':'play','start-detail':'play','start-one':'play',builder:'sliders','build-detail':'sliders','next-question':'right',export:'download','export-stored':'history',reset:'reset','retry-missed':'reset'};
     const clean=label.replace(/<span aria-hidden="true">→<\/span>/g,'');
@@ -74,8 +97,9 @@
     const summary=E.summary(bank.questions,state);
     const practiced=bank.topics.map(t=>({...t,m:E.summary(byTopic.get(t.id),state)})).filter(t=>t.m.attempts).sort((a,b)=>a.m.mastery-b.m.mastery);
     const focus=practiced[0]?.name||'All categories';
+    const unfinished=session&&!session.ended;
     view.html=heading('','Overview','Start a recommended session. Select a category to look closer.')+
-      `<section class="card overview-hub"><div class="hub-lead"><div class="heading-line"><span class="section-icon">${icon('play')}</span><h2>Next session</h2>${info('Recommended session',['Practice prioritizes recent mistakes, due reviews and new scenarios.','Progress scores are study heuristics, not exam predictions.'])}</div><div class="hub-focus">${esc(focus)}</div><div class="hub-meta"><span>${quantity(Math.min(10,bank.questions.length),'question')}</span><span class="tag">Adaptive</span>${summary.due?`<button class="text-button" data-action="review">${summary.due} due</button>`:''}</div><div class="actions">${btn('Start practice','start-adaptive','',true)}${menu('Session options',btn('Build a quiz','builder')+btn('Due reviews','review'))}</div></div><div class="hub-metrics" aria-label="Learning summary">${metric('Mastery',summary.mastery+'%','insights','chart')}${metric('Accuracy',ratio(summary.accuracy),'all-answers','check')}${metric('Explored',`${summary.seen}<span> / ${summary.total}</span>`,'library','book')}</div></section>`+
+      `<section class="card overview-hub"><div class="hub-lead"><div class="heading-line"><span class="section-icon">${icon('play')}</span><h2>${unfinished?'Continue session':'Next session'}</h2>${info('Recommended session',['Practice prioritizes recent mistakes, due reviews and new scenarios.','Progress scores are study heuristics, not exam predictions.'])}</div><div class="hub-focus">${esc(unfinished?topicName(current.q.topic):focus)}</div><div class="hub-meta"><span>${unfinished?`Question ${session.position+1} of ${session.total}`:quantity(Math.min(10,bank.questions.length),'question')}</span><span class="tag">Adaptive</span>${summary.due?`<button class="text-button" data-action="review">${summary.due} due</button>`:''}</div><div class="actions">${btn(unfinished?'Resume session':'Start practice',unfinished?'resume':'start-adaptive','',true)}${menu('Session options',btn('Build a quiz','builder')+btn('Due reviews','review'))}</div></div><div class="hub-metrics" aria-label="Learning summary">${metric('Mastery',summary.mastery+'%','insights','chart')}${metric('Accuracy',ratio(summary.accuracy),'all-answers','check')}${metric('Explored',`${summary.seen}<span> / ${summary.total}</span>`,'library','book')}</div></section>`+
       `<section class="card overview-map"><div class="workbench-toolbar"><div class="heading-line"><h2>Learning map</h2>${info('Learning map',['The first categories need attention or have not been explored.','Choose a category or expand the rest.'])}</div><label class="inline-select"><span class="visually-hidden">Overview category</span><select id="overview-category">${topicOptions()}</select></label></div><div id="overview-map-content">${overviewMap()}</div></section>`;
     $('#overview-category').value=overviewCategory;
     if(storageWarning)main.insertAdjacentHTML('afterbegin',`<p class="note" role="alert">${esc(storageWarning)}</p>`);
@@ -84,12 +108,22 @@
     const events=state.events.filter(filter);
     return events.length?events.slice(-100).reverse().map(e=>`<div class="session-row answer-row"><span>${esc(qMap.get(e.id)?.angle||e.id)}<small>${new Date(e.at).toLocaleString()} · ${esc(topicName(qMap.get(e.id)?.topic))}</small></span><div class="actions"><span class="tag ${e.correct?'green':'red'}">${e.correct?'Correct':'Incorrect'}</span>${btn('Practice','start-one',`data-id="${esc(e.id)}"`)}</div></div>`).join(''):'<div class="empty">No matching answers yet.</div>';
   }
+  function seconds(ms){return `${(ms/1000).toFixed(1)}s`;}
+  function paceRows(skill) {
+    return state.events.filter(e=>e.timingVersion===1&&(!skill||e.skill===skill)).slice(-100).reverse().map(e=>`<div class="session-row answer-row"><span>${esc(qMap.get(e.id)?.angle||e.id)}<small>${new Date(e.at).toLocaleString()} · ${e.correct?'Correct':'Incorrect'}</small></span><span>${seconds(e.selectionMs)} to choose · ${seconds(e.ms)} to submit${info('Recorded timing',[`${e.changes} answer changes.`,e.interrupted?'Timing was paused while the question was out of view.':'No view interruptions recorded.','Active viewing time can still include reading, thinking or an unobserved interruption.'])}</span></div>`).join('')||'<div class="empty">No timed answers yet.</div>';
+  }
+  function pace() {
+    const groups=[...bySkill.keys()].map(skill=>{const events=state.events.filter(e=>e.timingVersion===1&&e.correct&&!e.interrupted&&e.skill===skill);const times=events.map(e=>e.ms).sort((a,b)=>a-b);const middle=Math.floor(times.length/2);return {skill,n:times.length,ms:times.length?(times[middle]+times[Math.floor((times.length-1)/2)])/2:0};}).filter(g=>g.n);
+    const max=Math.max(1,...groups.map(g=>g.ms));
+    return `<div class="heading-line pace-heading"><h2>Median active time</h2>${info('Response time',['Each bar summarizes correct answers without recorded view interruptions.','Select a bar to inspect its answers.','Task length, difficulty and access needs affect time.','Timing does not infer confidence, lower mastery, or change review intervals.'])}</div>${groups.length?groups.map(g=>`<button class="module-row pace-bar" data-action="pace-detail" data-id="${esc(g.skill)}" aria-label="${esc(g.skill)}: ${seconds(g.ms)} median active time over ${g.n} correct answers. View answers."><span class="row-icon">${icon('clock')}</span><span><span class="module-name">${esc(g.skill)} <span class="module-meta">${quantity(g.n,'answer')}</span></span><span class="track" style="display:block"><span class="fill" style="display:block;width:${g.ms/max*100}%"></span></span></span><span class="module-value">${seconds(g.ms)}</span></button>`).join(''):'<div class="empty">Complete a question to start recording response times.</div>'}<div id="pace-detail">${paceRows()}</div>`;
+  }
   function insightContent() {
     if(insightsMode==='skills')return moduleRows([...bySkill].map(([name,questions])=>({id:name,name,questions})),'skill');
     if(insightsMode==='activity')return activity()+`<div id="day-detail">${activeDay?dayDetail(activeDay):''}</div>`;
     if(insightsMode==='sessions')return sessionList();
     if(insightsMode==='answers')return answerRows();
-    if(insightsMode==='confident')return answerRows(e=>e.confidence==='sure'&&!e.correct);
+    if(insightsMode==='mistakes')return answerRows(e=>!e.correct);
+    if(insightsMode==='pace')return pace();
     if(insightsMode==='secure') {
       const qs=bank.questions.filter(q=>E.mastery(state.records[q.id])>=80&&(state.records[q.id]?.attempts||0)>=3);
       return qs.length?qs.map(q=>`<div class="session-row"><span>${esc(q.angle)}<small>${esc(topicName(q.topic))}</small></span>${btn('Practice','start-one',`data-id="${esc(q.id)}"`)}</div>`).join(''):'<div class="empty">No secure scenarios yet.</div>';
@@ -100,7 +134,7 @@
     const summary=E.summary(bank.questions,state);
     view.html=heading('','Insights','Choose one view to explore your results. Select a row or chart bar for details. Secure status needs repeated practice and 80% estimated mastery. Activity retains 5,000 answers and 100 sessions. These measures do not predict an exam grade.')+
       `<div class="insight-summary">${metric('Accuracy',ratio(summary.accuracy),'all-answers','check')}${metric('Review due',summary.due,'review','clock')}${metric('Secure',summary.secure,'secure','check')}</div>`+
-      `<section class="card workbench"><div class="workbench-toolbar"><label class="view-picker" for="insight-view">${icon('chart')}<select id="insight-view" aria-label="Insight view"><option value="categories">Categories</option><option value="skills">Thinking skills</option><option value="activity">Practice activity</option><option value="sessions">Session history</option><option value="answers">Answer history</option><option value="confident">Confident mistakes</option><option value="secure">Secure scenarios</option></select></label><button class="text-button icon-link" data-action="builder">${icon('sliders')}Build a quiz</button></div><div id="insight-content">${insightContent()}</div></section>`;
+      `<section class="card workbench"><div class="workbench-toolbar"><label class="view-picker" for="insight-view">${icon('chart')}<select id="insight-view" aria-label="Insight view"><option value="categories">Categories</option><option value="skills">Thinking skills</option><option value="activity">Practice activity</option><option value="sessions">Session history</option><option value="answers">Answer history</option><option value="mistakes">Mistakes</option><option value="pace">Response time</option><option value="secure">Secure scenarios</option></select></label><button class="text-button icon-link" data-action="builder">${icon('sliders')}Build a quiz</button></div><div id="insight-content">${insightContent()}</div></section>`;
     $('#insight-view').value=insightsMode;
   }
   function dayDetail(day) { const events = state.events.filter(e => dayKey(e.at)===day); return `<div class="day-summary"><strong>${esc(day)}</strong><p>${events.length} answers · ${events.filter(e=>e.correct).length} correct</p></div>${events.slice(-30).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle || e.id)}<small>${esc(topicName(qMap.get(e.id)?.topic))}</small></span><span>${e.correct?'Correct':'Incorrect'}</span></div>`).join('')}${events.length>30?'<p class="small muted">Showing the latest 30 answers for this day.</p>':''}`; }
@@ -141,43 +175,55 @@
     $('#practice-topic').value=practiceTopic;$('#practice-skill').value=practiceSkill;
   }
   function start(pool, mode='adaptive', minutes=0, count=10, adaptive=true) {
+    if(!canEdit())return;
+    if(session&&!session.ended&&!confirm('Replace the unfinished session? Submitted answers stay in your learning history.'))return;
     if (!pool.length) { notify('No questions match those filters. Choose another focus.');return; }
-    session={mode, pool:[...pool], queue:adaptive?null:[...pool], total:adaptive?Math.min(count,pool.length):pool.length, answers:[], position:0, deadline:minutes?Date.now()+minutes*60000:0, ended:false};results=null;recent=[]; nextQuestion();route('practice');
+    session={mode, pool:[...pool], queue:adaptive?null:[...pool], total:adaptive?Math.min(count,pool.length):pool.length, answers:[], position:0, startedAt:Date.now(), deadline:minutes?Date.now()+minutes*60000:0, ended:false};results=null;recent=[]; nextQuestion();route('practice');save();
     clearInterval(clock); if (session.deadline) clock=setInterval(tick,1000);
   }
   function nextQuestion() {
     if (!session||session.ended)return;
     if (session.position>=session.total) {finish();return;}
     const q=session.queue?session.queue[session.position]:E.choose(session.pool,state,recent);
-    try { current={q,raw:E.materialize(q),selected:null,confidence:'okay',answered:false,start:Date.now(),reason:E.reason(q,state)};recent.push(q.id);recent=recent.slice(-15); }
+    flushTime();
+    try { current={q,raw:E.materialize(q),selected:null,confidence:'auto',answered:false,start:Date.now(),elapsedMs:0,firstChoiceMs:null,changes:0,pauses:0,reason:E.reason(q,state)};recent.push(q.id);recent=recent.slice(-15); }
     catch(error){notify(error.message);finish();return;}
-    if(location.hash==='#practice') {renderPractice(); main.focus();window.scrollTo({top:0});}
+    if(location.hash==='#practice') {renderPractice(); main.focus();window.scrollTo({top:0});}syncTime();save();
   }
   function remaining() {if(!session?.deadline)return 'Untimed';const seconds=Math.max(0,Math.ceil((session.deadline-Date.now())/1000));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} left`;}
   function tick() { if(!session||session.ended)return;const el=$('#timer');if(el)el.textContent=remaining();if(session.deadline&&Date.now()>=session.deadline){finish();notify('Time is up. Your session has been submitted.');} }
   function renderPractice() {
     if(results){renderResults();return;} if(!session||!current){practiceLanding();return;}
     const c=current; const isExam=session.mode==='exam'; const feedback=c.answered&&!isExam;
-    view.html=`<div class="study-layout"><div class="study-toolbar"><span class="muted small">${isExam?'EXAM':session.mode==='adaptive'?'ADAPTIVE PRACTICE':'PRACTICE QUIZ'} <span aria-hidden="true"> / </span> Question ${session.position+1} of ${session.total}</span><div class="actions"><span class="tag" id="timer">${remaining()}</span>${menu('Session options',btn('Finish session','finish-session'))}</div></div><div class="study-progress" role="progressbar" aria-label="Session progress" aria-valuenow="${session.position}" aria-valuemin="0" aria-valuemax="${session.total}"><div class="fill" style="width:${session.position/session.total*100}%"></div></div><article class="card question-card"><div class="question-top"><div class="eyebrow">${esc(topicName(c.q.topic))}</div><span class="muted small">${String(session.position+1).padStart(2,'0')}</span></div><div class="question-labels"><span class="tag">${esc(E.skill(c.q))}</span>${info('This question',[c.q.angle||'Practice',session.mode==='adaptive'?c.reason:''])}</div><h1 class="question-text" id="question-heading">${esc(c.raw.prompt)}</h1><form id="answer-form"><fieldset style="border:0;padding:0;margin:0" ${c.answered?'disabled':''}><legend class="visually-hidden">Choose one answer</legend><div class="answers">${c.raw.options.map((o,i)=>`<label class="answer ${feedback&&o.correct?'correct':feedback&&c.selected===i?'wrong':''}"><input type="radio" name="answer" value="${i}" ${c.selected===i?'checked':''}><span class="answer-letter" aria-hidden="true">${'ABCD'[i]}</span><span class="answer-text">${esc(o.text)}${feedback&&o.correct?'<span class="choice-state">Correct answer</span>':feedback&&c.selected===i?'<span class="choice-state">Your answer · incorrect</span>':''}</span></label>`).join('')}</div></fieldset>${!c.answered?`<div class="question-actions"><div class="field confidence-field"><label for="confidence-select">Confidence</label><select id="confidence-select" name="confidence">${[['unsure','Unsure'],['okay','Somewhat'],['sure','Confident']].map(([v,l])=>`<option value="${v}" ${c.confidence===v?'selected':''}>${l}</option>`).join('')}</select></div><button class="btn primary" type="submit" id="check-answer" ${c.selected===null?'disabled':''}>${isExam?'Save & continue':'Check answer'} <span aria-hidden="true">→</span></button></div>`:''}</form>${feedback?explanation(c):''}${feedback?`<div class="actions" style="margin-top:25px">${btn(session.position+1===session.total?'See session results':'Next question <span aria-hidden="true">→</span>','next-question','',true)}</div>`:''}<div class="question-helpers">${info('Study controls',['Use 1–4 to select an answer.','Press Enter to check or continue.','Progress saves after each submitted answer.'])}</div></article></div>`;
+    view.html=`<div class="study-layout"><div class="study-toolbar"><span class="muted small">${isExam?'EXAM':session.mode==='adaptive'?'ADAPTIVE PRACTICE':'PRACTICE QUIZ'} <span aria-hidden="true"> / </span> Question ${session.position+1} of ${session.total}</span><div class="actions"><span class="tag" id="timer">${remaining()}</span>${menu('Session options',btn('Finish session','finish-session'))}</div></div><div class="study-progress" role="progressbar" aria-label="Session progress" aria-valuenow="${session.position}" aria-valuemin="0" aria-valuemax="${session.total}"><div class="fill" style="width:${session.position/session.total*100}%"></div></div><article class="card question-card"><div class="question-top"><div class="eyebrow">${esc(topicName(c.q.topic))}</div><span class="muted small">${String(session.position+1).padStart(2,'0')}</span></div><div class="question-labels"><span class="tag">${esc(E.skill(c.q))}</span>${info('This question',[c.q.angle||'Practice',session.mode==='adaptive'?c.reason:''])}</div><h1 class="question-text" id="question-heading">${esc(c.raw.prompt)}</h1><form id="answer-form"><fieldset style="border:0;padding:0;margin:0" ${c.answered?'disabled':''}><legend class="visually-hidden">Choose one answer</legend><div class="answers">${c.raw.options.map((o,i)=>`<label class="answer ${feedback&&o.correct?'correct':feedback&&c.selected===i?'wrong':''}"><input type="radio" name="answer" value="${i}" ${c.selected===i?'checked':''}><span class="answer-letter" aria-hidden="true">${'ABCD'[i]}</span><span class="answer-text">${esc(o.text)}${feedback&&o.correct?'<span class="choice-state">Correct answer</span>':feedback&&c.selected===i?'<span class="choice-state">Your answer · incorrect</span>':''}</span></label>`).join('')}</div></fieldset>${!c.answered?`<div class="question-actions"><button class="btn primary" type="submit" id="check-answer" ${c.selected===null||submitting?'disabled':''}>${isExam?'Save & continue':'Check answer'} <span aria-hidden="true">→</span></button></div>`:''}</form>${feedback?explanation(c):''}${feedback?`<div class="actions" style="margin-top:25px">${btn(session.position+1===session.total?'See session results':'Next question <span aria-hidden="true">→</span>','next-question','',true)}</div>`:''}<div class="question-helpers">${info('Study controls',['Use 1–4 to select an answer.','Press Enter to check or continue.','Your question and selected answer save automatically.','Response timing pauses when this question is out of view.','Timing is not a confidence score and does not lower mastery.'])}</div></article></div>`;
   }
   function explanation(c) {
     const correct=c.raw.options[c.selected]?.correct;
-    const timing=[c.confidence==='sure'&&!correct?'Confident mistakes receive follow-up practice.':'',session?.mode==='exam'?'':`Next review: ${new Date(state.records[c.q.id]?.due||Date.now()).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}.`].filter(Boolean);
+    const timing=[session?.mode==='exam'?'':`Next review: ${new Date(state.records[c.q.id]?.due||Date.now()).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}.`].filter(Boolean);
     const worked=`${c.raw.math?`<pre class="steps">${esc(c.raw.math)}</pre>`:''}<ul class="choice-analysis">${c.raw.options.map((o,i)=>`<li><strong>${'ABCD'[i]} · ${o.correct?'Correct':i===c.selected?'Your answer':'Other choice'}</strong><br>${esc(o.why)}</li>`).join('')}</ul>`;
     return `<section class="feedback ${correct?'':'incorrect'}" aria-label="Answer explanation"><div class="heading-line"><h2>${correct?'Correct':'Incorrect'}</h2>${timing.length?info('Review timing',timing):''}</div><p class="explanation">${esc(c.raw.concept||'Review the correct answer.')}</p>${disclosure('Worked solution & choices',worked,'book')}</section>`;
   }
-  function submitAnswer() {
-    if(!current||current.answered||!session||session.ended)return;if(session.deadline&&Date.now()>=session.deadline){finish();return;}
-    const form=$('#answer-form');const selection=form.elements.answer.value;if(selection==='')return;
-    current.selected=Number(selection);current.confidence=form.elements.confidence.value||'okay';current.answered=true;
-    E.record(state,current.q,current.raw.options[current.selected].correct,current.confidence,Date.now()-current.start,session.mode);save();
+  async function submitAnswer() {
+    if(submitting||!canEdit()||!current||current.answered||!session||session.ended)return;
+    if(session.deadline&&Date.now()>=session.deadline){finish();return;}
+    const selection=$('#answer-form').elements.answer.value;if(selection==='')return;
+    flushTime();current.selected=Number(selection);current.confidence='auto';current.answered=true;
+    if(current.firstChoiceMs===null)current.firstChoiceMs=current.elapsedMs;
+    E.record(state,current.q,current.raw.options[current.selected].correct,'auto',current.elapsedMs,session.mode,Date.now(),{selectionMs:current.firstChoiceMs,changes:current.changes,interrupted:current.pauses>0});
     session.answers.push({...current});
-    if(session.mode==='exam'){session.position++;nextQuestion();}else{renderPractice();$('.feedback h2')?.setAttribute('tabindex','-1');$('.feedback h2')?.focus();}
+    submitting=true;const button=$('#check-answer');if(button)button.disabled=true;
+    if(session.mode==='exam'){session.position++;nextQuestion();}else renderPractice();
+    await save(true);submitting=false;if($('#check-answer'))$('#check-answer').disabled=current?.selected===null;
+    if(session.mode!=='exam'){$('.feedback h2')?.setAttribute('tabindex','-1');$('.feedback h2')?.focus();}
   }
-  function finish() {if(!session||session.ended)return;session.ended=true;clearInterval(clock); const correct=session.answers.filter(a=>a.raw.options[a.selected].correct).length;
+  function finish() {
+    if(!session||session.ended||!canEdit())return;
+    flushTime();session.ended=true;clearInterval(clock);
+    const correct=session.answers.filter(a=>a.raw.options[a.selected].correct).length;
     resultFilter='all';results={answers:[...session.answers],correct,total:session.total,mode:session.mode,unanswered:session.total-session.answers.length};
-    if(session.answers.length){state.sessions.push({at:Date.now(),correct,total:session.total,mode:session.mode==='exam'?'Exam':session.mode==='adaptive'?'Adaptive practice':'Practice quiz'});state.sessions=state.sessions.slice(-100);save();}
-    route('practice');if(location.hash==='#practice')renderResults(); }
+    if(session.answers.length){state.sessions.push({at:Date.now(),startedAt:session.startedAt,correct,total:session.total,mode:session.mode==='exam'?'Exam':session.mode==='adaptive'?'Adaptive practice':'Practice quiz'});state.sessions=state.sessions.slice(-100);}
+    save(true);route('practice');if(location.hash==='#practice')renderResults();
+  }
   function resultRows() {
     const answers=results.answers.filter(a=>resultFilter==='all'||(resultFilter==='missed'&&!a.raw.options[a.selected].correct)||(resultFilter==='correct'&&a.raw.options[a.selected].correct));
     return answers.map((a,i)=>`<details class="panel-disclosure result-answer"><summary><span class="summary-label">${icon(a.raw.options[a.selected].correct?'check':'book')}<span>${esc(a.q.angle||topicName(a.q.topic))}</span></span><span class="tag ${a.raw.options[a.selected].correct?'green':'red'}">${a.raw.options[a.selected].correct?'Correct':'Incorrect'}</span><span class="disclosure-chevron">${icon('down')}</span></summary><div class="disclosure-body"><div class="question-text">${esc(a.raw.prompt)}</div><p class="explanation"><strong>Your answer:</strong> ${esc(a.raw.options[a.selected].text)}</p><p class="explanation"><strong>Correct answer:</strong> ${esc(a.raw.correct)}</p>${explanation(a)}</div></details>`).join('')||'<div class="empty">No answers in this view.</div>';
@@ -190,20 +236,20 @@
   }
   function libraryContent() {
     if(libraryMode==='reference')return `<div class="field reference-search"><label for="glossary-search">Find a term</label><input type="search" id="glossary-search" placeholder="Search definitions"></div><div class="glossary" id="glossary-list">${glossaryRows('')}</div>`;
-    if(libraryMode==='data')return `<div class="data-panel"><div class="heading-line"><h2>Progress backups</h2>${info('Progress backups',['Progress stays in this browser and does not sync automatically.','Export a backup before changing devices or resetting progress.','Import replaces progress for the active bank.'])}</div><div class="data-toolbar">${btn('Export progress','export','',true)}<label class="btn file-label">${icon('upload')}Import progress<input class="visually-hidden" id="import-file" type="file" accept="application/json,.json"></label>${menu('More data options',btn('Export stored backup','export-stored')+btn('Reset progress','reset'))}</div><p class="status-message" id="data-status" role="status" aria-live="polite">${esc(storageWarning)}</p></div>`;
+    if(libraryMode==='data')return `<div class="data-panel"><div class="heading-line"><h2>Saved progress</h2>${info('Saved progress',['Your progress and unfinished session save automatically in this browser.','Up to seven daily restore points are kept in the local database after answers or session completion.','Browser storage can be cleared; download a backup to keep an independent copy.','A JSON backup is readable text and can be saved in your chosen folder or cloud drive.','Import replaces this bank’s workspace; it does not merge devices.','Timed exams keep their original deadline after closing the app.'])}</div><p class="status-message" id="data-status" role="status" aria-live="polite"></p><div class="data-toolbar">${btn('Save backup file','export','',true)}<label class="btn file-label">${icon('upload')}Load backup<input class="visually-hidden" id="import-file" type="file" accept="application/json,.json,text/plain,.txt"></label>${menu('More data options',btn('Download backup','download-backup')+btn('Keep browser storage','persist-storage')+btn('Export stored backup','export-stored')+btn('Reload saved progress','reload')+btn('Reset progress','reset'))}</div>${disclosure('Restore a date',`<div class="restore-controls"><div class="field"><label for="restore-date">Saved date</label><select id="restore-date"><option value="">Choose a saved date</option></select></div>${btn('Restore selected date','restore-date')}</div>`,'history')}</div>`;
     return moduleRows();
   }
   function library() {
     view.html=heading('','Library','Choose topics, definitions or progress backups from the view menu.')+
       `<section class="card workbench"><div class="workbench-toolbar"><label class="view-picker" for="library-view">${icon('book')}<select id="library-view" aria-label="Library view"><option value="topics">Topics</option><option value="reference">Quick reference</option><option value="data">Data & backups</option></select></label><span class="tag">${quantity(bank.questions.length,'scenario')}</span></div><div id="library-content">${libraryContent()}</div></section>`;
-    $('#library-view').value=libraryMode;
+    $('#library-view').value=libraryMode;if(libraryMode==='data'){updateStorageStatus();refreshCheckpoints();}
   }
   function glossaryRows(term) {
     const entries=Object.entries(bank.glossary||{}).filter(([k,v])=>(k+' '+v).toLowerCase().includes(term.toLowerCase()));
     return entries.map(([k,v])=>`<div class="glossary-entry"><span>${esc(k)}</span>${info(k,v)}</div>`).join('')||'<p class="empty">No matching terms.</p>';
   }
   function download(content,name,type='application/json') {const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-  function eventList(filter,title) {const events=state.events.filter(filter);view.html=heading('ANSWER HISTORY',title,`${events.length} matching answers in the retained history. Select a scenario to practice it.`)+`<section class="card">${events.length?events.slice(-100).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle||e.id)}<small>${new Date(e.at).toLocaleString()} · ${esc(topicName(qMap.get(e.id)?.topic))} · ${esc(e.confidence)}</small></span><div class="actions"><span class="tag ${e.correct?'green':'red'}">${e.correct?'Correct':'Incorrect'}</span>${btn('Practice','start-one',`data-id="${esc(e.id)}"`)}</div></div>`).join(''):'<p class="empty">No matching answers yet.</p>'}${events.length>100?'<p class="note">Showing the latest 100 matching answers.</p>':''}</section>`; }
+  function eventList(filter,title) {const events=state.events.filter(filter);view.html=heading('ANSWER HISTORY',title,`${events.length} matching answers in the retained history. Select a scenario to practice it.`)+`<section class="card">${events.length?events.slice(-100).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle||e.id)}<small>${new Date(e.at).toLocaleString()} · ${esc(topicName(qMap.get(e.id)?.topic))} · ${e.timingVersion===1?seconds(e.ms)+' active time':'Earlier rating: '+esc(e.confidence)}</small></span><div class="actions"><span class="tag ${e.correct?'green':'red'}">${e.correct?'Correct':'Incorrect'}</span>${btn('Practice','start-one',`data-id="${esc(e.id)}"`)}</div></div>`).join(''):'<p class="empty">No matching answers yet.</p>'}${events.length>100?'<p class="note">Showing the latest 100 matching answers.</p>':''}</section>`; }
   function render(){const path=location.hash.slice(1)||'overview';const [page,kind,id]=path.split('/'); document.querySelectorAll('[data-route]').forEach(a=>{const active=a.dataset.route===page||(page==='detail'&&a.dataset.route==='insights');if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});$('#breadcrumb').textContent=({overview:'Overview',practice:'Practice',insights:'Insights',builder:'Quiz builder',library:'Library',detail:'Category detail'})[page]||'Your workspace';
     if(page==='overview')overview();else if(page==='practice')renderPractice();else if(page==='insights')insights();else if(page==='builder')builder();else if(page==='library')library();else if(page==='detail')detail(kind,decodeSegment(id));else if(page==='answers')eventList(()=>true,'Answer history');else if(page==='confident')eventList(e=>e.confidence==='sure'&&!e.correct,'Confident mistakes');else{route('overview');return;} document.title=`${page==='detail'?(kind==='topic'?topicName(decodeSegment(id)):decodeSegment(id)||'Detail'):page.charAt(0).toUpperCase()+page.slice(1)} · SoS!`;
   }
@@ -218,15 +264,30 @@
     review:()=>{route('builder');setTimeout(()=>{if($('#target')){$('#target').value='due';updatePlan();}},0);},
     missed:()=>{route('builder');setTimeout(()=>{if($('#target')){$('#target').value='missed';updatePlan();}},0);},
     secure:()=>{insightsMode='secure';route('insights');},
-    'all-answers':()=>{insightsMode='answers';route('insights');},'confident-mistakes':()=>{insightsMode='confident';route('insights');},
+    'all-answers':()=>{insightsMode='answers';route('insights');},'confident-mistakes':()=>{insightsMode='mistakes';route('insights');},
     'next-question':()=>{if(current?.answered){session.position++;nextQuestion();}},
     'finish-session':()=>{if(confirm('Finish this session now? Unanswered questions count against the session score. Submitted answers are already saved.'))finish();},
     'retry-missed':()=>{const qs=[...new Set(results.answers.filter(a=>!a.raw.options[a.selected].correct).map(a=>a.q.id))].map(id=>qMap.get(id));if(!qs.length){notify('No missed answers in this session. Try adaptive practice for a fresh challenge.');return;}start(qs,'quiz',0,qs.length,false);},
     'select-topics':()=>{$$('#builder-form [name=topic]').forEach(x=>x.checked=true);updatePlan();},
     'clear-topics':()=>{$$('#builder-form [name=topic]').forEach(x=>x.checked=false);updatePlan();},
-    export:()=>download(JSON.stringify(state,null,2),`study-progress-${bank.id}-${dayKey(Date.now())}.json`),
-    'export-stored':()=>{try{download(localStorage.getItem(key)||JSON.stringify(state),`study-stored-${bank.id}.json`);}catch(_){notify('Browser storage is unavailable. Export current progress instead.');}},
-    reset:()=>{if(confirm('Delete learning progress for this question bank in this browser? Export a backup first if you want to keep it.')){state=E.empty(bank.id);session=null;current=null;results=null;recent=[];clearInterval(clock);save();render();notify('This bank’s progress has been reset.');}}
+    resume:()=>route('practice'),
+    'pace-detail':b=>{$('#pace-detail').innerHTML=paceRows(b.dataset.id);},
+    reload:()=>location.reload(),
+    export:async()=>{
+      const content=JSON.stringify(capture(),null,2),name=`sos-${bank.id}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+      if(window.showSaveFilePicker){try{const handle=await window.showSaveFilePicker({suggestedName:name,types:[{description:'SoS progress backup',accept:{'application/json':['.json']}}]});const stream=await handle.createWritable();await stream.write(content);await stream.close();notify('Backup saved.');}catch(error){if(error.name!=='AbortError')notify('Could not save to that location. Use Download backup from More data options.');}}
+      else download(content,name);
+    },
+    'download-backup':()=>download(JSON.stringify(capture(),null,2),`sos-${bank.id}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`),
+    'persist-storage':async()=>{try{const granted=await navigator.storage?.persist?.();notify(granted?'Browser storage protection granted. Keep a file backup too.':'Storage protection was not granted. Keep a downloaded backup.');}catch(_){notify('Storage protection is unavailable. Keep a downloaded backup.');}},
+    'restore-date':async()=>{
+      const index=$('#restore-date').value;if(index===''||!checkpoints[Number(index)]){notify('Choose a saved date first.');return;}
+      if(!canEdit()||!confirm('Restore this date? Current progress and the unfinished session will be replaced. Save a backup first if you need it.'))return;
+      const data=checkpoints[Number(index)];clearInterval(clock);applyWorkspace(data);storageLocked=false;await save();resumeClock();render();notify('Saved date restored.');
+    },
+    'export-stored':()=>download(storageLocked&&(storage.rawBackup||storage.legacy)?storage.rawBackup||storage.legacy:JSON.stringify(storedData||capture(),null,2),`sos-stored-${bank.id}.json`),
+    reset:async()=>{if(!storage.conflict&&confirm('Delete learning progress and dated restore points for this bank in this browser? Save a backup first if you want to keep them.')){state=E.empty(bank.id);session=null;current=null;results=null;recent=[];activeSince=null;storageLocked=false;clearInterval(clock);await storage.clearCheckpoints();await save();await storage.removeLegacy();storedData=null;render();notify('This bank’s progress has been reset.');}}
+
   };
   const $$=s=>[...document.querySelectorAll(s)];
   document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b&&!b.disabled)actions[b.dataset.action]?.(b);});
@@ -235,19 +296,40 @@
     if(e.target.id==='result-view'){resultFilter=e.target.value;$('#result-content').innerHTML=resultRows();}
     if(e.target.id==='overview-category'){overviewCategory=e.target.value;$('#overview-map-content').innerHTML=overviewMap();}
     if(e.target.id==='insight-view'){insightsMode=e.target.value;$('#insight-content').innerHTML=insightContent();}
-    if(e.target.id==='library-view'){libraryMode=e.target.value;$('#library-content').innerHTML=libraryContent();}
+    if(e.target.id==='library-view'){libraryMode=e.target.value;$('#library-content').innerHTML=libraryContent();if(libraryMode==='data'){updateStorageStatus();refreshCheckpoints();}}
     if(e.target.id==='scenario-filter'){scenarioFilter=e.target.value;const [,kind,id]=location.hash.slice(1).split('/');const qs=kind==='skill'?bySkill.get(decodeSegment(id)):byTopic.get(decodeSegment(id));$('#scenario-content').innerHTML=scenarioRows(qs||[]);}
-if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&current&&!current.answered){current.selected=Number(e.target.value);$('#check-answer').disabled=false;}if(e.target.name==='confidence'&&current)current.confidence=e.target.value;
-    if(e.target.id==='import-file'){const file=e.target.files[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('Choose a backup smaller than 5 MB.');const imported=E.validateState(JSON.parse(await file.text()),bank);if(!confirm('Replace progress for this bank with the imported backup?'))return;state=imported;session=null;current=null;results=null;clearInterval(clock);save();render();notify('Progress imported successfully.');}catch(error){$('#data-status').textContent=`Import failed: ${error.message}`;}finally{if($('#import-file'))$('#import-file').value='';}}
+if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&current&&!current.answered&&canEdit()){flushTime();const selected=Number(e.target.value);if(current.firstChoiceMs===null)current.firstChoiceMs=current.elapsedMs;else if(current.selected!==selected)current.changes++;current.selected=selected;$('#check-answer').disabled=submitting;syncTime();save();}
+    if(e.target.id==='import-file'){
+      const file=e.target.files[0];if(!file)return;
+      try {
+        if(file.size>10*1024*1024)throw Error('Choose a backup smaller than 10 MB.');
+        const imported=S.validate(JSON.parse(await file.text()),bank);
+        if(storage.conflict)throw Error('Reload this tab before importing.');
+        if(!confirm('Replace this bank’s progress and unfinished session with the selected backup?'))return;
+        clearInterval(clock);applyWorkspace(imported);storageLocked=false;
+        if(await save()){await storage.removeLegacy();storedData=null;resumeClock();render();notify('Backup loaded.');}
+      }catch(error){if($('#data-status'))$('#data-status').textContent=`Import failed: ${error.message}`;}finally{if($('#import-file'))$('#import-file').value='';}
+    }
+
   });
   document.addEventListener('input',e=>{if(e.target.id==='glossary-search')$('#glossary-list').innerHTML=glossaryRows(e.target.value);if(e.target.id==='question-count')updatePlan();});
   document.addEventListener('keydown',e=>{if(document.querySelector('.help-dialog[open]')||location.hash!=='#practice'||!session||session.ended||!current||e.ctrlKey||e.altKey||e.metaKey||e.repeat)return;const target=e.target;if(target.matches('input,select,textarea,button,a,summary')||target.isContentEditable)return;if(/^[1-4]$/.test(e.key)&&!current.answered){e.preventDefault();const input=$(`#answer-form [name=answer][value="${Number(e.key)-1}"]`);input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}else if(e.key==='Enter'){e.preventDefault();if(current.answered){session.position++;nextQuestion();}else if(current.selected!==null)submitAnswer();}});
   $('#theme-button').addEventListener('click',()=>{document.body.classList.toggle('dark');const dark=document.body.classList.contains('dark');try{localStorage.setItem('study-scaffold:theme',dark?'dark':'light');}catch(_){}$('#theme-button [data-label]').textContent=`Switch to ${dark?'light':'dark'} theme`;});
   $('#theme-button [data-label]').textContent=`Switch to ${document.body.classList.contains('dark')?'light':'dark'} theme`;
   $('#focus-button').addEventListener('click',()=>{document.body.classList.toggle('focus');const focus=document.body.classList.contains('focus');$('#focus-button [data-label]').textContent=focus?'Exit focus mode':'Focus mode';$('#focus-button').setAttribute('aria-pressed',String(focus));});
-  window.addEventListener('hashchange',()=>{render();main.focus();window.scrollTo({top:0});});
+  function resumeClock(){clearInterval(clock);if(session&&!session.ended&&session.deadline){tick();if(!session.ended)clock=setInterval(tick,1000);}}
+  window.addEventListener('hashchange',()=>{syncTime();render();main.focus();window.scrollTo({top:0});syncTime();if(session&&!session.ended)save();});
   $('.skip-link').addEventListener('click',e=>{e.preventDefault();main.focus();});
-  window.addEventListener('beforeunload',e=>{if(session&&!session.ended){e.preventDefault();e.returnValue='';}});
-  window.addEventListener('storage',e=>{if(e.key===key)notify('Progress changed in another tab. Export this tab’s data or reload before continuing.');});
-  render();
+  window.addEventListener('pagehide',()=>{flushTime();save();});
+  for(const name of ['blur','focus'])window.addEventListener(name,()=>{syncTime();if(session&&!session.ended)save();});
+  document.addEventListener('visibilitychange',()=>{syncTime();if(session&&!session.ended)save();resumeClock();});
+  document.addEventListener('click',()=>setTimeout(syncTime,0));
+  document.addEventListener('close',syncTime,true);
+  window.addEventListener('storage',e=>{if(e.key===`study-scaffold:${bank.id}:v2`) {storageWarning='Progress changed in another tab. Reload before continuing.';storageLocked=true;notify(storageWarning);}});
+  setInterval(()=>{if(activeSince!==null)save();},10000);
+  if(storage.mode==='Memory only')storageWarning='Storage is unavailable. Progress is in memory only; save a backup before closing.';
+  if(!storage.initial&&storedData&&!storageLocked){if(await save())await storage.removeLegacy();}
+  resumeClock();render();syncTime();
+  if(session&&!session.ended)notify('Your unfinished session is saved. Open Practice to resume.');
+
 })();

@@ -15,6 +15,8 @@ The visual direction is a calm reading workspace: warm off-white canvas, white c
 - Questions and answers use a line height of 2, preserved paragraph breaks, and comfortable reading widths. Dense data labels are separated from reading text.
 - Responsive reflow: desktop sidebar, compact horizontal navigation on smaller screens, and a single-column reading experience on phones.
 - Focus mode hides navigation without changing the active question. Theme preference persists locally.
+- No confidence-rating step. Selecting and submitting remain separate to allow correction; active time is captured in the background and explored only in the optional Response time view.
+- One Data & backups view for saved status, a location-aware backup action, file import, and dated restoration. An unfinished session becomes the primary Overview action, making resumption visible without another setup flow.
 - Real form controls, visible focus rings, labels, a skip link, text alternatives for chart bars, and reduced-motion support.
 - No decorative imagery, autoplay, gamification badges, external font requests, or charting libraries. All charts use native HTML/CSS.
 

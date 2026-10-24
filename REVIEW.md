@@ -21,10 +21,10 @@ The original HTML is preserved in `midterm_trainer.html`. The new app is a separ
 
 ## Efficiency choices
 
-No framework runtime, build pipeline, npm dependencies, charting library, external fonts, or network-based adaptive service. Topic and skill pools are indexed once. The question bank is loaded once; only the selected scenario is materialized. Detailed answer history is bounded to 5,000 events and recent session history to 100. Small views re-render using a single delegated set of event handlers. The timer updates its own text rather than re-rendering the question.
+No framework runtime, build pipeline, npm dependencies, charting library, external fonts, or network-based adaptive service. Topic and skill pools are indexed once. The question bank is loaded once; only the selected scenario is materialized. Detailed answer history is bounded to 5,000 events and recent session history to 100. Small views re-render using a single delegated set of event handlers. The timer updates its own text rather than re-rendering the question. Queued IndexedDB writes save the workspace at meaningful transitions and ten-second active checkpoints; daily restore history is bounded to seven dates. See [STORAGE.md](STORAGE.md).
 
 The current full-view rendering is appropriate for a small curriculum. If thousands of scenarios are introduced, paginate scenario and answer histories and move large-bank loading behind a subject picker.
 
 ## Content and measurement limits
 
-The review covers app behavior and generator structure. It does not certify tax conclusions, distractor math in every possible variation, legal currency, or course alignment. The supplied content remains clearly labeled as an unverified example. Estimated mastery is a heuristic for choosing practice, not a psychometrically calibrated score. Self-reported confidence affects review intervals; response time is recorded but not used to penalize the learner.
+The review covers app behavior and generator structure. It does not certify tax conclusions, distractor math in every possible variation, legal currency, or course alignment. The supplied content remains clearly labeled as an unverified example. Estimated mastery is a heuristic for choosing practice, not a psychometrically calibrated score. The confidence control has been removed. Active response time and answer revisions are recorded descriptively and do not penalize mastery or alter scheduling. Earlier confidence ratings remain compatible with imported histories.

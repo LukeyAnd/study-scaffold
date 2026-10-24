@@ -1,6 +1,6 @@
 # Research and methodology for exam review
 
-Evidence checked: **October 23, 2026**. This is a focused research synthesis and an implementation guide, not a systematic review of every study or a validation study of this app. The cited sources include original experiments, original research syntheses, author manuscripts, and publisher abstracts. Full text was not available for every source; access levels are recorded below. No copyrighted paper PDFs are redistributed.
+Evidence checked: **October 23, 2026**, with the response-timing policy revisited **October 24, 2026**. This is a focused research synthesis and an implementation guide, not a systematic review of every study or a validation study of this app. The cited sources include original experiments, original research syntheses, author manuscripts, and publisher abstracts. Full text was not available for every source; access levels are recorded below. No copyrighted paper PDFs are redistributed.
 
 The methodology has two parts: evidence-informed learning decisions, and practical design choices for gathering context and creating a usable review. Exact session lengths, question counts, selection weights, and readiness thresholds below are **product defaults, not findings established by the cited research**.
 
@@ -58,7 +58,7 @@ For an unfamiliar concept, a worked explanation and a closely related attempt ca
 
 ## 4. Run the review loop
 
-1. **Attempt:** answer from memory or with the resources permitted by the exam. An optional confidence rating is collected before correctness is revealed.
+1. **Attempt:** answer from memory or with the resources permitted by the exam. The app requires no confidence rating; active response time is recorded automatically as descriptive context.
 2. **Compare:** explain the applicable rule, reasoning or steps, and the specific misconception. For uncertain but correct answers, reinforce the reasoning rather than dismissing the uncertainty.
 3. **Repair:** classify the gap as a knowledge/prerequisite, method-selection, execution, interpretation, or pacing issue. Show a concise source-linked explanation and, when useful, a supported example.
 4. **Return:** revisit the objective after intervening work and on another day when feasible. Use a different question or reasoning context. Early correction and delayed recall serve different purposes.
@@ -79,13 +79,21 @@ Do not report a probability of passing, an intelligence score, or psychometric a
 | Already in the browser scaffold | Still a limitation or future improvement |
 | --- | --- |
 | Submitted-answer retrieval, explanatory feedback, randomized choice order, repeated scenario practice | Recognition-based MCQs only; no automatic grading of constructed responses |
-| Per-scenario history, mistake weighting, due reviews, confidence-sensitive intervals | Current review intervals and selection weights are hand-tuned, not a replication of ARTS, FSRS, or the cited experiments |
+| Per-scenario history, mistake weighting, due reviews, and automatic active timing | Current review intervals and selection weights are hand-tuned, not a replication of ARTS, FSRS, or the cited experiments; timing does not change the schedule |
 | Category and thinking-skill drill-downs, coverage counts, session summaries | Categories and heuristic skill labels do not replace a course-specific objective blueprint |
 | “Secure” requires repeated evidence and can fall after mistakes | Three attempts may occur in one sitting; secure status is not evidence of multi-day retention or an 80% chance of passing |
 | Fixed, unique-scenario quiz plans and feedback deferred in exam mode | A mock exam built from previously practiced items is not held out unless the author deliberately reserves items |
 | Bank replacement and source-linked explanations from the packaged authoring script | The agent or instructor must verify course correctness, source currency, scoring, and assessment alignment |
 
 The skill uses this research to guide intake, bank authoring, and a companion review plan. Adding this document does **not** silently change the existing engine or claim its current scores have been experimentally validated.
+
+### Response timing without extra confidence clicks
+
+ARTS used response time together with accuracy to adapt practice and outperformed fixed comparison schedules in the studied tasks [R9]. This supports considering latency in an appropriately designed system; it does not establish a universal seconds-to-confidence conversion for this app's variable-length questions. Removing the rating is a usability decision, not a claim that confidence has been measured automatically.
+
+The current policy records active time to first choice and submission, revisions, and view interruptions. Timing pauses when the question leaves the active view. Correct, uninterrupted answers contribute to descriptive median-time charts. The learning policy continues to use observed correctness, recent errors, spacing, and coverage. It does not label a rapid error as a confident misconception or a slow correct answer as weak recall. Legacy self-reported ratings are retained when importing older history, but new answers use an explicit `auto` value meaning no rating was collected.
+
+This conservative policy remains an implementation choice: task complexity, reading, input method, accessibility needs, and unobserved interruptions confound timing. Before using timing to modify scheduling, evaluate a within-learner, comparable-task baseline and delayed retention, inspect effects on learners with different access needs, and compare against the existing accuracy-based policy. A small response-time sample is not a confidence instrument or pass prediction.
 
 ## Evaluation and maintenance
 
