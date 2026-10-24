@@ -20,9 +20,12 @@ One repository ZIP includes the app, self-contained skill, research, and setup i
 
 The resulting file should be `~/.agents/skills/exam-review-designer/SKILL.md`, with `references`, `scripts`, and `assets` beside it. Avoid an extra nesting level such as `exam-review-designer/exam-review-designer/SKILL.md`. These are the user-level locations documented by [official OpenAI skill guidance](https://learn.chatgpt.com/docs/build-skills). A repository-scoped install can instead use `.agents/skills/exam-review-designer` in the target repository.
 
-An agent with the built-in skill installer can also be asked:
+An agent with the built-in skill installer can also be asked (copy into AI chat):
 
-> Use `$skill-installer` to install `https://github.com/LukeyAnd/study-scaffold/tree/main/skills/exam-review-designer`.
+```text
+Use $skill-installer to install
+https://github.com/LukeyAnd/study-scaffold/tree/main/skills/exam-review-designer.
+```
 
 ## Use another agent
 
@@ -32,7 +35,14 @@ The skill's intake works with a real ask widget when available and ordinary chat
 
 ## Start a review
 
-> Use `$exam-review-designer` to create a review for my upcoming exam. Inspect the material I attach first. Ask only for missing information about scope, exam format, timing, and my needs. Then build a source-linked review plan and an offline browser review where appropriate. Tell me what is provisional.
+Copy this prompt into your AI chat. GitHub adds a copy icon in the upper-right corner of the block.
+
+```text
+Use $exam-review-designer to create a review for my upcoming exam. Inspect the
+material I attach first. Ask only for missing information about scope, exam format,
+timing, and my needs. Then build a source-linked review plan and an offline browser
+review where appropriate. Tell me what is provisional.
+```
 
 Attach your syllabus, objectives, exam guide, representative tasks, or relevant notes in normal chat. The agent will ask follow-ups only where needed; it should not require you to complete a long form when those facts are already supplied.
 
@@ -42,7 +52,12 @@ The skill creates local outputs. It does not automatically publish private notes
 
 For the full project, give the agent this starting instruction:
 
-> Read AGENTS.md first, then choose the relevant route in AGENT_GUIDE.md. Complete my requested change using the existing contracts and targeted checks. Keep affected instructions and portable snapshots current, and report actual verification and remaining limits.
+```text
+Read AGENTS.md first, then choose the relevant route in AGENT_GUIDE.md. Complete my
+requested change using the existing contracts and targeted checks. Keep affected
+instructions and portable snapshots current, and report actual verification and
+remaining limits.
+```
 
 The installed skill's `SKILL.md` gives its own six-step reading and execution order. Generated reviews include a local `AGENTS.md` pointing to course context, sources, bank data, and runtime files; the framework's test/packaging tools are not claimed to exist in those smaller folders. Some hosts discover these files automatically; otherwise explicitly ask the agent to read them.
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — documentation
+
+- Converted copyable AI prompts to fenced text blocks so GitHub provides its native copy icon; terminal commands remain separate from AI prompts.
+- Added an accessible Mermaid workflow showing selected local sources, agent authoring and review, browser study, and local progress/backup storage.
+
 ## 1.0.1 — October 24, 2026
 
 - Added clearly separated human terminal instructions and AI-agent routes in the repository README.

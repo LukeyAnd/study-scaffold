@@ -10,9 +10,15 @@
 
 ## Have an agent build a standalone review
 
-The same GitHub ZIP includes `skills/exam-review-designer/`. Give the agent that folder, or install it following [INSTALL.md](INSTALL.md). Ask your agent:
+The same GitHub ZIP includes `skills/exam-review-designer/`. Give the agent that folder, or install it following [INSTALL.md](INSTALL.md). Copy this block into your AI chat using GitHub's upper-right copy icon:
 
-> Use the Exam Review Designer skill to build a review from my sources. Read its setup instructions first. Reuse tools you already have, install only a missing tool needed for this task, and verify it before continuing. Ask only for consequential missing course information. Build a source-linked review, check the questions and audit, open the result in my browser, and report what you actually verified.
+```text
+Use the Exam Review Designer skill to build a review from my sources. Read its setup
+instructions first. Reuse tools you already have, install only a missing tool needed
+for this task, and verify it before continuing. Ask only for consequential missing
+course information. Build a source-linked review, check the questions and audit, open
+the result in my browser, and report what you actually verified.
+```
 
 The builder needs **Python 3.10+ with its standard library**. The generated review needs only a browser. The skill can also return an importable course JSON without using the builder. Skill installation instructions are in [INSTALL.md](INSTALL.md).
 

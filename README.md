@@ -2,7 +2,7 @@
 
 A minimal study framework built around **your own course sources**. Create a review with your preferred AI, check its questions, and practice adaptively in a browser.
 
-**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.0.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)**
+**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.0.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
 
 ## For humans — download and start
 
@@ -15,9 +15,40 @@ A minimal study framework built around **your own course sources**. Create a rev
 
 Start with an exam guide/objectives, relevant assigned notes or textbook excerpts, and the exam format. Worked solutions and rubrics improve the fit. The browser does not read PDFs or call an AI itself. See [what to upload and verify](SOURCE_GUIDE.md).
 
+## How it works
+
+```mermaid
+flowchart TD
+    accTitle: From your source files to a saved study session
+    accDescr: You choose which local files to share with an AI agent. The agent prepares a review, you check it, and you study in the browser. Progress stays in the browser, with optional JSON backup and restore.
+    Files["Course files on your computer"]
+    Share["You share selected files + a prompt"]
+    Agent["AI agent reads the shared files<br/>and follows the review workflow"]
+    Check["Agent + you review sources and questions"]
+    Output["Reviewed course JSON or review folder<br/>saved on your computer"]
+    Study["Import JSON or open the review<br/>and study in your browser"]
+    Progress[("Progress saved in this browser profile")]
+    Backup[/"Backup JSON saved on your computer"/]
+    Files --> Share --> Agent --> Check --> Output --> Study --> Progress
+    Check -->|Revise or resolve gaps| Agent
+    Progress -->|Export| Backup
+    Backup -.->|Restore later| Study
+    classDef local fill:#f6f7f4,stroke:#647068,color:#202923
+    classDef work fill:#ffffff,stroke:#285b48,color:#202923
+    classDef study fill:#e9f0e6,stroke:#285b48,color:#202923
+    class Files,Output,Backup local
+    class Share,Agent,Check work
+    class Study,Progress study
+```
+
+- **You choose what the agent can access:** attach selected files or grant access in your chosen AI environment. The study app does not automatically upload them.
+- **The agent prepares; the browser runs the study session.** Your progress stays in that browser profile unless you export it. The local preview server only serves files.
+
 ## For humans — start or restart local study
 
 These are commands **you run in a terminal after the review is built**, rather than instructions to paste into an AI chat. Opening `index.html` directly is still an option; a local server gives the browser a consistent address for your study workspace.
+
+On GitHub, hover over a command or prompt block and use its **copy icon in the upper-right corner**. Copy terminal commands into your terminal; copy the AI prompt below into your AI chat. Heading links have GitHub's link icon for sharing a section.
 
 ### Start
 
@@ -68,7 +99,12 @@ node tools/serve.cjs --port 4173
 
 The same ZIP contains `skills/exam-review-designer/`. Paste the following into **your AI chat, not your terminal**:
 
-> Read skills/exam-review-designer/SKILL.md and follow its workflow. Build a review from my sources, ask only for consequential missing context, verify the questions and sources, and report what you actually checked. Reuse existing tools and install only a missing requirement needed for this task.
+```text
+Read skills/exam-review-designer/SKILL.md and follow its workflow. Build a review from
+my sources, ask only for consequential missing context, verify the questions and
+sources, and report what you actually checked. Reuse existing tools and install only a
+missing requirement needed for this task.
+```
 
 For repeated use, copy that folder into your agent's supported skills directory; see [INSTALL.md](INSTALL.md). A standalone review build uses Python 3.10+ standard library; the resulting review needs only a browser. Importable course JSON can be authored without running the builder.
 
@@ -107,15 +143,7 @@ For repository work, read [AGENTS.md](AGENTS.md), then the matching route in [AG
 
 ## For developers — verify changes
 
-The app uses plain HTML, CSS, and JavaScript with no third-party runtime dependencies. Optional preview needs either Node.js 20+ or Python 3.10+:
-
-```sh
-node tools/serve.cjs
-# or
-python tools/serve.py
-```
-
-Open the printed localhost address and keep its port stable for saved progress. No `npm install` or `pip install` is needed.
+The app uses plain HTML, CSS, and JavaScript with no third-party runtime dependencies. Use the [human local-preview commands](#for-humans--start-or-restart-local-study) above; keep the address/port stable for saved progress. No `npm install` or `pip install` is needed.
 
 For maintainers with both runtimes:
 
