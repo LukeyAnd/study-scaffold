@@ -14,8 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
 TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
-TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "START_HERE.md", "SETUP.md", "FIRST_RUN_TEST.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
-SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills", "downloads")
+TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "START_HERE.md", "SETUP.md", "FIRST_RUN_TEST.md", "CHANGELOG.md", "RELEASE_REVIEW.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
+SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".ps1", ".cmd", ".yaml", ".yml"}
 
 
@@ -39,7 +39,7 @@ def sync_skill():
 
 
 def eligible(path):
-    return path.is_file() and path.suffix in EXTENSIONS and not any(p in {"__pycache__", "node_modules", ".git"} for p in path.parts)
+    return path.is_file() and (path.suffix in EXTENSIONS or path.name == "LICENSE") and not any(p in {"__pycache__", "node_modules", ".git"} for p in path.parts)
 
 
 def archive(path, files, prefix, base):
@@ -67,11 +67,14 @@ def build(output):
         hashes.append(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {name}")
         print(f"{name}: {path.stat().st_size:,} bytes")
     (output / "SHA256SUMS.txt").write_text("\n".join(hashes) + "\n", encoding="utf-8")
-    if output == ROOT / "downloads":
-        shutil.copyfile(output / "study-scaffold.zip", ROOT / "study-scaffold.zip")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "downloads")
-    build(parser.parse_args().output_dir.resolve())
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "dist", help="Local, ignored QA artifacts; never publish under the website")
+    parser.add_argument("--sync-only", action="store_true", help="Refresh portable skill snapshots without creating archives")
+    args = parser.parse_args()
+    if args.sync_only:
+        sync_skill()
+    else:
+        build(args.output_dir.resolve())

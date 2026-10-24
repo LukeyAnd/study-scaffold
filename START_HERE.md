@@ -2,7 +2,7 @@
 
 ## Study or create an AI prompt
 
-1. Extract the **app ZIP** completely. Open the extracted `study-scaffold` folder.
+1. Download the ZIP from the GitHub repository (**Code → Download ZIP**, or the versioned ZIP linked in the README). Extract it completely and open the extracted `study-scaffold-...` folder.
 2. Open `index.html` in your browser. On Windows, `Start SoS.cmd` opens the same page and installs nothing. The hosted app also works without a download.
 3. Choose **Create my review**. Follow **What to upload**, copy the prompt to your preferred AI, and attach your course sources there. Import its reviewed course JSON through **Add a class**.
 
@@ -10,7 +10,7 @@
 
 ## Have an agent build a standalone review
 
-Use the **skill ZIP** instead. Ask your agent:
+The same GitHub ZIP includes `skills/exam-review-designer/`. Give the agent that folder, or install it following [INSTALL.md](INSTALL.md). Ask your agent:
 
 > Use the Exam Review Designer skill to build a review from my sources. Read its setup instructions first. Reuse tools you already have, install only a missing tool needed for this task, and verify it before continuing. Ask only for consequential missing course information. Build a source-linked review, check the questions and audit, open the result in my browser, and report what you actually verified.
 

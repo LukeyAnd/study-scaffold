@@ -26,6 +26,6 @@ SoS! is a dependency-free browser study app and a portable review-authoring skil
 
 For runtime/engine changes run `node --test tests/*.test.cjs` (`npm test` is an equivalent shortcut). For skill, builder, packaging, or documentation-reference changes run `python -m unittest discover -s tests -p "*test.py"`. Node 20+ and Python 3.10+ are sufficient; no dependency installation is needed. See [AGENT_GUIDE.md](AGENT_GUIDE.md) for targeted browser checks and the packaging order.
 
-If delivery includes the app or skill ZIP, run `python tools/package_release.py` after source changes and rerun package tests. This synchronizes runtime/research snapshots and both ZIPs. Do not hand-edit generated copies or ZIP contents.
+After changes to runtime, research, setup or distribution, run `python tools/package_release.py` and rerun package tests. It synchronizes portable snapshots and creates ignored QA archives in `dist/`; GitHub generates the user-facing repository ZIP. Never commit archives or reintroduce website downloads. Do not hand-edit generated copies or ZIP contents.
 
 Update the affected documentation and agent routes in the same change when files, commands, schemas, capabilities, or delivery steps change. Report what changed, verification actually performed, and material limits. Do not claim deployment, source correctness, or browser verification without evidence.

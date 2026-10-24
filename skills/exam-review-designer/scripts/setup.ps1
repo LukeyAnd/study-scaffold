@@ -131,7 +131,7 @@ if ($Install -and $missing.Count -gt 0 -and -not $WhatIfPreference) {
     }
 }
 $next = switch ($Task) {
-    'Study' { 'Extract the app ZIP and open index.html (or Start SoS.cmd on Windows). No runtimes or packages are required.' }
+    'Study' { 'Extract the GitHub source ZIP and open index.html (or Start SoS.cmd on Windows). No runtimes or packages are required.' }
     'Build' { 'Use the verified Python executable with scripts/create_review.py in the skill. No pip or npm packages are required.' }
     'Preview' { 'Use verified Node with tools/serve.cjs or verified Python with tools/serve.py in the app project. Keep the printed localhost address stable.' }
     'Develop' { 'Run Node tests and Python package tests from the repository. No npm install or pip install is required.' }

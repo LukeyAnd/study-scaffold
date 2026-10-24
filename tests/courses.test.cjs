@@ -10,6 +10,13 @@ test('JSON courses compile with preserved IDs, source feedback and independent w
  const raw=sample(),bank=C.compile(raw);E.validateBank(bank);const question=E.materialize(bank.questions[0]);assert.match(question.concept,/Sources:/);
  const a=E.empty(bank.id),other=E.empty('another-class');E.record(a,bank.questions[0],true,'auto',1200,'quiz');assert.equal(other.events.length,0);assert.equal(bank.questions[0].id,raw.questions[0].id);
 });
+test('question IDs matching inherited object names remain usable before and after JSON recovery',()=>{
+ const raw=sample();raw.questions[0].id='toString';const bank=C.compile(raw),q=bank.questions[0],state=E.empty(bank.id);
+ assert.equal(E.recordFor(state,q.id),null);assert.equal(E.summary(bank.questions,state).seen,0);assert.equal(E.choose(bank.questions,state).id,q.id);
+ E.record(state,q,true,'auto',1200,'quiz');const restored=JSON.parse(JSON.stringify(state));E.validateState(restored,bank);
+ assert.equal(E.summary(bank.questions,restored).accuracy,100);E.record(restored,q,false,'auto',900,'quiz');
+ assert.equal(E.recordFor(restored,q.id).attempts,2);assert.equal(E.summary(bank.questions,restored).accuracy,50);assert.equal(typeof({}).toString,'function');
+});
 test('import rejects unsafe IDs, unresolved source references and ambiguous choices',()=>{
  for(const change of [b=>b.id='__proto__',b=>b.questions[0].sourceRefs[0].sourceId='missing',b=>b.questions[0].variants[0].distractors[0]=b.questions[0].variants[0].correct,b=>b.questions[0].topic='missing']){const raw=sample();change(raw);assert.throws(()=>C.compile(raw));}
 });

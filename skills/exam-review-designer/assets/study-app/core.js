@@ -14,6 +14,7 @@
   }
   const empty = bankId => ({ version: 1, bankId, records: {}, events: [], sessions: [] });
   const freshRecord = () => ({ attempts: 0, correct: 0, recent: [], streak: 0, lastAt: 0, due: 0, interval: 0, ease: 2, totalMs: 0 });
+  const recordFor = (state, id) => Object.hasOwn(state.records, id) ? state.records[id] : null;
   function mastery(r, now = Date.now()) {
     if (!r || !r.attempts) return 0;
     const total = r.recent.reduce((n, x, i) => n + (i + 1) * Number(x), 0);
@@ -23,7 +24,7 @@
     return Math.round(100 * total / (weight || 1) * evidence * retention);
   }
   function summary(questions, state, now = Date.now()) {
-    const rs = questions.map(q => state.records[q.id] || freshRecord());
+    const rs = questions.map(q => recordFor(state, q.id) || freshRecord());
     const attempts = rs.reduce((n, r) => n + r.attempts, 0);
     const correct = rs.reduce((n, r) => n + r.correct, 0);
     return { attempts, correct, accuracy: attempts ? Math.round(correct / attempts * 100) : null,
@@ -32,14 +33,14 @@
       secure: rs.filter(r => r.attempts >= 3 && mastery(r, now) >= 80).length, total: questions.length };
   }
   function priority(q, state, now = Date.now()) {
-    const r = state.records[q.id];
+    const r = recordFor(state, q.id);
     if (!r || !r.attempts) return 3.5;
     const due = r.due <= now;
     const wrong = r.recent.at(-1) === false;
     return 0.25 + (100 - mastery(r, now)) / 35 + (wrong ? 5 : 0) + (due ? 3 : 0);
   }
   function reason(q, state, now = Date.now()) {
-    const r = state.records[q.id];
+    const r = recordFor(state, q.id);
     if (!r?.attempts) return 'New scenario · establish a baseline';
     if (r.recent.at(-1) === false) return 'Recent mistake · try a fresh variation';
     if (r.due <= now) return 'Review due · strengthen recall';
@@ -59,8 +60,8 @@
   }
   function plan(pool, state, count, target = 'recommended', rng = Math.random, now = Date.now()) {
     let candidates = [...pool];
-    if (target === 'missed') candidates = candidates.filter(q => state.records[q.id]?.recent.at(-1) === false);
-    if (target === 'due') candidates = candidates.filter(q => state.records[q.id]?.attempts && state.records[q.id].due <= now);
+    if (target === 'missed') candidates = candidates.filter(q => recordFor(state, q.id)?.recent.at(-1) === false);
+    if (target === 'due') candidates = candidates.filter(q => recordFor(state, q.id)?.attempts && recordFor(state, q.id).due <= now);
     const chosen = [];
     while (candidates.length && chosen.length < count) {
       const q = target === 'balanced' ? candidates[Math.floor(rng() * candidates.length)] : choose(candidates, state, [], rng, now);
@@ -69,7 +70,7 @@
     return chosen;
   }
   function record(state, q, correct, confidence, ms, mode, now = Date.now(), timing = null) {
-    const r = state.records[q.id] || freshRecord();
+    const r = recordFor(state, q.id) || freshRecord();
     r.attempts++; r.correct += Number(correct); r.recent = [...r.recent, !!correct].slice(-8);
     r.streak = correct ? r.streak + 1 : 0;
     if (correct) {
@@ -78,7 +79,7 @@
       r.ease = Math.min(2.8, r.ease + (confidence === 'sure' ? 0.1 : 0));
     } else { r.interval = 10 / 1440; r.ease = Math.max(1.3, r.ease - 0.2); }
     r.lastAt = now; r.due = now + r.interval * DAY; r.totalMs += Math.max(0, ms);
-    state.records[q.id] = r;
+    Object.defineProperty(state.records, q.id, {value:r, writable:true, enumerable:true, configurable:true});
     state.events.push({ id: q.id, topic: q.topic, skill: skill(q), correct: !!correct, confidence, ms: Math.max(0, ms), at: now, mode,
       ...(timing ? {timingVersion:1, selectionMs:timing.selectionMs, changes:timing.changes, interrupted:timing.interrupted} : {}) });
     state.events = state.events.slice(-5000);
@@ -113,7 +114,7 @@
     if (data.sessions.some(s => !s || !Number.isFinite(s.at) || !Number.isInteger(s.correct) || !Number.isInteger(s.total) || s.correct < 0 || s.total < 1 || s.total < s.correct || typeof s.mode !== 'string')) throw Error('Backup contains invalid sessions.');
     return data;
   }
-  const api = { DAY, SKILLS, skill, empty, mastery, summary, priority, reason, choose, plan, record, validateBank, materialize, validateState };
+  const api = { DAY, SKILLS, skill, empty, recordFor, mastery, summary, priority, reason, choose, plan, record, validateBank, materialize, validateState };
   root.StudyEngine = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

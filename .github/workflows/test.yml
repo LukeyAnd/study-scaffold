@@ -1,14 +1,26 @@
-name: Verify study engine
+name: Verify first release
 on: [push, pull_request]
 permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.10'
+          - os: windows-latest
+            python: '3.14'
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - run: npm test
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python tools/package_release.py
+      - run: node --test tests/*.test.cjs
       - run: python -m unittest discover -s tests -p "*test.py"
+      - run: python tools/verify_first_run.py

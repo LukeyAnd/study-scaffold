@@ -1,6 +1,6 @@
 # Author a source-aligned browser review
 
-The skill ZIP contains an offline app template. The script assembles a new review from a validated bank, resolved intake context, and a plan. It does not generate or verify subject knowledge on its own.
+The skill folder included in the GitHub repository ZIP contains an offline app template. The script assembles a new review from a validated bank, resolved intake context, and a plan. It does not generate or verify subject knowledge on its own.
 
 Use [setup.md](setup.md) if the Python builder is needed or setup fails. It distinguishes browser/JSON use (no runtimes), standalone generation (Python only), and optional preview (Node or Python). The skill includes `scripts/setup.ps1` and a standard-library `scripts/serve.py`; keep tooling out of generated learner folders.
 

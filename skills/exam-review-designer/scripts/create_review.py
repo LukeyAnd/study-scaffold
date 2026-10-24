@@ -113,7 +113,7 @@ def create_review(bank_path, context_path, plan_path, output):
     template = SKILL_ROOT / "assets" / "study-app"
     agent_guide = SKILL_ROOT / "assets" / "review-agent-guide.md"
     audit_template = SKILL_ROOT / "assets" / "question-audit-template.md"
-    require(all((template / f).is_file() for f in TEMPLATE_FILES) and agent_guide.is_file() and audit_template.is_file(), "Bundled app template is incomplete. Download the complete skill ZIP.")
+    require(all((template / f).is_file() for f in TEMPLATE_FILES) and agent_guide.is_file() and audit_template.is_file(), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
     compiled = compile_bank(bank)
     target.mkdir(parents=True)
     for filename in TEMPLATE_FILES:

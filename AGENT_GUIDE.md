@@ -13,7 +13,7 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 | Change saves, resume, timing, or backups | [STORAGE.md](STORAGE.md) | [storage.js](storage.js), [core.js](core.js), affected parts of [app.js](app.js), [storage tests](tests/storage.test.cjs) |
 | Change classes, JSON imports or AI prompts | [COURSES.md](COURSES.md) | [courses.js](courses.js), [prompts.js](prompts.js), [course tests](tests/courses.test.cjs), relevant storage/UI calls |
 | Change bank shape or review generation | [Authoring contract](skills/exam-review-designer/references/authoring.md) | [Builder](skills/exam-review-designer/scripts/create_review.py), [example bank](skills/exam-review-designer/assets/example-bank.json), [package tests](tests/skill_package_test.py) |
-| Change installation or download packaging | [INSTALL.md](INSTALL.md) | [Packager](tools/package_release.py), [package tests](tests/skill_package_test.py), [download page](downloads/index.html) |
+| Change installation or release distribution | [INSTALL.md](INSTALL.md) | [Packager](tools/package_release.py), [package tests](tests/skill_package_test.py), [release review](RELEASE_REVIEW.md); distribute through GitHub's source ZIP |
 | Understand a prior implementation decision | Relevant route above | [REVIEW.md](REVIEW.md) provides background; inspect current code before relying on historical descriptions |
 
 Use targeted symbol/file searches for large sources. `banks/tax.js` and `midterm_trainer.html` are examples/history; read them only when the task involves that content. Generated app copies are output artifacts, not a second source of truth.
@@ -45,10 +45,10 @@ For local browser inspection, run `node tools/serve.cjs` or `python tools/serve.
 ## 5. Package and deliver when included in scope
 
 1. Update affected design, storage, methodology, installation, and agent instructions. Keep concrete facts in their owning document; route to them instead of copying them into every guide.
-2. Run `python tools/package_release.py`. It copies canonical runtime files to the skill template, synchronizes research/license resources, and rebuilds the app ZIP, skill ZIP, and checksums.
+2. Run `python tools/package_release.py`. It copies canonical runtime files to the skill template, synchronizes research/license/setup resources, and creates ignored local QA archives/checksums in `dist/`. The user-facing download is GitHub's repository ZIP, including the skill folder. Keep archives out of the repository and website.
 3. Run the Python package tests **after** packaging. Run `npm test` too when runtime behavior changed. If the host supplies a skill validator, run it when skill instructions change; that optional host tool is not bundled with this project.
 4. Review the diff and archive contents. Private inputs and progress do not belong in the public ZIP. Respect the user's existing publication authorization; preparing a private review does not authorize publishing its materials.
-5. If publishing is authorized and part of the task, push the reviewed source/artifacts, verify the deployed version and downloaded ZIP checksums, and report the result. If the task is local only, hand off local paths instead.
+5. If publishing is authorized and part of the task, push reviewed source, verify the hosted app and a fresh GitHub source ZIP using `python tools/verify_first_run.py --archive PATH`, and report the result. GitHub controls its generated archive bytes; check contents against the intended commit rather than promising a permanent archive checksum. If the task is local only, hand off local paths instead.
 
 ## 6. Keep the handoff current
 

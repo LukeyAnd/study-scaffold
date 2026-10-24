@@ -1,12 +1,12 @@
 # First-run verification
 
-Checked October 24, 2026 on Windows with Chrome, PowerShell 5.1, and existing host-provided Node/Python executables. The candidate app and skill ZIPs were extracted into new folders with spaces in their names. Browser checks used empty, isolated profiles and loopback preview servers. No software was installed and no user browser profile or execution policy was changed.
+Checked October 24, 2026 on Windows with Chrome, PowerShell 5.1, and existing host-provided Node/Python executables. The first-run verifier extracts one source ZIP into a new folder with spaces in its name and uses the skill included at `skills/exam-review-designer`. Browser checks use empty, isolated profiles and loopback preview servers. No software is installed and no user browser profile or execution policy is changed. Current release evidence is in [RELEASE_REVIEW.md](RELEASE_REVIEW.md).
 
 ## Checks performed
 
 | Starting point | Result |
 | --- | --- |
-| App ZIP extracted with no `node_modules` | Contains the app, `Start SoS.cmd`, first-run instructions, and optional setup/preview tools |
+| Source ZIP extracted with no `node_modules` | Contains the app, included skill, `Start SoS.cmd`, first-run instructions, and optional setup/preview tools |
 | Study check with an empty PATH, including `-Install` | Ready; no runtime or installer requested |
 | Build/Preview/Develop checks with missing tools | Reports only the task's missing requirements; Build proposes Python alone, Preview proposes one runtime |
 | Existing Python or Node outside PATH | Explicit executable paths are verified and reused; Python alone satisfies Build and Preview |
@@ -32,7 +32,7 @@ node --test tests/*.test.cjs
 python tools/verify_first_run.py
 ```
 
-The last command extracts both ZIPs, checks the extracted setup helpers on Windows, and builds a review using the extracted skill. It reports exactly which checks ran. It does not perform browser checks by default.
+The last command extracts the ignored local QA archive from `dist/`, checks the extracted setup helpers on Windows, and builds a review using its included skill. To exercise an actual GitHub download instead, use `python tools/verify_first_run.py --archive "/path/to/study-scaffold.zip"`. The extracted folder name is detected automatically, including versioned GitHub names. It reports exactly which checks ran. It does not perform browser checks by default.
 
 For browser QA only, a test host may supply Playwright and Chrome/Chromium, set `STUDY_NODE` to its Node executable, `SOS_PLAYWRIGHT` to the host's Playwright module, and optionally `SOS_BROWSER` to a browser executable; then run `python tools/verify_first_run.py --browser`. Browser automation is a maintainer tool, never a dependency of the app or a generated review. This verification writes only temporary files under `.validation` and removes its extracted folders afterward.
 

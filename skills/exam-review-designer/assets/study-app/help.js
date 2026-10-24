@@ -1,4 +1,4 @@
-/* Shared, keyboard-accessible help for the app and the download page. */
+/* Shared, keyboard-accessible help for the study app. */
 (function () {
   'use strict';
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

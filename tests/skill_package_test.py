@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
+DIST = ROOT / "dist"
 spec = importlib.util.spec_from_file_location("create_review", SKILL / "scripts" / "create_review.py")
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
@@ -111,7 +112,7 @@ assert.equal(seen.size,2);"""
             self.assertEqual((SKILL / "assets" / "study-app" / name).read_bytes(), expected, name)
 
     def test_skill_zip_is_self_contained_with_one_top_level_folder(self):
-        with zipfile.ZipFile(ROOT / "downloads" / "exam-review-designer.zip") as archive:
+        with zipfile.ZipFile(DIST / "exam-review-designer.zip") as archive:
             names = archive.namelist()
             self.assertEqual({Path(n).parts[0] for n in names}, {"exam-review-designer"})
             for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "assets/review-agent-guide.md", "assets/question-audit-template.md", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/source-quality.md", "references/intake.md"):
@@ -132,17 +133,18 @@ assert.equal(seen.size,2);"""
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken reference in {doc.name}: {link}")
 
     def test_repository_agent_routes_resolve(self):
-        for doc in (ROOT / "AGENTS.md", ROOT / "AGENT_GUIDE.md", ROOT / "START_HERE.md", ROOT / "SETUP.md", ROOT / "FIRST_RUN_TEST.md", ROOT / "FEATURES.md"):
+        for doc in ROOT.glob("*.md"):
             for link in re.findall(r"\]\(([^)]+)\)", doc.read_text(encoding="utf-8")):
                 if "://" not in link and not link.startswith("#"):
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken agent route in {doc.name}: {link}")
 
     def test_app_zip_contains_methodology_and_no_learning_data_or_nested_archives(self):
-        with zipfile.ZipFile(ROOT / "downloads" / "study-scaffold.zip") as archive:
+        with zipfile.ZipFile(DIST / "study-scaffold.zip") as archive:
             names = archive.namelist()
-            for name in ("index.html", "FEATURES.md", "AGENTS.md", "AGENT_GUIDE.md", "SOURCE_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
+            for name in ("index.html", "FEATURES.md", "AGENTS.md", "AGENT_GUIDE.md", "SOURCE_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md", "skills/exam-review-designer/LICENSE"):
                 self.assertIn("study-scaffold/" + name, names)
             self.assertFalse(any(n.endswith(".zip") or "/.git/" in n or "/__pycache__/" in n for n in names))
+            self.assertFalse(any("/downloads/" in n or "/dist/" in n for n in names))
             self.assertFalse(any(Path(n).name.startswith(("study-progress-", "study-stored-")) for n in names))
             # The null-valued authoring template is expected, but no learner's context is packaged.
             context_files = [n for n in names if Path(n).name == "review-context.json"]

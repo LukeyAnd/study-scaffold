@@ -40,6 +40,8 @@
   needsCourseSelection=!requested&&!preferred&&!storage.initial&&!storage.legacy&&bank.example===true;
   if(needsCourseSelection)promptMode='new';
   try { document.body.classList.toggle('dark', localStorage.getItem('study-scaffold:theme') === 'dark'); } catch (_) {}
+  function updateThemeButton(){const dark=document.body.classList.contains('dark');$('#theme-button').setAttribute('aria-pressed',String(dark));$('#theme-button [data-label]').textContent=dark?'Light theme':'Dark theme';}
+  updateThemeButton();
   $('#content-status').textContent = bank.reviewStatus || 'Personal study workspace';
   function notify(message) { clearTimeout(noticeTimer); $('#notice').textContent = message; noticeTimer = setTimeout(() => $('#notice').textContent = '', 5000); }
   function applyWorkspace(data) { const d=S.unpack(data,bank);state=d.state;session=d.session;current=d.current;recent=d.recent;results=d.results;activeSince=null;if(current&&!current.answered&&session&&!session.ended)current.pauses++; }
@@ -96,7 +98,7 @@
   function route(path) { if (location.hash === `#${path}`) render(); else location.hash = path; }
   const quantity = (n, word, plural = word + 's') => `${n} ${n === 1 ? word : plural}`;
   function ratio(value) { return value === null ? '—' : `${value}%`; }
-  function status(q) { const r = state.records[q.id]; if (!r?.attempts) return ['New', '']; if (r.recent.at(-1) === false) return ['Needs review', 'red']; if (r.due <= Date.now()) return ['Review due', 'amber']; if (E.mastery(r) >= 80 && r.attempts >= 3) return ['Secure', 'green']; return ['Developing', 'amber']; }
+  function status(q) { const r = E.recordFor(state,q.id); if (!r?.attempts) return ['New', '']; if (r.recent.at(-1) === false) return ['Needs review', 'red']; if (r.due <= Date.now()) return ['Review due', 'amber']; if (E.mastery(r) >= 80 && r.attempts >= 3) return ['Secure', 'green']; return ['Developing', 'amber']; }
   function tag(q) { const [text, color] = status(q); return `<span class="tag ${color}">${text}</span>`; }
   function moduleRows(groups = bank.topics.map(t => ({ ...t, questions: byTopic.get(t.id) })), type = 'topic') {
     return groups.map((t, i) => { const s = E.summary(t.questions, state); return `<button class="module-row" data-action="detail" data-kind="${type}" data-id="${esc(t.id)}" aria-label="${esc(t.name)}: ${s.mastery}% estimated mastery, ${s.seen} of ${s.total} scenarios attempted. View details."><span class="row-icon">${icon(type==='skill'?'sliders':'book')}</span><span><span class="module-name">${esc(t.name)} <span class="module-meta">${s.seen}/${s.total} explored</span></span><span class="track" style="display:block"><span class="fill" style="display:block;width:${s.mastery}%"></span></span></span><span class="module-value">${s.seen ? s.mastery + '%' : 'New'} ${icon('right')}</span></button>`; }).join('');
@@ -155,7 +157,7 @@
     if(insightsMode==='mistakes')return answerRows(e=>!e.correct);
     if(insightsMode==='pace')return pace();
     if(insightsMode==='secure') {
-      const qs=bank.questions.filter(q=>E.mastery(state.records[q.id])>=80&&(state.records[q.id]?.attempts||0)>=3);
+      const qs=bank.questions.filter(q=>E.mastery(E.recordFor(state,q.id))>=80&&(E.recordFor(state,q.id)?.attempts||0)>=3);
       return qs.length?qs.map(q=>`<div class="session-row"><span>${esc(q.angle)}<small>${esc(topicName(q.topic))}</small></span>${btn('Practice','start-one',`data-id="${esc(q.id)}"`)}</div>`).join(''):'<div class="empty">No secure scenarios yet.</div>';
     }
     return moduleRows();
@@ -170,7 +172,7 @@
   function dayDetail(day) { const events = state.events.filter(e => dayKey(e.at)===day); return `<div class="day-summary"><strong>${esc(day)}</strong><p>${events.length} answers · ${events.filter(e=>e.correct).length} correct</p></div>${events.slice(-30).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle || e.id)}<small>${esc(topicName(qMap.get(e.id)?.topic))}</small></span><span>${e.correct?'Correct':'Incorrect'}</span></div>`).join('')}${events.length>30?'<p class="small muted">Showing the latest 30 answers for this day.</p>':''}`; }
   function scenarioRows(questions) {
     const filtered=questions.filter(q=>{const [label]=status(q);return scenarioFilter==='all'||(scenarioFilter==='review'&&(label==='Needs review'||label==='Review due'))||(scenarioFilter==='new'&&label==='New')||(scenarioFilter==='secure'&&label==='Secure');});
-    return filtered.map(q=>{const r=state.records[q.id];return disclosure(esc(q.angle||q.id),`<div class="scenario-facts"><span>${esc(E.skill(q))}</span><span>${quantity(r?.attempts||0,'attempt')} · ${r?.correct||0} correct</span></div><div class="track"><div class="fill" style="width:${E.mastery(r)}%"></div></div><div class="preview-footer"><span>${E.mastery(r)}% mastery</span>${btn('Practice variation','start-one',`data-id="${esc(q.id)}"`)}</div>`,'book',tag(q));}).join('')||'<div class="empty">No scenarios match this view.</div>';
+    return filtered.map(q=>{const r=E.recordFor(state,q.id);return disclosure(esc(q.angle||q.id),`<div class="scenario-facts"><span>${esc(E.skill(q))}</span><span>${quantity(r?.attempts||0,'attempt')} · ${r?.correct||0} correct</span></div><div class="track"><div class="fill" style="width:${E.mastery(r)}%"></div></div><div class="preview-footer"><span>${E.mastery(r)}% mastery</span>${btn('Practice variation','start-one',`data-id="${esc(q.id)}"`)}</div>`,'book',tag(q));}).join('')||'<div class="empty">No scenarios match this view.</div>';
   }
   function detail(kind,id) {
     const qs=kind==='skill'?bySkill.get(id):byTopic.get(id);if(!qs){route('overview');return;}
@@ -229,7 +231,7 @@
   }
   function explanation(c) {
     const correct=c.raw.options[c.selected]?.correct;
-    const timing=[session?.mode==='exam'?'':`Next review: ${new Date(state.records[c.q.id]?.due||Date.now()).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}.`].filter(Boolean);
+    const timing=[session?.mode==='exam'?'':`Next review: ${new Date(E.recordFor(state,c.q.id)?.due||Date.now()).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}.`].filter(Boolean);
     const worked=`${c.raw.math?`<pre class="steps">${esc(c.raw.math)}</pre>`:''}<ul class="choice-analysis">${c.raw.options.map((o,i)=>`<li><strong>${'ABCD'[i]} · ${o.correct?'Correct':i===c.selected?'Your answer':'Other choice'}</strong><br>${esc(o.why)}</li>`).join('')}</ul>`;
     return `<section class="feedback ${correct?'':'incorrect'}" aria-label="Answer explanation"><div class="heading-line"><h2>${correct?'Correct':'Incorrect'}</h2>${timing.length?info('Review timing',timing):''}</div><p class="explanation">${esc(c.raw.concept||'Review the correct answer.')}</p>${disclosure('Worked solution & choices',worked,'book')}</section>`;
   }
@@ -412,8 +414,7 @@ if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&c
   });
   document.addEventListener('input',e=>{if(e.target.id==='glossary-search')$('#glossary-list').innerHTML=glossaryRows(e.target.value);if(e.target.id==='question-count')updatePlan();});
   document.addEventListener('keydown',e=>{if(document.querySelector('.help-dialog[open]')||location.hash!=='#practice'||!session||session.ended||!current||e.ctrlKey||e.altKey||e.metaKey||e.repeat)return;const target=e.target;if(target.matches('input,select,textarea,button,a,summary')||target.isContentEditable)return;if(/^[1-4]$/.test(e.key)&&!current.answered){e.preventDefault();const input=$(`#answer-form [name=answer][value="${Number(e.key)-1}"]`);input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}else if(e.key==='Enter'){e.preventDefault();if(current.answered){session.position++;nextQuestion();}else if(current.selected!==null)submitAnswer();}});
-  $('#theme-button').addEventListener('click',()=>{document.body.classList.toggle('dark');const dark=document.body.classList.contains('dark');try{localStorage.setItem('study-scaffold:theme',dark?'dark':'light');}catch(_){}$('#theme-button [data-label]').textContent=`Switch to ${dark?'light':'dark'} theme`;});
-  $('#theme-button [data-label]').textContent=`Switch to ${document.body.classList.contains('dark')?'light':'dark'} theme`;
+  $('#theme-button').addEventListener('click',()=>{document.body.classList.toggle('dark');const dark=document.body.classList.contains('dark');try{localStorage.setItem('study-scaffold:theme',dark?'dark':'light');}catch(_){}updateThemeButton();});
   $('#focus-button').addEventListener('click',()=>{document.body.classList.toggle('focus');const focus=document.body.classList.contains('focus');$('#focus-button [data-label]').textContent=focus?'Exit focus mode':'Focus mode';$('#focus-button').setAttribute('aria-pressed',String(focus));});
   function resumeClock(){clearInterval(clock);if(session&&!session.ended&&session.deadline){tick();if(!session.ended)clock=setInterval(tick,1000);}}
   window.addEventListener('hashchange',()=>{syncTime();render();main.focus();window.scrollTo({top:0});syncTime();if(session&&!session.ended)save();});

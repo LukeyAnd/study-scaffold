@@ -4,7 +4,7 @@ SoS! helps students turn their own course material into a review, practice it in
 
 ## Start and study
 
-- Use the hosted app or download and extract the app ZIP for offline study.
+- Use the hosted app or download and extract the repository ZIP from GitHub for offline study.
 - Open `index.html`; Windows users also have `Start SoS.cmd`.
 - Studying requires a browser, with no account, API key, Node.js, Python, SQL, or package installation.
 - Start with your own review or expand the optional tax/math examples.
@@ -72,7 +72,7 @@ SoS! helps students turn their own course material into a review, practice it in
 
 ## Setup, sharing, and customization
 
-- Download separate app and agent-skill ZIPs, with published checksums and an MIT source-code license.
+- Download one GitHub repository ZIP containing the app, agent skill, research, and instructions, with an MIT source-code license.
 - Follow the beginner guide and task-specific agent file map. The Windows setup helper checks existing tools and offers explicit installation of missing requirements.
 - Building a standalone review needs Python 3.10+; optional localhost preview can use Node.js 20+ or Python. Neither route requires npm/pip packages.
 - Keep question data separate from the app; replace content or add classes without rebuilding the interface.

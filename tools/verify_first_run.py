@@ -48,6 +48,7 @@ def extract(archive_path, target):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--browser', action='store_true', help='Use the host-provided optional Playwright runtime')
+    parser.add_argument('--archive', type=Path, default=ROOT / 'dist' / 'study-scaffold.zip', help='GitHub source ZIP or local QA archive; the skill is inside it')
     args = parser.parse_args()
     validation = ROOT / '.validation'
     validation.mkdir(exist_ok=True)
@@ -56,10 +57,12 @@ def main():
         stage = Path(folder).resolve()
         if not stage.is_relative_to(validation.resolve()):
             raise ValueError('Temporary target is outside the verification workspace')
-        extract(ROOT / 'downloads' / 'study-scaffold.zip', stage / 'app')
-        extract(ROOT / 'downloads' / 'exam-review-designer.zip', stage / 'skill')
-        app = stage / 'app' / 'study-scaffold'
-        skill = stage / 'skill' / 'exam-review-designer'
+        extract(args.archive.resolve(), stage / 'app')
+        roots = [p for p in (stage / 'app').iterdir() if p.is_dir() and (p / 'index.html').is_file() and (p / 'README.md').is_file()]
+        if len(roots) != 1:
+            raise ValueError('Expected one extracted project folder with index.html and README.md')
+        app = roots[0]
+        skill = app / 'skills' / 'exam-review-designer'
         assert not (app / 'node_modules').exists()
         assert (app / 'START_HERE.md').is_file() and (app / 'Start SoS.cmd').is_file()
         assert (skill / 'scripts' / 'setup.ps1').is_file()
@@ -69,7 +72,9 @@ def main():
         plan = stage / 'plan.md'
         plan.write_text('# Software test only\n\nAttempt, inspect feedback, and return later. This is not a subject-validation claim.\n', encoding='utf-8')
         output = stage / 'generated review with spaces'
-        subprocess.run([sys.executable, str(skill / 'scripts' / 'create_review.py'), '--bank', str(skill / 'assets' / 'example-bank.json'), '--context', str(context), '--plan', str(plan), '--output', str(output)], check=True, capture_output=True, text=True)
+        built = subprocess.run([sys.executable, str(skill / 'scripts' / 'create_review.py'), '--bank', str(skill / 'assets' / 'example-bank.json'), '--context', str(context), '--plan', str(plan), '--output', str(output)], capture_output=True, text=True, timeout=30)
+        if built.returncode:
+            raise RuntimeError('Extracted skill could not build a review:\n' + (built.stdout + built.stderr)[-4000:])
         assert (output / 'Start SoS.cmd').is_file()
         assert (output / 'QUESTION_AUDIT.md').read_text(encoding='utf-8').startswith('# Question audit')
         results['standaloneSkillGeneration'] = True
