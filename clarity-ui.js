@@ -1,0 +1,82 @@
+/* A local note drawer and a deferred-review queue; no AI or upload service. */
+(function(root){
+  'use strict';
+  const N=root.StudyClarity;
+  const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function create({store,bank,icon,help,notify,onSaved=()=>{},onPractice=()=>{},onToggle=()=>{}}){
+    let current=null,dirty=false,busy=false,adding=false,launch=null,filter='open',module='all',urls=[];
+    const dialog=document.createElement('dialog');dialog.className='clarity-drawer';dialog.setAttribute('aria-labelledby','clarity-title');document.body.append(dialog);
+    const $=selector=>dialog.querySelector(selector);
+    const button=(label,action,primary=false,extra='')=>`<button type="button" class="btn${primary?' primary':''}" data-clarity="${action}" ${extra}>${label}</button>`;
+    const count=()=>store.list().filter(n=>!n.resolved).length;
+    const dispose=()=>{urls.forEach(url=>URL.revokeObjectURL(url));urls=[];};
+    const status=(message,error=false)=>{const node=$('#clarity-status');if(node){node.textContent=message;node.setAttribute('role',error?'alert':'status');}};
+    function read(){if(!current)return;current.text=$('#clarity-text').value;current.explanation=$('#clarity-explanation').value;current.resolved=$('#clarity-state').value==='resolved';current.updatedAt=Math.max(Date.now(),current.createdAt);}
+    function close(force=false){if(busy||adding)return;if(!force&&dirty&&!confirm('Discard unsaved changes to this clarity note?'))return;dispose();dialog.close();current=null;dirty=false;onToggle();if(launch?.isConnected)launch.focus();else document.querySelector('#main')?.focus();}
+    function pictures(){
+      dispose();$('#clarity-images').innerHTML=current.images.map(image=>{const url=URL.createObjectURL(image.blob);urls.push(url);return `<figure><a href="${url}" download="${esc(image.name)}" aria-label="Download image ${esc(image.name)}"><img src="${url}" alt="Saved attachment: ${esc(image.name)}"></a><figcaption><span>${esc(image.name)}</span><button type="button" class="text-button" data-clarity="remove-image" data-id="${esc(image.id)}" aria-label="Remove image ${esc(image.name)}">${icon('close')}</button></figcaption></figure>`;}).join('');
+      $('#clarity-image-count').textContent=`${current.images.length}/${N.LIMITS.images}`;
+    }
+    function show(note){
+      launch=document.activeElement;current=structuredClone(note);dirty=false;busy=false;
+      dialog.innerHTML=`<form id="clarity-form"><header class="clarity-heading"><div class="heading-line"><h2 id="clarity-title">Need clarity?</h2>${help('Clarity notes',['Save what is unclear and return to your session.','Type, paste a dictation transcript, or use your device’s text dictation.','Paste or attach up to three PNG/JPEG/WebP images, 4 MB each. Images need the local database.','Notes stay on this device. Export notes separately from progress backups.','The exam deadline still runs while this drawer is open.','Copy an AI help prompt when ready, attach images yourself, then paste useful explanations back here.'])}</div><button type="button" class="help-close" data-clarity="close" aria-label="Close clarity note">${icon('close')}</button></header><div class="clarity-body"><h3>${esc(current.context.concept)}</h3><div class="clarity-context"><span class="tag">${esc(current.context.topicName)}</span><span class="tag">${current.resolved?'Resolved':'To revisit'}</span></div><details class="panel-disclosure"><summary><span class="summary-label">${icon('book')}Question context</span><span class="disclosure-chevron">${icon('down')}</span></summary><div class="disclosure-body"><p class="question-text">${esc(current.context.prompt)}</p><ol>${current.context.options.map(o=>`<li>${esc(o)}</li>`).join('')}</ol></div></details><div class="field clarity-field"><label for="clarity-text">What would you like to understand?</label><textarea id="clarity-text" rows="6" maxlength="12000" placeholder="Write a question, paste a dictation transcript, or paste an image.">${esc(current.text)}</textarea></div><div class="clarity-attachments"><label class="btn file-label ${store.images?'':'unavailable'}">${icon('image')}Add images<input id="clarity-files" class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" multiple ${store.images?'':'disabled'}></label><span id="clarity-image-count" class="tag"></span></div><div class="clarity-images" id="clarity-images"></div><details class="panel-disclosure clarity-explanation"><summary><span class="summary-label">${icon('book')}What helped</span><span class="disclosure-chevron">${icon('down')}</span></summary><div class="disclosure-body"><div class="field"><label for="clarity-explanation">Explanation or research notes</label><textarea id="clarity-explanation" rows="6" maxlength="12000">${esc(current.explanation)}</textarea></div><div class="field clarity-field"><label for="clarity-state">Follow-up status</label><select id="clarity-state"><option value="open">To revisit</option><option value="resolved">Resolved</option></select></div>${help('Saved explanations',['Paste an explanation from your AI, instructor or own notes.','Check important claims and sources before relying on it.','Marking a note resolved does not change mastery or exam scores.'])}</div></details><details class="panel-disclosure" id="clarity-help"><summary><span class="summary-label">${icon('clarity')}Ask your AI</span><span class="disclosure-chevron">${icon('down')}</span></summary><div class="disclosure-body"><div class="actions">${button(`${icon('copy')}Copy AI prompt`,'copy-prompt')}${button(`${icon('download')}Download prompt`,'download-prompt')}</div><label class="field-label" for="clarity-prompt">Prompt to paste into your AI chat</label><textarea id="clarity-prompt" rows="8" readonly></textarea>${help('AI handoff',['No AI is contacted from this drawer.','The text prompt includes this question, your note, objectives and source references.','Copying text does not attach images. Download the images above or export this note and supply them to your agent.'])}</div></details></div><footer class="clarity-footer"><p id="clarity-status" class="status-message" role="status" aria-live="polite">${esc(store.warning||'Save to keep this note.')}</p><div class="actions"><button type="submit" class="btn primary" id="clarity-save">${icon('check')}Save & return</button><details class="utility-menu"><summary aria-label="Note options">${icon('more')}</summary><div class="menu-panel">${button('Download note backup','export-one')}${current.revision?button('Delete note','delete'):''}</div></details></div></footer></form>`;
+      $('#clarity-state').value=current.resolved?'resolved':'open';pictures();updatePrompt();dialog.showModal();$('#clarity-text').focus();onToggle();
+    }
+    function updatePrompt(){read();$('#clarity-prompt').value=N.helpPrompt(current);}
+    async function add(files){
+      if(!files.length||adding||busy)return;adding=true;
+      try{
+        if(!store.images)throw Error('Images need the local database. You can still save a text note.');
+        if(current.images.length+files.length>N.LIMITS.images)throw Error('Keep up to three images per note.');
+        const added=[];for(const file of files)added.push(await N.image(file));current.images.push(...added);dirty=true;pictures();updatePrompt();status('Image added. Save to keep your changes.');
+      }catch(error){status(error.message,true);}finally{adding=false;}
+    }
+    function download(content,name,type='application/json'){const url=URL.createObjectURL(new Blob([content],{type}));const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+    async function save(){
+      if(busy||adding)return;read();busy=true;dialog.querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=true);status('Saving…');
+      try{current=await store.save(current);dirty=false;busy=false;close(true);onSaved();notify('Clarity note saved for later.');}
+      catch(error){status(error.message,true);busy=false;dialog.querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=false);$('#clarity-files').disabled=!store.images;}
+    }
+    function selected(){return store.list().filter(n=>(filter==='all'||(filter==='resolved'?n.resolved:!n.resolved))&&(module==='all'||n.context.topicId===module));}
+    function rowsHTML(){
+      const notes=selected();return notes.length?notes.map(n=>`<article class="clarity-row"><div><h3>${esc(n.context.concept)}</h3><div class="clarity-row-meta"><span>${esc(n.context.topicName)}</span><span>${new Date(n.updatedAt).toLocaleDateString()}</span>${n.images.length?`<span>${icon('image')}${n.images.length}</span>`:''}<span class="tag">${n.resolved?'Resolved':'To revisit'}</span></div></div><div class="actions">${button('Open note','open',false,`data-id="${esc(n.id)}"`)}${button(`${icon('play')}Practice`,'practice-one',false,`data-id="${esc(n.id)}" ${bank.questions.some(q=>q.id===n.context.questionId)?'':'disabled'}`)}</div></article>`).join(''):'<div class="empty">No matching clarity notes. Use “Need clarity?” beside a question to save one.</div>';
+    }
+    function refreshQueue(){document.querySelector('#clarity-list').innerHTML=rowsHTML();document.querySelector('[data-clarity="practice-all"]').disabled=!selected().some(n=>bank.questions.some(q=>q.id===n.context.questionId));}
+    function libraryHTML(){
+      const topics=[...new Map(store.list().map(n=>[n.context.topicId,n.context.topicName]))];if(module!=='all'&&!topics.some(([id])=>id===module))module='all';
+      return `<div class="clarity-library"><div class="heading-line"><h2>Clarity notes</h2>${help('Clarity notes',['Park a question while studying, then revisit it here or after a session.','Images and text are stored locally, separately from progress.','Export notes to transfer notes and images; progress backups do not contain them.','Saved-question practice uses existing scenarios; it does not generate new questions automatically.','To research a concept, open its note and copy the AI prompt.'])}</div>${store.warning?`<p role="alert">${esc(store.warning)}</p>`:''}<div class="clarity-toolbar"><label class="field">Status<select id="clarity-filter"><option value="open" ${filter==='open'?'selected':''}>To revisit</option><option value="resolved" ${filter==='resolved'?'selected':''}>Resolved</option><option value="all" ${filter==='all'?'selected':''}>All notes</option></select></label><label class="field">Module<select id="clarity-module"><option value="all">All modules</option>${topics.map(([id,name])=>`<option value="${esc(id)}" ${module===id?'selected':''}>${esc(name)}</option>`).join('')}</select></label><details class="utility-menu"><summary aria-label="Clarity note options">${icon('more')}Options</summary><div class="menu-panel">${button('Export notes with images','export-all')}<label class="btn file-label">${icon('upload')}Load notes backup<input class="visually-hidden" id="clarity-import" type="file" accept="application/json,.json"></label></div></details></div><div id="clarity-list">${rowsHTML()}</div><div class="setup-footer"><span>${count()} to revisit</span>${button(`${icon('play')}Practice saved questions`,'practice-all',true,selected().some(n=>bank.questions.some(q=>q.id===n.context.questionId))?'':'disabled')}</div><p id="clarity-library-status" class="status-message" role="status"></p></div>`;
+    }
+    const libraryStatus=(message,error=false)=>{const el=document.querySelector('#clarity-library-status');if(el){el.textContent=message;el.setAttribute('role',error?'alert':'status');}else notify(message);};
+    document.addEventListener('click',async event=>{
+      const target=event.target.closest('[data-clarity]');if(!target||target.disabled||busy||adding)return;
+      const action=target.dataset.clarity;event.preventDefault();
+      try{
+        if(action==='open'){const note=store.list().find(n=>n.id===target.dataset.id);if(note)show(note);}
+        else if(action==='close')close();
+        else if(action==='remove-image'){current.images=current.images.filter(i=>i.id!==target.dataset.id);dirty=true;pictures();updatePrompt();status('Image removed. Save to keep your changes.');}
+        else if(action==='copy-prompt'){updatePrompt();try{await navigator.clipboard.writeText($('#clarity-prompt').value);status('AI prompt copied. Attach saved images separately.');}catch(_){$('#clarity-help').open=true;$('#clarity-prompt').focus();$('#clarity-prompt').select();status('Prompt selected. Copy it with your keyboard or browser.');}}
+        else if(action==='download-prompt'){updatePrompt();download($('#clarity-prompt').value,`sos-clarity-prompt-${current.id}.txt`,'text/plain');}
+        else if(action==='export-one'){read();download(JSON.stringify(await N.archive([current],bank.id),null,2),`sos-clarity-${bank.id}-${current.id}.json`);status('Note backup downloaded with its images.');}
+        else if(action==='export-all'){if(!store.readable)throw Error('Saved notes could not be read. Reload before exporting.');download(JSON.stringify(await N.archive(store.list(),bank.id),null,2),`sos-clarity-${bank.id}-${Date.now()}.json`);libraryStatus('Notes backup downloaded with images.');}
+        else if(action==='delete'){if(confirm('Delete this clarity note and its images from this browser?')){await store.remove(current);dirty=false;close(true);onSaved();notify('Clarity note deleted.');}}
+        else if(action==='practice-all'||action==='practice-one'){const notes=action==='practice-one'?store.list().filter(n=>n.id===target.dataset.id):selected();const ids=[...new Set(notes.map(n=>n.context.questionId))].filter(id=>bank.questions.some(q=>q.id===id));if(ids.length)onPractice(ids);}
+      }catch(error){if(dialog.open)status(error.message,true);else libraryStatus(error.message,true);}
+    });
+    document.addEventListener('change',async event=>{
+      if(event.target.id==='clarity-filter'||event.target.id==='clarity-module'){filter=document.querySelector('#clarity-filter').value;module=document.querySelector('#clarity-module').value;refreshQueue();}
+      if(event.target.id==='clarity-files'){await add([...event.target.files]);event.target.value='';}
+      if(event.target.id==='clarity-import'){
+        const file=event.target.files[0];if(!file)return;
+        try{if(file.size>N.LIMITS.importBytes)throw Error('Choose a notes backup smaller than 50 MB.');const notes=await N.readArchive(JSON.parse(await file.text()),bank.id);if(!confirm('Replace this class’s clarity notes and images with the selected backup? Learning progress stays unchanged.'))return;await store.replace(notes);onSaved();libraryStatus('Clarity notes loaded.');}catch(error){libraryStatus(error.message,true);}finally{if(event.target.isConnected)event.target.value='';}
+      }
+    });
+    dialog.addEventListener('submit',event=>{event.preventDefault();save();});
+    dialog.addEventListener('input',event=>{if(event.target.matches('#clarity-text,#clarity-explanation,#clarity-state')){dirty=true;updatePrompt();status('Unsaved changes. Save to keep this note.');}});
+    dialog.addEventListener('change',event=>{if(event.target.id==='clarity-state'){dirty=true;updatePrompt();}});
+    dialog.addEventListener('paste',async event=>{const files=[...(event.clipboardData?.items||[])].filter(item=>item.kind==='file'&&item.type.startsWith('image/')).map(item=>item.getAsFile()).filter(Boolean);if(files.length){event.preventDefault();const transcript=event.clipboardData.getData('text/plain');if(transcript&&event.target.id==='clarity-text'){$('#clarity-text').value+='\n'+transcript;dirty=true;}await add(files);}});
+    window.addEventListener('beforeunload',event=>{if(dialog.open&&dirty){event.preventDefault();event.returnValue='';}});
+    dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+    return {count,libraryHTML,openQuestion(q,raw){const context=N.capture(bank,q,raw),existing=store.list().find(n=>!n.resolved&&n.context.questionId===q.id&&n.context.prompt===raw.prompt);show(existing||N.draft(context));},isOpen:()=>dialog.open};
+  }
+  root.StudyClarityUI={create};
+})(globalThis);

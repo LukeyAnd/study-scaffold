@@ -2,7 +2,7 @@
 
 A minimal study framework built around **your own course sources**. Create a review with your preferred AI, check its questions, and practice adaptively in a browser.
 
-**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.0.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
+**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.0.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
 
 ## For humans — download and start
 
@@ -119,7 +119,11 @@ For repeated use, copy that folder into your agent's supported skills directory;
 
 ## First release and limits
 
-**v1.0.0 was the first public release; v1.0.1 adds human restart instructions and a portable preview for generated reviews.** Earlier package version numbers were development bookkeeping. See [CHANGELOG.md](CHANGELOG.md), [first-release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
+**v1.1.0 adds local clarity notes, image/transcript capture and question-design cue checks.** See [CHANGELOG.md](CHANGELOG.md), [first-release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
+
+Use **Need clarity?** beside a question to save something to revisit, then open **Library → Clarity notes**. Copy its context to your preferred AI and paste back a source-checked explanation. Notes/images have their own backup, separate from progress. See [CLARITY.md](CLARITY.md).
+
+Question authoring now includes a varied reasoning/answer-length plan and an editorial screen for longest-answer clues. Best-answer comparisons require a stated criterion and one defensible key. See [QUESTION_DESIGN.md](QUESTION_DESIGN.md).
 
 - Adaptation uses transparent heuristics. Mastery scores and response speed do not predict passing or certify durable retention.
 - The app scores MCQs; other exam formats need companion practice. Static answer keys are inspectable, so exam mode is for personal study.

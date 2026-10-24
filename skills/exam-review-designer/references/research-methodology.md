@@ -129,6 +129,14 @@ Start with Today and delayed-retention evidence, while checking accessibility in
 
 ## Source register
 
+### Question construction update — October 24, 2026
+
+The [question-design algorithm](QUESTION_DESIGN.md) adds independent reasoning/length plans and an editorial cue screen. NBME distinguishes one-best-answer items from multi-true formats, describes clues that reward testwise guessing, and recommends plausible homogeneous alternatives and content review. Its item-analysis guidance also distinguishes observed difficulty from intended task demands. [Original guide, chapters 2–5](https://www.nbme.org/sites/default/files/2021-02/NBME_Item%20Writing%20Guide_R_6.pdf).
+
+SoS! adapts those principles; the 30/45/25 task mix, 70/30 length mix and all numeric warning thresholds are project heuristics, not tested optima. Alternatives can be partly true when an explicit scenario criterion establishes one best key. Deliberate wording-cue drills belong outside scored practice. Length screening cannot determine subject correctness, eliminate every cue or calibrate difficulty; record the actual semantic review in the question audit.
+
+The new clarity-note workflow supports saving a question-linked doubt for later source-checked explanation. Its benefit has not been evaluated experimentally; it does not replace delayed independent retrieval or change mastery when a note is marked resolved. AI handoff is manual and should request hints before direct answers.
+
 **R1.** Roediger, H. L., & Karpicke, J. D. (2006). *Test-enhanced learning: Taking memory tests improves long-term retention*. Psychological Science, 17, 249–255. [Publisher abstract](https://www.psychologicalscience.org/journals/psychological-science/j.1467-9280.2006.01693.x/). DOI: 10.1111/j.1467-9280.2006.01693.x. Access: original article abstract. Laboratory prose-learning experiments; immediate and delayed outcomes differ.
 
 **R2.** Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). *Improving students’ learning with effective learning techniques*. Psychological Science in the Public Interest, 14, 4–58. [Publisher summary and abstract](https://www.psychologicalscience.org/journals/pspi/1529100612453266/). DOI: 10.1177/1529100612453266. Access: original review abstract and recommendations. Broad synthesis, not validation of this app.

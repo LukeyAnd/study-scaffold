@@ -1,6 +1,16 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const E=require('../core.js'),C=require('../courses.js'),P=require('../prompts.js');
 const sample=()=>JSON.parse(fs.readFileSync('skills/exam-review-designer/assets/example-bank.json','utf8'));
+test('question-design quotas total exactly the requested families and appear in AI handoff',()=>{
+ for(let count=1;count<=100;count++){
+  const plan=P.designPlan(count);
+  for(const quota of Object.values(plan)){assert.equal(Object.values(quota).reduce((a,b)=>a+b,0),count);assert.ok(Object.values(quota).every(n=>Number.isInteger(n)&&n>=0));}
+ }
+ assert.deepEqual(P.designPlan(20),{reasoning:{foundations:6,application:9,'best-answer':5},length:{comparable:14,natural:6}});
+ assert.throws(()=>P.designPlan(2.5));
+ const text=P.build({mode:'new',subject:'Science',title:'Biology',scope:'Cells',count:20});
+ assert.match(text,/"foundations":6/);assert.match(text,/"comparable":14/);assert.match(text,/TEST_STRATEGY.md/);assert.match(text,/ITEM_DESIGN_REPORT.md/);assert.match(text,/two choices remain equally defensible/);
+});
 const patch=id=>{const raw=sample();return {kind:'sos-course-patch',version:1,bankId:id,topics:raw.topics,objectives:raw.objectives,sources:raw.sources,questions:raw.questions};};
 test('multiple bundled classes coexist without changing the original bank identity',()=>{
  const ctx=vm.createContext({});for(const name of ['tax','example'])vm.runInContext(fs.readFileSync(`banks/${name}.js`,'utf8'),ctx);

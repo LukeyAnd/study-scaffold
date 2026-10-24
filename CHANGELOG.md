@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased — documentation
+## 1.1.0 — October 24, 2026
+
+- Added a question-side clarity drawer for text, pasted device-dictation transcripts and raster images, with exact question/concept/source context.
+- Added a module/status-filtered notes queue, end-session access, linked-family practice, manual AI prompt/image handoff and a saved explanation/resolution field.
+- Added separate local notes/image storage and backup, transactional stale-write protection, text-only fallback and recoverable save errors. Notes do not change learning scores.
+- Added a default reasoning/length mix to AI authoring prompts, explicit best-answer criteria, a standalone cue-audit command and a generated item-design report. Thresholds are editorial heuristics; deliberate cue-spotting exercises remain unscored.
 
 - Converted copyable AI prompts to fenced text blocks so GitHub provides its native copy icon; terminal commands remain separate from AI prompts.
 - Added an accessible Mermaid workflow showing selected local sources, agent authoring and review, browser study, and local progress/backup storage.

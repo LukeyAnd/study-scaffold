@@ -38,6 +38,8 @@ The clarity, alignment and technical-flaw checks adapt principles from NBME's he
 
 ## Make the checks inspectable
 
+Use the [question-design algorithm](QUESTION_DESIGN.md) to plan reasoning/length profiles and screen accidental answer cues. Comparable lengths and plausible partly true alternatives need semantic review. For a best-answer item, state the ranking criterion and explain why the runner-up loses; withhold two equally defensible answers. The screen does not verify sources or calibrate difficulty. Keep deliberate cue-spotting exercises in an unscored companion.
+
 Keep `QUESTION_AUDIT.md` with the review. For each question/family record: ID, objective, source + exact locator/version, solution/variant checks performed, distractor check, checker/method, status and unresolved issue. Use explicit statuses such as **not reviewed**, **checked against cited source**, and **withheld pending clarification**. An AI's self-check is not independent expert sign-off; record human or separate review only if it happened. A second model agreeing is not a substitute for primary evidence.
 
 The builder creates an unfilled audit template; it does not perform these content checks. The agent fills it from actual work. If a review lacks an audit, say what was and was not checked. Do not invent reviewer names, dates, evidence or validation results.

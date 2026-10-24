@@ -4,6 +4,11 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const icon = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6"/><circle class="info-dot" cx="12" cy="7.5" r=".8"/></svg>';
   const paths = {
+    clarity:'<path d="M21 11a8 8 0 0 1-8 8H7l-5 3 2-6a8 8 0 1 1 17-5Z"/><path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 4m0 3h.01"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/>',
+    copy:'<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>',
+    close:'<path d="m6 6 12 12M18 6 6 18"/>',
+
     overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
     play:'<path d="m8 5 11 7-11 7Z"/>',
     chart:'<path d="M4 3v17h17M8 15v-4m5 4V6m5 9v-7"/>',

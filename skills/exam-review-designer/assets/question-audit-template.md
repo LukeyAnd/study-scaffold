@@ -13,6 +13,13 @@ Record the governing scope/version, source policy, files/pages or URLs actually 
 
 Name only real checkers/methods; distinguish model self-check, source comparison, and human/independent review. Re-solve each family and inspect supported variant ranges. A structural pass is not a subject-correctness check.
 
+## Design and cue checks
+
+| Family ID | Intended demand | Length profile | Best-answer criterion / closest alternative rationale | Actual length / grammar / overlap / numeric-equivalence checks | Unresolved warnings |
+| --- | --- | --- | --- | --- | --- |
+
+Use the generated `ITEM_DESIGN_REPORT.md` as an editorial screen, not approval. Record changes and re-solve revised options. Ratios and thresholds are project defaults; disclose departures for the exam blueprint or source limitations. Keep deliberate cue-spotting exercises outside the scored bank. Intended demand is not calibrated difficulty.
+
 ## Withheld questions and coverage gaps
 
 List unsupported, conflicting or ambiguous items excluded from the scored bank, missing materials, uncovered objectives, and the clarification needed. If no issues were found, state the actual scope of checking rather than claiming universal correctness.

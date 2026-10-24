@@ -43,6 +43,9 @@ class SkillPackageTests(unittest.TestCase):
     def test_creates_runnable_bank_with_provenance_and_companion_files(self):
         output = builder.create_review(self.bank_path, self.context_path, self.plan_path, self.folder / "review")
         self.assertTrue((output / "index.html").is_file())
+        report = (output / "ITEM_DESIGN_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("Editorial warnings only", report)
+        self.assertIn(self.bank["questions"][0]["id"], report)
         self.assertRegex((output / "index.html").read_text(encoding="utf-8"), r'src="banks/course\.js(?:\?[^\"]*)?"')
         self.assertNotIn("banks/tax.js", (output / "index.html").read_text(encoding="utf-8"))
         # A copied template must include every local runtime asset referenced by its shell.

@@ -8,6 +8,8 @@
 
 ## For humans — start or restart local study
 
+Use **Need clarity?** beside a question to save a note, pasted device-dictation transcript or image for later. Find it in **Library → Clarity notes** or after the session. Copy its context to your preferred AI; paste a checked explanation into **What helped**. SoS! does not record voice or call an AI automatically. Export notes separately from progress before moving or clearing browser data.
+
 These are commands **you run in a terminal after the review is built**. A local server gives the browser a consistent address for the review. The included preview needs Python 3.10+ and no additional packages.
 
 ### Start

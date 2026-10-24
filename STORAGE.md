@@ -4,6 +4,8 @@ Each class uses its stable bank ID as a separate workspace key. Subject grouping
 
 ## Learner workflow
 
+**Clarity notes and images are separate from progress backups.** Use the notes queue's export/import actions to transfer them. Resetting progress preserves notes. Their database, limits and conflict behavior are documented in [CLARITY.md](CLARITY.md).
+
 Start a session and answer normally. There is no confidence control. The selected answer, exact generated question and choice order, fixed quiz plan, submitted answers, and elapsed active time save automatically. Open **Practice** to continue, or use **Resume session** on Overview. Reopening submitted feedback does not submit it again. The last results screen is saved too.
 
 Open **Library → Data & backups** for saved status and backup controls:

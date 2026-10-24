@@ -6,11 +6,12 @@ Uses only Python's standard library. It never downloads files or overwrites a fo
 import argparse
 import json
 import re
+import runpy
 import shutil
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
+TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "clarity.js", "clarity-ui.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
 ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}\Z")
 
 
@@ -117,11 +118,14 @@ def create_review(bank_path, context_path, plan_path, output):
     preview = SKILL_ROOT / "scripts" / "serve.py"
     require(all((template / f).is_file() for f in TEMPLATE_FILES) and all(p.is_file() for p in (agent_guide, audit_template, human_readme, preview)), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
     compiled = compile_bank(bank)
+    screen = runpy.run_path(str(SKILL_ROOT / "scripts" / "audit_questions.py"))
+    design_report = screen["markdown"](screen["audit"](bank))
     target.mkdir(parents=True)
     for filename in TEMPLATE_FILES:
         shutil.copyfile(template / filename, target / filename)
     shutil.copyfile(agent_guide, target / "AGENTS.md")
     shutil.copyfile(audit_template, target / "QUESTION_AUDIT.md")
+    (target / "ITEM_DESIGN_REPORT.md").write_text(design_report, encoding="utf-8")
     shutil.copyfile(human_readme, target / "README.md")
     (target / "tools").mkdir()
     shutil.copyfile(preview, target / "tools" / "serve.py")

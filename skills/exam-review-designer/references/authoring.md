@@ -67,6 +67,8 @@ These are structural checks, not proof of content validity. Check semantic dupli
 
 ## Stable families and variants
 
+Use [QUESTION_DESIGN.md](QUESTION_DESIGN.md) for the default reasoning/length mix, explicit best-answer criteria, and cue-screen algorithm. Run `scripts/audit_questions.py --bank bank.json --output ITEM_DESIGN_REPORT.md` using the actual skill path; the builder also writes this report automatically. Warnings require editorial review, not automatic padding or key changes. Record actual checks in the question audit. Deliberate cueful strategy examples belong in an unscored `TEST_STRATEGY.md`, outside the bank.
+
 Variants under one question ID share learning history. Use a family when variants test the same objective and comparable reasoning. If the skill or governing rule changes materially, use a different ID or bank revision. Do not multiply near-identical questions to inflate coverage or represent three variants as three independent skills.
 
 Reserve held-out items separately when a later assessment is intended to be novel. Do not include those items in the training bank and call them held out merely because they have not been randomly selected yet. For multi-format assessments, create companion `WRITTEN_PRACTICE.md`, oral prompts, or coding tasks with source-linked rubrics and identify the limits of automated scoring.

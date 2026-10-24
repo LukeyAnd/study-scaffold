@@ -13,8 +13,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
-TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
-TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "START_HERE.md", "SETUP.md", "FIRST_RUN_TEST.md", "CHANGELOG.md", "RELEASE_REVIEW.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
+TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "clarity.js", "clarity-ui.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
+TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "CLARITY.md", "QUESTION_DESIGN.md", "START_HERE.md", "SETUP.md", "FIRST_RUN_TEST.md", "CHANGELOG.md", "RELEASE_REVIEW.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
 SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".ps1", ".cmd", ".yaml", ".yml"}
 
@@ -36,6 +36,7 @@ def sync_skill():
         source, dest = ROOT / "tools" / name, SKILL / "scripts" / name
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
+    shutil.copyfile(ROOT / "QUESTION_DESIGN.md", SKILL / "references" / "QUESTION_DESIGN.md")
 
 
 def eligible(path):

@@ -19,6 +19,7 @@ This is a generated, local-first SoS! review. Follow the user's requested outcom
 | Change page flow or controls | [app.js](app.js) | [index.html](index.html), [help.js](help.js), [styles.css](styles.css) |
 | Change learning selection or scheduling | [core.js](core.js) | Relevant calls in `app.js`; review methodology before changing learning claims |
 | Change saves, resume, or timing | [storage.js](storage.js) | Relevant fields/calls in `core.js` and `app.js`; preserve import compatibility |
+| Change clarity notes or image/text AI handoff | [clarity.js](clarity.js) | [clarity-ui.js](clarity-ui.js), relevant calls in `app.js`; notes have their own backup and never change scores |
 | Add classes or material through JSON; generate an AI prompt | [courses.js](courses.js) | [prompts.js](prompts.js) and the All classes / Create with AI screens; preserve old IDs and data |
 
 Keep `bank.json` as the question source. With the original Exam Review Designer skill available, use its documented authoring schema and builder to create a fresh sibling output folder, then deliberately transfer reviewed changes. The builder refuses to overwrite this folder. If the skill is unavailable, request it only when recompilation is needed; do not silently let the JSON and compiled bank disagree.
@@ -34,6 +35,8 @@ For additions, prefer a `sos-course-patch` version-one JSON file for the target 
 - Progress belongs to the browser profile/origin. Use **Library → Data & backups** for portable JSON files. Moving to another URL does not automatically move history.
 
 ## Verify and hand off
+
+Read [ITEM_DESIGN_REPORT.md](ITEM_DESIGN_REPORT.md) for the builder's editorial length-cue screen, and fill the question audit with actual checks. A screen pass does not prove correct sources or fair choices. Best-answer items need a stated criterion and a defensible runner-up rationale. Keep deliberate cue-spotting exercises unscored.
 
 Independently solve changed questions and verify their source/version, distractors, and objective coverage. A valid JSON shape does not establish subject correctness. For app changes, exercise the affected flow in the browser; for persistence changes, reload with an answer selected, reopen submitted feedback, test backup round trips, and check timed-exam expiry as applicable. Do not claim tests from the full framework repository ran here: that test suite is not part of this generated folder.
 

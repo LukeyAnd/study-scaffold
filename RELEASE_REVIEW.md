@@ -45,3 +45,17 @@ Checked locally on Windows with Chrome, PowerShell 5.1, and existing host Node/P
 No additional permission is needed for the already authorized public framework release. A useful final personal review is a five-minute trial: download/extract the GitHub ZIP, create/import a small course, answer a question, reload, and export a backup. Before relying on a real course, review its question audit and important answers against the governing sources. Before sharing that course, confirm permission to share its content; permission to publish this framework does not cover private student material.
 
 Report reproducible software issues through the repository's Issues page using nonprivate examples. Keep this report and [CHANGELOG.md](CHANGELOG.md) consistent with any later changes; test results are evidence for the checked version, not a promise about future edits.
+
+## Version 1.1.0 follow-up
+
+Checked October 24, 2026. Added local question-linked clarity notes with raster image/transcript capture, a deferred queue, independent backup and manual AI handoff; added a source-aware question-design plan and editorial cue audit. No automatic AI service, microphone recording, new runtime dependency, multi-select scoring or psychometric difficulty calibration was introduced.
+
+- **31 Node tests passed**, including note validation, raster signature/size limits, image backup round trips, class isolation and stale text saves, plus exact question-design quota allocation and AI prompt inclusion.
+- **24 Python tests passed**, including builder reports, package references/synchronization, length cues in both directions, tie handling, equal family weights, numeric/unsegmented text, strict warning exits and report no-overwrite behavior.
+- **Extracted QA ZIP browser checks passed** with isolated Chrome profiles: pasted transcript/image, actual image decoding and Blob recovery, exact-session preservation, end-session queue, manual AI prompt, saved explanation/resolution, image backup transfer, stale-tab rejection, class isolation, responsive drawer, text-only fallback and failed-save draft preservation. Existing first-run, chart, theme, exam and recovery checks passed too.
+- The portable skill passed the host's skill validator. Desktop/mobile drawer screenshots were inspected. Checks used localhost; the original direct-file, other-browser and actual OS-installer limits remain.
+- Source correctness still needs course-specific review. Question-design proportions and thresholds are documented project heuristics; passing the screen is not factual or difficulty approval.
+
+Public CI, hosted assets and the actual final GitHub ZIP must be verified against the release commit after publication; local evidence alone does not establish those outcomes.
+
+The new screen was also exercised against the optional tax generator: 54 families, 10 variants each, deterministic LCG seed 20261024. A longest-option strategy succeeded 86.1% under the screen's tie/family weighting; 49 families had at least one warning. This confirms the reported wording problem in that example. It is not a factual audit or exhaustive generator check. The optional unverified tax bank was not automatically rewritten; newly authored reviews need the source/design checks above.

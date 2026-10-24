@@ -39,6 +39,8 @@ Write a review plan using `assets/review-plan-template.md`. Adapt scheduling to 
 
 ## 4. Create the agreed deliverable
 
+Use [references/QUESTION_DESIGN.md](references/QUESTION_DESIGN.md) to plan intended reasoning demand and option-length profiles independently. Follow the actual exam blueprint before default ratios. Best-answer comparisons require a stated criterion and a source-supported reason the runner-up loses; withhold equally defensible keys. Run `scripts/audit_questions.py` when available and record actual cue checks; the builder writes `ITEM_DESIGN_REPORT.md` automatically. Do not pad options or treat intended demand as measured difficulty. Keep deliberate wording-cue strategy exercises in a separate unscored companion.
+
 For an existing SoS! class, inspect its exported authoring context/course file and return an additions-only patch when the user asks to add material. Preserve old IDs and questions; do not rewrite the app or regenerate the entire bank unnecessarily. The browser's Create with AI screen supplies the prompt and context, then validates imported additions. Read the incremental-update contract in [references/authoring.md](references/authoring.md).
 
 Honor the requested medium. For an offline browser tool, read [references/authoring.md](references/authoring.md), author a source-linked bank JSON, and use `scripts/create_review.py` with the bundled `assets/study-app` template. No network download or runtime account is required. This script needs Python 3.10+; without Python, copy the template and adapt the bank using the documented schema, or provide a chat/document review if that is the user's preferred medium.

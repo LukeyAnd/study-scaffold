@@ -18,6 +18,8 @@ Checked October 24, 2026 on Windows with Chrome, PowerShell 5.1, and existing ho
 | Build with only the extracted skill and its example inputs | Generates a standalone review in a fresh folder, with source/context/plan files, an explicitly unreviewed question-audit template, and the Windows launcher |
 | Generated review opened independently | Loads its own assets, presents the authored course, and shows question feedback with sources |
 | Generated preview moved and restarted (v1.0.1) | The included server serves the moved review, stops, and serves its bank again on the same address/port after restart |
+| Clarity notes (v1.1.0) | Pasted transcript/image, decoded preview, saved Blob reload, exact-session recovery, end-session queue, manual AI prompt, resolution, image backup into a second profile, class isolation, stale-save rejection and recoverable storage failure passed; drawer checked at 375/768/1360 px |
+| Question design (v1.1.0) | Largest-remainder quotas conserve the requested count; length clues in both directions, ties, family weighting, numeric/unsegmented text, malformed input, strict warnings and report no-overwrite behavior passed; generated review includes its advisory screen |
 | Both optional preview servers | Serve HTML/JavaScript, reject private paths, and need no additional packages; a busy Python port produces an actionable error |
 
 The arithmetic example is a software fixture. These checks do not establish the correctness or exam coverage of a learner's course. Follow the source and question-audit workflow for that review.

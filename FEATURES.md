@@ -34,6 +34,8 @@ SoS! helps students turn their own course material into a review, practice it in
 
 ## Adaptive practice and feedback
 
+- AI authoring prompts plan a mix of foundational, application and explicit best-answer questions, independently varying option-length profiles. An optional Python screen flags conspicuous key lengths and bank-wide longest-answer clues; the builder includes its report. These are editorial heuristics, not calibrated difficulty or factual verification. See [QUESTION_DESIGN.md](QUESTION_DESIGN.md).
+
 - Answer four-option multiple-choice questions, with randomized answer order and authored/generated variations where available.
 - Practice across the class or focus on a category and thinking skill.
 - The next adaptive question favors recent mistakes, due reviews, lower estimated mastery, and unexplored scenarios; a pool-sized cooldown reduces immediate repetition.
@@ -55,6 +57,13 @@ SoS! helps students turn their own course material into a review, practice it in
 - Click relevant bars/rows to inspect the underlying category, scenarios, day, or answers.
 - Inspect descriptive response-time summaries. Active viewing time, first-choice time, revisions, and interruptions are recorded automatically; speed does not become a confidence score or change learning scores/scheduling.
 - Use the Library for modules, authored glossary/reference material, sources, and data controls.
+
+## Clarity notes and targeted follow-up
+
+- Open **Need clarity?** beside a question and save text, pasted device-dictation transcripts, or PNG/JPEG/WebP images linked to that exact question and concept.
+- Return during or after a session through **Library → Clarity notes**. Filter by module/status and practice the linked existing question families.
+- Copy a context prompt for your preferred AI, deliberately attach images, and paste a checked explanation into **What helped**. Mark a note resolved without changing scores.
+- Notes/images stay local and have a separate JSON backup. The text-only fallback disables images. No microphone recording, automatic AI research, cloud sync or live tutoring is included. See [CLARITY.md](CLARITY.md).
 
 ## Local saves and backups
 
