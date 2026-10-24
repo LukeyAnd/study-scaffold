@@ -1,5 +1,9 @@
 # Start here
 
+## Start with your AI
+
+Attach the repository ZIP and your course material, then say **Start my SoS! review** using the installed skill or [copyable start prompt](START_WITH_AI.md). The agent will inspect what is available, guide you through missing context, and do the work it can. When it needs you, it should ask the next essential question or give one exact action. Begin with `SKILL.md` alone if necessary; add the full folder when its resources are needed. [INSTALL.md](INSTALL.md) explains host activation and its limits.
+
 ## Study or create an AI prompt
 
 1. Download the ZIP from the GitHub repository (**Code → Download ZIP**, or the versioned ZIP linked in the README). Extract it completely and open the extracted `study-scaffold-...` folder.
@@ -13,11 +17,11 @@
 The same GitHub ZIP includes `skills/exam-review-designer/`. Give the agent that folder, or install it following [INSTALL.md](INSTALL.md). Copy this block into your AI chat using GitHub's upper-right copy icon:
 
 ```text
-Use the Exam Review Designer skill to build a review from my sources. Read its setup
-instructions first. Reuse tools you already have, install only a missing tool needed
-for this task, and verify it before continuing. Ask only for consequential missing
-course information. Build a source-linked review, check the questions and audit, open
-the result in my browser, and report what you actually verified.
+Use the Exam Review Designer skill to start my review now. Inspect my course files,
+reuse known answers and do the work you can. Ask only the next essential question
+or give me one exact action when you need me. Consult setup instructions only when
+a builder or preview is needed, reuse available tools and verify the result. Deliver
+the review with source checks and the actual file/import/launch steps for my device.
 ```
 
 The builder needs **Python 3.10+ with its standard library**. The generated review needs only a browser. The skill can also return an importable course JSON without using the builder. Skill installation instructions are in [INSTALL.md](INSTALL.md).

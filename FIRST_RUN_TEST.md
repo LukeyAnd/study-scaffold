@@ -41,6 +41,8 @@ For browser QA only, a test host may supply Playwright and Chrome/Chromium, set 
 
 ## Limits
 
+- Version 1.1.1 packages the guided-start prompt, revised skill metadata and continuation rules in the generated agent guide and AI prompts. Package tests check the entry files and metadata limit; existing generation and browser flows remain verifiable with the commands above. The [intake scenarios](skills/exam-review-designer/references/intake-examples.md) describe expected conversational behavior, not executed model evaluations. Fresh ChatGPT/Claude installation, automatic skill selection and attachment-only first-turn behavior were not live-tested.
+
 - This was an isolated-folder/profile test on the existing computer, not a fresh Windows VM or an actual OS installation test. Missing tools were simulated using an empty PATH and restricted discovery.
 - The opt-in installation route was checked with `-WhatIf`; WinGet downloads, agreements, PATH refresh, and successful installation still need a real clean-machine check. Recheck current official package availability before installing.
 - Direct `file://` browser launch and double-clicking `Start SoS.cmd` were not browser-verified in this environment. The extracted apps were verified through localhost. Keep a stable origin and export progress before moving it.

@@ -152,6 +152,15 @@ assert.equal(seen.size,2);"""
                 if "://" not in link and not link.startswith("#"):
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken reference in {doc.name}: {link}")
 
+    def test_skill_metadata_fits_the_documented_cross_host_description_limit(self):
+        # Claude documents a 200-character description limit; retain portable
+        # discovery metadata even though other hosts permit longer descriptions.
+        frontmatter = (SKILL / "SKILL.md").read_text(encoding="utf-8").split("---", 2)[1]
+        fields = dict(line.split(":", 1) for line in frontmatter.splitlines() if ":" in line)
+        self.assertEqual(fields["name"].strip(), SKILL.name)
+        self.assertGreater(len(fields["description"].strip()), 0)
+        self.assertLessEqual(len(fields["description"].strip()), 200)
+
     def test_repository_agent_routes_resolve(self):
         for doc in ROOT.glob("*.md"):
             for link in re.findall(r"\]\(([^)]+)\)", doc.read_text(encoding="utf-8")):
@@ -161,7 +170,7 @@ assert.equal(seen.size,2);"""
     def test_app_zip_contains_methodology_and_no_learning_data_or_nested_archives(self):
         with zipfile.ZipFile(DIST / "study-scaffold.zip") as archive:
             names = archive.namelist()
-            for name in ("index.html", "FEATURES.md", "AGENTS.md", "AGENT_GUIDE.md", "SOURCE_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md", "skills/exam-review-designer/LICENSE"):
+            for name in ("index.html", "FEATURES.md", "START_WITH_AI.md", "AGENTS.md", "AGENT_GUIDE.md", "SOURCE_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md", "skills/exam-review-designer/agents/openai.yaml", "skills/exam-review-designer/LICENSE"):
                 self.assertIn("study-scaffold/" + name, names)
             self.assertFalse(any(n.endswith(".zip") or "/.git/" in n or "/__pycache__/" in n for n in names))
             self.assertFalse(any("/downloads/" in n or "/dist/" in n for n in names))

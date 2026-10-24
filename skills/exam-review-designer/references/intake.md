@@ -4,9 +4,13 @@ The goal is sufficient information for a useful review, not a long onboarding fo
 
 ## A small adaptive conversation
 
+Begin rather than announcing readiness. On each learner reply, incorporate the new fact, inspect any new material, and continue to the next unresolved step. End a handoff with the next essential question or an exact learner action. If no learner input is needed, complete the work. Avoid “Would you like me to make the review?” after the user has asked for it. Do not repeat a question already answered in the conversation or context record.
+
 Read [source-quality.md](source-quality.md) for source-pack suggestions and authority checks. Start with scope plus relevant substantive material and exam format; do not require every suggested upload for a small task. Recommend worked solutions/rubrics and representative questions when they would change the review. Ask for actual readable source excerpts, not merely a title. Keep source policy (supplied-only by default), governing version, access gaps, and conflicts in the context record.
 
 Ask only unresolved high-value questions. Example first batch when almost nothing is known:
+
+Prefer the first question alone when that is enough to unlock source inspection. The list below is a menu of missing facts, not a mandatory form or a requirement to ask all three at once.
 
 1. **Scope and material:** “What course and topics are on this exam? Please attach the exam guide, objectives, or representative material you want me to use.” Ask for attachments in ordinary chat, not a text-only widget.
 2. **Exam task:** “Which response format is closest: multiple choice, worked problems, written/oral answers, or a mixture?” Use host-supported options or a free-text answer. Follow up on rubric/allowed resources only if needed.

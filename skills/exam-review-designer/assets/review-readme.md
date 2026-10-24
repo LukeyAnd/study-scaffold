@@ -49,4 +49,6 @@ If your computer uses `python3` instead, substitute `python3` for `python`. If n
 
 ## For AI agents
 
+For guided study, inspect the existing context and sources, continue the work you can, and ask only the next essential question or give one exact learner action at a handoff. Reuse prior answers. Do not end at a summary of what the skill could do. Deliver actual files or save/import steps appropriate to the host; an agent's cloud localhost server is not this learner's computer.
+
 Read [AGENTS.md](AGENTS.md) for the ordered file map and modification contracts. The human instructions above are launch/restart guidance, not a replacement for course context, source review or question audits. Keep this README and the included preview command current when changing the delivered files.

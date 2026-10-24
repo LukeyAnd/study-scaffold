@@ -1,11 +1,26 @@
 ---
 name: exam-review-designer
-description: Build a source-aligned exam review from course materials, exam constraints, and learner needs. Use for creating adaptive study banks, targeted quizzes, mock exams, and spaced review plans; includes a short context intake and an optional offline browser scaffold.
+description: Guide students through SoS! exam-review setup from their course files. Use to start or resume a review, build quizzes or mock exams, or add material; ask only for missing essentials.
 ---
 
 # Exam Review Designer
 
 Build a review that matches what the learner needs to do on the exam. Use supplied material before asking questions, separate evidence from assumptions, and keep practice results distinct from claims of readiness.
+
+## Start and keep the learner moving
+
+When this skill is invoked, or the learner supplies a SoS! package to start a review, **begin the workflow now**. Do not merely describe the skill, list its files, or end with “let me know” / “I can help.” If the package was supplied for code review or another task, follow that task instead of starting an unrelated course intake.
+
+If the host produces a response to an attachment-only first message and no task is stated, ask which class/exam the learner wants to prepare for. Do not run an installer or assume a course from the example banks. The package cannot make a host respond to a silent upload or activate a disabled skill.
+
+- Inspect accessible course attachments and any existing context first. Choose the next useful step yourself and carry out authorized reading, source checks, planning, authoring and verification without asking “shall I continue?” between stages.
+- At each handoff, end with **one focused question** when a consequential fact or decision is missing, or **one concrete next action** when the learner must upload, download, import, open or answer something. Say exactly what and where. Otherwise keep working. Do not manufacture a question just to end with a question mark.
+- Prefer one short intake question at a time; combine closely related missing details only when that reduces effort. Use a real host question widget for suitable choices, or ordinary chat. Never treat a pending widget as an answer, and never request files through a text-only widget.
+- With no course context, start with: “Which class and exam are you preparing for? Attach an exam guide or a relevant section of your notes if you have one.” Skip this when already answered. Do not ask for installation, themes or a full study profile first.
+- Reuse answers, inspected-source locations and open issues in the available context record. On resume, continue at the first unresolved step. Defaults for reversible presentation/planning choices should be stated briefly; do not invent exam dates, source access, governing facts or consent to research/publish.
+- Deliver the actual result when ready and identify the next learner action, such as “Import the attached bank.json through All classes → Add a class.” If you can perform that step with the available tools and authorization, do it and verify it instead. A completed task needs no artificial follow-up approval.
+
+**If only this SKILL.md is available:** begin intake and source inspection using these instructions. You can prepare a source-linked plan or chat review without executable tools. Do not stall the first turn asking for the whole repository. Request the accompanying folder/ZIP only when a missing schema, reference or browser template is needed; do not invent its contents or claim a runnable review was built. If the host cannot read archives, ask for the specific extracted file needed next. Follow supplied-only source policy unless the learner permits supplemental research.
 
 This is a subject-independent framework. Bundled question banks are software examples, not a default curriculum or authority. Read [references/source-quality.md](references/source-quality.md) for upload recommendations, source authority/version decisions, and the content-checking workflow before authoring or revising scored material.
 
@@ -54,6 +69,8 @@ Keep `review-context.json`, a source register, and `REVIEW_PLAN.md` with the gen
 The builder also writes a short `AGENTS.md` into the generated review, from `assets/review-agent-guide.md`. Keep that guide with the shared folder so the next agent can locate course context, sources, bank data, runtime files, and recovery guidance. If assembling manually without Python, adapt the same guide to the files actually delivered and remove links to absent files.
 
 The generated human `README.md` comes from `assets/review-readme.md` and explains starting, stopping and restarting the included `tools/serve.py`. Give the learner the actual review folder and launch command; distinguish terminal commands for humans from prompts for their AI chat. Keep the preview with the complete folder so later sessions do not depend on the installed skill's location. For manual assembly, copy `assets/review-readme.md` to `README.md` and `scripts/serve.py` to `tools/serve.py`, and verify that the delivered instructions match the actual files.
+
+Match delivery to the host: provide real downloadable files/folder bundles when supported, or clearly labeled save/import instructions when only text output is possible. An agent's cloud filesystem or localhost server is not the learner's computer. Do not present a temporary sandbox path or server address as if the learner can open it locally; deliver the complete review and the command they can run after extracting it.
 
 ## 5. Verify observable results
 

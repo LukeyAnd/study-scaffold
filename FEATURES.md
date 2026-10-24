@@ -27,6 +27,8 @@ SoS! helps students turn their own course material into a review, practice it in
 
 - The optional **Exam Review Designer** skill walks an agent through intake, source inspection, objective mapping, question writing, and verification.
 - Agents use available question widgets or chat to gather consequential missing context.
+- Guided startup begins work instead of ending at a skill summary. At each learner handoff, the agent asks the next essential question or gives an exact action; known answers are reused and routine work continues autonomously.
+- A single `SKILL.md` can begin intake and source inspection. The full package supplies schemas/templates when needed; [START_WITH_AI.md](START_WITH_AI.md) provides a fallback for hosts that do not activate attachments as skills.
 - Source guidance covers editions/dates, exact locators, conflicting information, and an inspectable question audit. Correctness still requires actual review.
 - The Python builder creates a standalone browser review with course data, context, a review plan, a source register, an initially unreviewed audit template, and agent handoff instructions.
 - Generated reviews include a human start/stop/restart guide and their own Python preview server, so local hosting does not depend on finding the original project or skill.

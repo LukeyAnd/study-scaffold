@@ -8,6 +8,7 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 | --- | --- | --- |
 | First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](SETUP.md), [setup helper](tools/setup.ps1), [first-run evidence](FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
 | Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
+| Start from an attached ZIP/skill or resume learner onboarding | [START_WITH_AI.md](START_WITH_AI.md) | The skill's guided handoff contract and [intake](skills/exam-review-designer/references/intake.md); ask only the next important gap and otherwise continue work |
 | Change appearance or interaction | [DESIGN.md](DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
 | Change adaptive selection or scheduling | [RESEARCH.md](RESEARCH.md) | [core.js](core.js), [engine tests](tests/engine.test.cjs); [app.js](app.js) only for the affected flow |
 | Change question quality, answer cues or intended demand mix | [QUESTION_DESIGN.md](QUESTION_DESIGN.md) | [Source guide](SOURCE_GUIDE.md), [audit script](skills/exam-review-designer/scripts/audit_questions.py), [prompts.js](prompts.js), [authoring contract](skills/exam-review-designer/references/authoring.md) |

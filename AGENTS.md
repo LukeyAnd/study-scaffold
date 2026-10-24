@@ -8,6 +8,7 @@ SoS! is a dependency-free browser study app and a portable review-authoring skil
    Use [START_HERE.md](START_HERE.md) and [SETUP.md](SETUP.md) for first-run/setup requests. Studying/importing/prompt generation needs no runtime installation. Standalone generation needs only Python; preview can reuse Node or Python. Check actual executables before installing anything.
 2. Use the routing table in [AGENT_GUIDE.md](AGENT_GUIDE.md). Read only the relevant route and its linked files. Do not load the example tax bank, every reference, or generated snapshots by default.
 3. For a new course review, begin at [skills/exam-review-designer/SKILL.md](skills/exam-review-designer/SKILL.md). That file defines the intake → sources → blueprint → authoring → verification sequence.
+   Begin the guided workflow when asked to start; complete authorized steps yourself. At a learner handoff, ask the next consequential question or give one exact next action. See [START_WITH_AI.md](START_WITH_AI.md) for the upload/activation fallback; do not equate attaching an archive with installing a skill.
 4. Read the relevant implementation and tests before changing behavior. Canonical runtime files are at the repository root. `skills/exam-review-designer/assets/study-app/` is a generated copy; update the root first, then rebuild.
 
 ## Preserve these product contracts

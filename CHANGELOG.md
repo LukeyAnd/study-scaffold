@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1 — October 24, 2026
+
+- Made learner startup and handoffs explicit: begin the requested review immediately, complete authorized work autonomously, and ask the next essential question or give one exact learner action when needed.
+- Added a copyable ZIP/attachment start prompt, a single-file intake fallback, resume guidance, and host-aware file/localhost delivery instructions.
+- Updated the installed skill's default prompt, generated-review agent guide and browser-generated AI prompts to preserve guided continuation.
+- Shortened skill metadata for portability and documented current ChatGPT/Codex and Claude activation paths without claiming universal auto-installation or live host verification.
+
 ## 1.1.0 — October 24, 2026
 
 - Added a question-side clarity drawer for text, pasted device-dictation transcripts and raster images, with exact question/concept/source context.

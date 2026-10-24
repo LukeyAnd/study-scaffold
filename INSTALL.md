@@ -2,7 +2,7 @@
 
 For the shortest first-run path, use [START_HERE.md](START_HERE.md). No runtimes need installing to study or generate a prompt in the browser. [SETUP.md](SETUP.md) covers only the tools required for an optional builder/preview/development task and includes a read-only check plus explicit installation mode.
 
-Download the [current release ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.0.zip), or use **Code → Download ZIP** on the repository for the latest source. Extract the entire `study-scaffold-...` folder.
+Download the [current release ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.1.zip), or use **Code → Download ZIP** on the repository for the latest source. Extract the entire `study-scaffold-...` folder.
 
 - **Study:** open the extracted folder's `index.html` or `Start SoS.cmd` on Windows.
 - **Use an agent:** give it `skills/exam-review-designer/SKILL.md` and its accompanying folder, or install that folder below.
@@ -27,7 +27,15 @@ Use $skill-installer to install
 https://github.com/LukeyAnd/study-scaffold/tree/main/skills/exam-review-designer.
 ```
 
-## Use another agent
+## Use ChatGPT, Claude or another agent
+
+For an ordinary chat attachment, use the short [start prompt](START_WITH_AI.md). The agent is instructed to begin immediately, carry out available work, and end learner handoffs with the next important question or exact action. Uploading a ZIP alone is not a universal activation event.
+
+**ChatGPT/Codex:** enabled skills can be selected explicitly or matched to a request. Standalone skill availability varies by surface; OpenAI recommends plugins for broader distribution. Use your host's skill selector or the attached-file start prompt rather than assuming a repository ZIP is an installed plugin. [Official OpenAI guidance](https://learn.chatgpt.com/docs/build-skills).
+
+**Claude:** for persistent use, upload a skill-only ZIP through **Customize → Skills → + Create skill → Upload a skill**, then enable it; required capabilities and workspace policy may affect access. Compress the included `exam-review-designer` folder itself, not the whole repository, for this importer. Its ZIP should have that one top-level skill folder. A normal chat attachment can instead use the start prompt. [Claude skill use](https://support.claude.com/en/articles/12512180-use-skills-in-claude), [package structure](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills).
+
+Host guidance checked October 24, 2026. These are documented paths, not a claim that importing into each host was tested here.
 
 Place the included `skills/exam-review-designer` folder in the host's documented skill directory, or give it `SKILL.md` and the accompanying resources explicitly. If a host requires a skill-only ZIP, compress that folder with one `exam-review-designer` top-level folder and use its documented import interface. Installation paths and ZIP-import support vary; this project does not claim every host has the same UI. A plugin-directory listing is not included.
 
@@ -38,10 +46,10 @@ The skill's intake works with a real ask widget when available and ordinary chat
 Copy this prompt into your AI chat. GitHub adds a copy icon in the upper-right corner of the block.
 
 ```text
-Use $exam-review-designer to create a review for my upcoming exam. Inspect the
-material I attach first. Ask only for missing information about scope, exam format,
-timing, and my needs. Then build a source-linked review plan and an offline browser
-review where appropriate. Tell me what is provisional.
+Use the Exam Review Designer skill to start my SoS! review now. Inspect the
+material I attach, do the work you can, and ask only the next essential question
+when you need me. Keep guiding me through sources, review creation and launch;
+end each handoff with a clear question or specific action. State what is provisional.
 ```
 
 Attach your syllabus, objectives, exam guide, representative tasks, or relevant notes in normal chat. The agent will ask follow-ups only where needed; it should not require you to complete a long form when those facts are already supplied.

@@ -59,3 +59,11 @@ Checked October 24, 2026. Added local question-linked clarity notes with raster 
 Public CI, hosted assets and the actual final GitHub ZIP must be verified against the release commit after publication; local evidence alone does not establish those outcomes.
 
 The new screen was also exercised against the optional tax generator: 54 families, 10 variants each, deterministic LCG seed 20261024. A longest-option strategy succeeded 86.1% under the screen's tie/family weighting; 49 families had at least one warning. This confirms the reported wording problem in that example. It is not a factual audit or exhaustive generator check. The optional unverified tax bank was not automatically rewritten; newly authored reviews need the source/design checks above.
+
+## Version 1.1.1 guided startup
+
+Checked October 24, 2026. The skill now begins the requested workflow, completes available authorized work and ends learner handoffs with an essential question or exact next action. The same contract travels in default prompts, browser-generated AI prompts and generated-review agent instructions. The single-file route can begin intake before requesting missing resources. A root start guide supplies a short activation fallback.
+
+- **31 Node tests and 25 Python tests passed**, covering existing runtime behavior, prompt generation, builder/package synchronization, required archive entry files and the documented 200-character description limit. The portable skill passed the host's validator.
+- Extracted-package first-run checks passed, including standalone generation and setup helpers. Live cross-host installation/activation was not evaluated. Intake examples are manual acceptance scenarios, not independent model-test results.
+- Official OpenAI and Claude documentation was inspected for activation and package structure. Enabling/importing a skill differs from attaching its source; no universal silent-upload trigger is promised. Private course files are not published and no extra runtime dependency was added.

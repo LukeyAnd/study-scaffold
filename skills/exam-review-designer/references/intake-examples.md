@@ -6,7 +6,7 @@ These are realistic checks for the skill, not claims of an automated agent evalu
 
 User: “Make me a review for my biology final.”
 
-Expected behavior: ask for scope/material, exam response format, and exam horizon/available time. Do not invent units or silently build a tax-themed app. If no widget exists, ask in chat. Offer a provisional general review only with a clearly stated basis.
+Expected behavior: first ask about scope/material, then gather exam response format and horizon only where consequential. Prefer one useful question over a mandatory three-part form. Do not invent units or silently build a tax-themed app. If no widget exists, ask in chat. A general/provisional review needs an agreed basis.
 
 ## Context already supplied
 
@@ -43,3 +43,41 @@ Expected behavior: use ordinary chat in the first case. In the second, continue 
 User: “Build a review from my private class notes.”
 
 Expected behavior: create local outputs. Do not upload the notes, grades, or a generated bank to a public repository unless publishing those materials is authorized.
+
+## Package attached without course context
+
+User: “Start my SoS! review,” with the repository ZIP or skill-only package.
+
+Expected first handoff: load the skill and ask which class/exam this is for, recommending one relevant exam guide or note excerpt. Do not end with “The ZIP contains an adaptive study app” or ask the user to choose which agent instruction file to read. Do not install runtimes during intake.
+
+If the host responds to an attachment-only message with no task, ask the same course question. If the user instead requests a code/package review, carry out that request rather than beginning study intake. The package cannot cause a host to respond to an upload event that the host does not expose.
+
+## Only SKILL.md is accessible
+
+User attaches the single file and says: “Help me prepare for my chemistry exam.”
+
+Expected behavior: begin scope/source intake using the core instructions. Do not demand the entire repository before the first useful question. Request the full folder, or one specific missing reference, when its schema/template becomes necessary; do not fabricate a browser build or promise tool access.
+
+## All essential facts are supplied
+
+User attaches readable scope, substantive notes, exam format and constraints and says: “Create the review now.”
+
+Expected behavior: inspect sources, map objectives, author and check supported material, and deliver the requested result without asking “Should I proceed?” At delivery, give the precise import/open action if the learner must perform it. Do not invent a missing topic preference to force a closing question.
+
+## Resume after the learner answers
+
+The learner answers the previous format question and attaches the requested notes page. A context record already includes class, scope and exam date.
+
+Expected behavior: incorporate the answer, inspect that page and continue at the next unresolved step. Do not repeat the class/date questions or restart the welcome message. Ask about a source conflict only if it affects scoring.
+
+## Text-only or cloud host delivery
+
+The host cannot save files, or can only build in a remote sandbox.
+
+Expected behavior: provide complete JSON with exact save/import steps when text-only, or an actual downloadable complete folder when supported. Do not claim that a local file was saved, that the learner's browser opened, or that the learner can access the sandbox's localhost URL. End with the one concrete learner action needed next.
+
+## Completed review
+
+The verified bank file is attached and ready to import.
+
+Expected final action: “Import the attached bank.json through All classes → Add a class, then select Start practice.” If the agent can actually import and verify using its authorized tools, do so and give the next study action instead. Avoid an unrelated follow-up question or a generic offer to help.

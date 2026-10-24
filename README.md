@@ -2,7 +2,20 @@
 
 A minimal study framework built around **your own course sources**. Create a review with your preferred AI, check its questions, and practice adaptively in a browser.
 
-**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.0.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
+**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
+
+## For humans — start with your AI
+
+Attach the ZIP and any course material to your preferred AI, or use the installed **Exam Review Designer** skill. The agent should start inspecting, ask only what is missing, and guide you to a usable review. If it only summarizes the attachment, copy this into chat:
+
+```text
+Start my SoS! review using the attached package. Read and follow
+skills/exam-review-designer/SKILL.md (or SKILL.md in a skill-only package).
+Inspect my files, do the work you can, and end with the next essential
+question or a specific action when you need me. Begin now.
+```
+
+See [START_WITH_AI.md](START_WITH_AI.md) for the guided flow and [INSTALL.md](INSTALL.md) for host setup. An ordinary attachment does not guarantee skill installation or activation in every AI product.
 
 ## For humans — download and start
 
@@ -103,7 +116,8 @@ The same ZIP contains `skills/exam-review-designer/`. Paste the following into *
 Read skills/exam-review-designer/SKILL.md and follow its workflow. Build a review from
 my sources, ask only for consequential missing context, verify the questions and
 sources, and report what you actually checked. Reuse existing tools and install only a
-missing requirement needed for this task.
+missing requirement needed for this task. Begin now and keep working when you can;
+end each learner handoff with the next essential question or one exact action.
 ```
 
 For repeated use, copy that folder into your agent's supported skills directory; see [INSTALL.md](INSTALL.md). A standalone review build uses Python 3.10+ standard library; the resulting review needs only a browser. Importable course JSON can be authored without running the builder.
@@ -119,7 +133,7 @@ For repeated use, copy that folder into your agent's supported skills directory;
 
 ## First release and limits
 
-**v1.1.0 adds local clarity notes, image/transcript capture and question-design cue checks.** See [CHANGELOG.md](CHANGELOG.md), [first-release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
+**v1.1.1 adds guided agent startup and concrete next-step handoffs.** Version 1.1.0 introduced local clarity notes and question-design cue checks. See [CHANGELOG.md](CHANGELOG.md), [first-release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
 
 Use **Need clarity?** beside a question to save something to revisit, then open **Library → Clarity notes**. Copy its context to your preferred AI and paste back a source-checked explanation. Notes/images have their own backup, separate from progress. See [CLARITY.md](CLARITY.md).
 
