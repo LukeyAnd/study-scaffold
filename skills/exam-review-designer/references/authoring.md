@@ -2,6 +2,8 @@
 
 The skill ZIP contains an offline app template. The script assembles a new review from a validated bank, resolved intake context, and a plan. It does not generate or verify subject knowledge on its own.
 
+A full bank may include a nonempty `subject` string to group the class in the app. `title` is the class name; its `topics` are the modules. The bank ID identifies its separate learning workspace. A generated app also supports importing other course JSON through All classes, or returning additions through Create with AI.
+
 ## Inputs and command
 
 Create `bank.json`, `review-context.json`, and `REVIEW_PLAN.md` in the learner's workspace. Then run:
@@ -69,6 +71,8 @@ Reserve held-out items separately when a later assessment is intended to be nove
 
 ## Delivery checks
 
+For additions to an existing class, use the incremental contract below instead of rebuilding the app.
+
 1. Confirm that the context and plan reflect the learner's actual answers and accessible sources.
 2. Independently solve every variant; compare against the source and rubric; check the objective coverage map.
 3. Open the generated `index.html` or use a local preview when the environment allows it. Verify answer selection, feedback, small-screen layout, and bank counts. If unavailable, state which checks remain unperformed.
@@ -76,3 +80,11 @@ Reserve held-out items separately when a later assessment is intended to be nove
 5. Before sharing a ZIP, review included context, questions, and source excerpts for private/restricted material. The script does not upload or publish anything.
 
 For a chat/document review, use the same source/objective/feedback design without requiring this app or script.
+
+## Incremental updates
+
+Inspect the exported `sos-authoring-context` file (bank ID, modules, objective/source IDs and existing question IDs) and new source material first. Return `patch.json` with `kind: "sos-course-patch"`, `version: 1`, the target `bankId`, and `topics`, `objectives`, `sources`, `glossary`, `questions`. Lists contain new definitions only; each new question uses the same MCQ/variant schema above. Its references may reuse existing IDs. At least one new question family is required.
+
+Preserve existing questions, IDs and glossary meanings. Do not put a changed question under an old ID, remove an old module, move an old question, or regenerate existing content. The browser accepts identical repeated entries without duplicating them and rejects conflicting IDs. Independently solve and source-check every addition; report any scope gaps. A materially different curriculum needs a separate bank ID.
+
+The learner imports the patch through **Options → Create with AI → Add material** for the target class and then opens the updated class. The browser preserves generator functions in bundled classes and merges data for imported classes. No changes to runtime JavaScript, CSS, or storage are needed. A running session retains its original pool and deadline; additions enter new sessions. The standalone Python builder accepts a complete bank, not a patch; use it only when a fresh standalone output is requested.

@@ -1,5 +1,7 @@
 # Local saves, timing, and portable backups
 
+Each class uses its stable bank ID as a separate workspace key. Subject grouping, course JSON files, prompt context, and additive material updates are described in [COURSES.md](COURSES.md). Moving a custom class to another device requires its course file as well as its learning-progress backup.
+
 ## Learner workflow
 
 Start a session and answer normally. There is no confidence control. The selected answer, exact generated question and choice order, fixed quiz plan, submitted answers, and elapsed active time save automatically. Open **Practice** to continue, or use **Resume session** on Overview. Reopening submitted feedback does not submit it again. The last results screen is saved too.

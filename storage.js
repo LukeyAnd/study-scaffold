@@ -104,5 +104,25 @@
       close(){db?.close();channel?.close();}
     };
   }
-  const api={snapshot,validate,unpack,open,dateKey};root.StudyStorage=api;if(typeof module!=='undefined')module.exports=api;
+  async function openLibrary(){
+    let db=null,local=null,entries=[],warning='';
+    const key='sos-course-library:v1';
+    try{db=await new Promise((resolve,reject)=>{if(!root.indexedDB){reject(Error('Unavailable'));return;}const req=root.indexedDB.open('sos-course-library',1);req.onupgradeneeded=()=>req.result.createObjectStore('courses');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);req.onblocked=()=>reject(Error('Close older SoS tabs.'));});db.onversionchange=()=>db.close();}catch(_){try{local=root.localStorage;local.setItem('sos-library-test','1');local.removeItem('sos-library-test');}catch(_){local=null;}}
+    try{
+      if(db)entries=await new Promise((resolve,reject)=>{const req=db.transaction('courses').objectStore('courses').getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
+      else if(local)entries=JSON.parse(local.getItem(key)||'[]');
+      if(!Array.isArray(entries))throw Error('Invalid library');
+    }catch(_){entries=[];warning='Saved classes could not be read. Reload before adding or updating classes.';}
+    return {entries,warning,mode:db?'Local database':local?'Browser storage':'Memory only',
+      async put(bank,expectedRevision=0){
+        if(warning)throw Error(warning);
+        if(!db&&!local)throw Error('Course storage is unavailable. Keep the course file and enable browser storage before adding it.');
+        const row={id:bank.id,bank:JSON.parse(JSON.stringify(bank)),revision:expectedRevision+1};
+        if(db)await new Promise((resolve,reject)=>{let stale=false;const tx=db.transaction('courses','readwrite'),store=tx.objectStore('courses'),req=store.get(bank.id);req.onsuccess=()=>{if((req.result?.revision||0)!==expectedRevision){stale=true;tx.abort();}else store.put(row,bank.id);};tx.oncomplete=resolve;tx.onabort=()=>reject(Error(stale?'This class changed in another tab. Reload before updating it.':'Could not save the class.'));tx.onerror=()=>{};});
+        else{const all=JSON.parse(local.getItem(key)||'[]');if((all.find(e=>e.id===bank.id)?.revision||0)!==expectedRevision)throw Error('This class changed in another tab. Reload before updating it.');local.setItem(key,JSON.stringify([...all.filter(e=>e.id!==bank.id),row]));}
+        entries=[...entries.filter(e=>e.id!==bank.id),row];return row;
+      },close(){db?.close();}
+    };
+  }
+  const api={snapshot,validate,unpack,open,openLibrary,dateKey};root.StudyStorage=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

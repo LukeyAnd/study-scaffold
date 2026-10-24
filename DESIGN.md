@@ -7,6 +7,7 @@ The visual direction is a calm reading workspace: warm off-white canvas, white c
 ## Implemented
 
 - A predictable five-part navigation: Overview, Practice, Insights, Quizzes, Library. Matching line icons accompany the written labels.
+- A top-level Class dropdown groups courses by subject. All classes exposes a subject filter, module previews and course import without another permanent navigation item. Create with AI keeps optional context/import details collapsed.
 - One main task per page. Overview combines the recommended session and three compact metrics, followed by a category map. Insights and Library show one selected view at a time through labeled native dropdowns.
 - Secondary actions live in clearly named menus. Category selection, advanced quiz settings, scenario details, and worked solutions expand on demand; active quiz filters remain visible in their collapsed summaries.
 - Restrained use of color. Green marks the main action and positive results; amber and red appear with written status labels.
@@ -22,7 +23,7 @@ The visual direction is a calm reading workspace: warm off-white canvas, white c
 
 ## Suggested next improvements
 
-1. **Bank switcher and structured content editor.** Let instructors manage courses and review questions without editing JavaScript. Use a validated JSON schema and a preview step; keep executable generators as an advanced option.
+1. **Structured content editor.** Course switching, validated JSON import, AI prompts and additions-only updates now exist. A future form editor could support deliberate per-question revisions with content review.
 2. **Explicit learning objectives and sources.** Add objectives, difficulty, authoritative references, author review status, and a content revision date. This would make drill-downs more meaningful than inferring thinking skills from titles.
 3. **Longer-term learning trends.** When enough attempts exist, show rolling accuracy and review adherence with sample counts. Avoid an impressive-looking readiness percentage before evidence supports it.
 4. **Accessible chart comparisons.** Add a data-table view and filters for time window or category when the history grows. The current chart bars are keyboard-operable and expose values through accessible labels.

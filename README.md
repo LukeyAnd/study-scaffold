@@ -14,6 +14,8 @@ The `exam-review-designer` skill helps an agent inspect course material, gather 
 
 ## Get started
 
+Choose a subject/class from the **Class** dropdown; **All classes…** shows its modules and imports. **Options → Create with AI** generates a prompt for a new course or additions-only file, so material can be added without rewriting the app. See [COURSES.md](COURSES.md).
+
 1. Download the ZIP and extract it.
 2. Open **index.html** in a modern browser. No installation, API key, account, or internet connection is needed for the downloaded app.
 3. Start adaptive practice, or open **Quizzes** to make a focused quiz or timed exam.
@@ -31,6 +33,8 @@ Open `http://127.0.0.1:4173`. There are no npm packages to install. If that port
 ## What is included
 
 - A consolidated overview with a recommended session, compact mastery/accuracy/coverage metrics, and an expandable category map.
+- Subject/class selection with independent sessions and a local course library; validated course import and append-only additions.
+- A local prompt generator with source/ID context export for the learner's preferred AI tool.
 - Nine subject categories and six thinking-skill labels: calculation, reverse reasoning, error spotting, comparison, application, and concepts.
 - Adaptive practice that re-evaluates the next question after each answer.
 - Per-scenario review scheduling and an anti-repeat window that shrinks to fit the available pool.
@@ -62,6 +66,8 @@ Only submitted answers update learning records. Unanswered questions reduce the 
 Open **Library → Data & backups** to save a dated JSON file in your preferred location, load an earlier backup, or restore one of the latest seven study dates. JSON is readable text; no SQL setup is needed. IndexedDB is the default local database, with localStorage as a fallback. See [STORAGE.md](STORAGE.md) for storage behavior, recovery, timing fields, and limitations.
 
 ## Replace the content
+
+For normal use, import a complete course JSON through **All classes → Add a class**, or use **Create with AI → Add material** for additions-only patches. These paths preserve runtime code and existing course history. The JavaScript example below is an advanced bank-authoring option.
 
 The tax bank is an example, not a dependency of the engine. **The supplied Gemini tax explanations have not been independently verified for legal accuracy, current law, or a specific tax year.** Validate them against your course materials before relying on them. The software tests check generation and learning behavior, not the truth of the tax content.
 
@@ -111,6 +117,8 @@ styles.css                 Shared design tokens and responsive layouts
 app.js                     UI, routing, storage, sessions, and chart interactions
 core.js                    Subject-independent, testable adaptive engine
 storage.js                 Local database, session snapshots, backup validation
+courses.js                 Course JSON, subjects, and append-only updates
+prompts.js                 Local AI authoring prompts and class context
 banks/tax.js               Supplied 54-scenario example bank
 banks/example.js           Tiny replacement-bank template
 tests/engine.test.cjs      Learning, scheduling, filtering, and generator tests
@@ -149,7 +157,7 @@ This repository is configured for **GitHub Pages** at **https://lukeyand.github.
 - Browser data can be cleared or disabled. Save independent backup files periodically; storage errors are shown instead of silently ignored. Dated restore points require IndexedDB.
 - Progress is designed for one active study tab. Database revisions reject stale writes, and a warning asks the other tab to reload. Simultaneous editing is not merged.
 - Static question banks and answer keys are inspectable in the browser. Exam mode is for self-assessment, not proctored or high-stakes testing.
-- No AI question generation, automatic course ingestion, cloud syncing, or authentication is included.
+- No automatic AI calls, automatic source ingestion, cloud syncing, or authentication is included. The prompt generator prepares instructions for the learner's preferred AI.
 
 ## License
 

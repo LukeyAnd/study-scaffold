@@ -10,9 +10,9 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 | Change appearance or interaction | [DESIGN.md](DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
 | Change adaptive selection or scheduling | [RESEARCH.md](RESEARCH.md) | [core.js](core.js), [engine tests](tests/engine.test.cjs); [app.js](app.js) only for the affected flow |
 | Change saves, resume, timing, or backups | [STORAGE.md](STORAGE.md) | [storage.js](storage.js), [core.js](core.js), affected parts of [app.js](app.js), [storage tests](tests/storage.test.cjs) |
+| Change classes, JSON imports or AI prompts | [COURSES.md](COURSES.md) | [courses.js](courses.js), [prompts.js](prompts.js), [course tests](tests/courses.test.cjs), relevant storage/UI calls |
 | Change bank shape or review generation | [Authoring contract](skills/exam-review-designer/references/authoring.md) | [Builder](skills/exam-review-designer/scripts/create_review.py), [example bank](skills/exam-review-designer/assets/example-bank.json), [package tests](tests/skill_package_test.py) |
 | Change installation or download packaging | [INSTALL.md](INSTALL.md) | [Packager](tools/package_release.py), [package tests](tests/skill_package_test.py), [download page](downloads/index.html) |
-| Embed the app in WordPress / Elementor | [ELEMENTOR.md](ELEMENTOR.md) | [STORAGE.md](STORAGE.md), [index.html](index.html); this optional route does not imply a native WordPress plugin exists |
 | Understand a prior implementation decision | Relevant route above | [REVIEW.md](REVIEW.md) provides background; inspect current code before relying on historical descriptions |
 
 Use targeted symbol/file searches for large sources. `banks/tax.js` and `midterm_trainer.html` are examples/history; read them only when the task involves that content. Generated app copies are output artifacts, not a second source of truth.

@@ -17,8 +17,11 @@ This is a generated, local-first SoS! review. Follow the user's requested outcom
 | Change page flow or controls | [app.js](app.js) | [index.html](index.html), [help.js](help.js), [styles.css](styles.css) |
 | Change learning selection or scheduling | [core.js](core.js) | Relevant calls in `app.js`; review methodology before changing learning claims |
 | Change saves, resume, or timing | [storage.js](storage.js) | Relevant fields/calls in `core.js` and `app.js`; preserve import compatibility |
+| Add classes or material through JSON; generate an AI prompt | [courses.js](courses.js) | [prompts.js](prompts.js) and the All classes / Create with AI screens; preserve old IDs and data |
 
 Keep `bank.json` as the question source. With the original Exam Review Designer skill available, use its documented authoring schema and builder to create a fresh sibling output folder, then deliberately transfer reviewed changes. The builder refuses to overwrite this folder. If the skill is unavailable, request it only when recompilation is needed; do not silently let the JSON and compiled bank disagree.
+
+For additions, prefer a `sos-course-patch` version-one JSON file for the target bank ID, containing only new question families and any new module/objective/source definitions. Import through Create with AI → Add material; do not rewrite existing questions or runtime code. Browser-imported classes are stored on the device, separately from this folder's original `bank.json`; export their Course file before moving them.
 
 ## Preserve the learner's experience
 

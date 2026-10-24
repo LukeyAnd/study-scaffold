@@ -41,7 +41,7 @@ class SkillPackageTests(unittest.TestCase):
     def test_creates_runnable_bank_with_provenance_and_companion_files(self):
         output = builder.create_review(self.bank_path, self.context_path, self.plan_path, self.folder / "review")
         self.assertTrue((output / "index.html").is_file())
-        self.assertIn('src="banks/course.js"', (output / "index.html").read_text(encoding="utf-8"))
+        self.assertRegex((output / "index.html").read_text(encoding="utf-8"), r'src="banks/course\.js(?:\?[^\"]*)?"')
         self.assertNotIn("banks/tax.js", (output / "index.html").read_text(encoding="utf-8"))
         # A copied template must include every local runtime asset referenced by its shell.
         for resource in re.findall(r'(?:src|href)="([^"]+)"', (output / "index.html").read_text(encoding="utf-8")):
@@ -102,6 +102,7 @@ assert.equal(seen.size,2);"""
             expected = (ROOT / name).read_bytes()
             if name == "index.html":
                 expected = expected.replace(b"banks/tax.js", b"banks/course.js")
+                expected = re.sub(rb'\s*<script defer src="banks/example\.js(?:\?[^\"]*)?"></script>', b'', expected)
             self.assertEqual((SKILL / "assets" / "study-app" / name).read_bytes(), expected, name)
 
     def test_skill_zip_is_self_contained_with_one_top_level_folder(self):
@@ -126,7 +127,7 @@ assert.equal(seen.size,2);"""
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken reference in {doc.name}: {link}")
 
     def test_repository_agent_routes_resolve(self):
-        for doc in (ROOT / "AGENTS.md", ROOT / "AGENT_GUIDE.md", ROOT / "ELEMENTOR.md"):
+        for doc in (ROOT / "AGENTS.md", ROOT / "AGENT_GUIDE.md"):
             for link in re.findall(r"\]\(([^)]+)\)", doc.read_text(encoding="utf-8")):
                 if "://" not in link and not link.startswith("#"):
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken agent route in {doc.name}: {link}")
@@ -134,7 +135,7 @@ assert.equal(seen.size,2);"""
     def test_app_zip_contains_methodology_and_no_learning_data_or_nested_archives(self):
         with zipfile.ZipFile(ROOT / "downloads" / "study-scaffold.zip") as archive:
             names = archive.namelist()
-            for name in ("index.html", "AGENTS.md", "AGENT_GUIDE.md", "ELEMENTOR.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
+            for name in ("index.html", "AGENTS.md", "AGENT_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md"):
                 self.assertIn("study-scaffold/" + name, names)
             self.assertFalse(any(n.endswith(".zip") or "/.git/" in n or "/__pycache__/" in n for n in names))
             self.assertFalse(any(Path(n).name.startswith(("study-progress-", "study-stored-")) for n in names))

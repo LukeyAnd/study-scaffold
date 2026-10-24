@@ -9,7 +9,7 @@ Build a review that matches what the learner needs to do on the exam. Use suppli
 
 ## 1. Choose the route and read in order
 
-For a course review: inspect supplied material and context → [references/intake.md](references/intake.md) for unresolved questions → [references/research-methodology.md](references/research-methodology.md) for practice design → [references/authoring.md](references/authoring.md) only when building the browser app → `scripts/create_review.py` to assemble it. The script can be executed without loading its implementation unless it needs diagnosis or modification.
+For a course review: inspect supplied material and context → [references/intake.md](references/intake.md) for unresolved questions → [references/research-methodology.md](references/research-methodology.md) for practice design → [references/authoring.md](references/authoring.md) when creating/importing course JSON or adding material → `scripts/create_review.py` to assemble a standalone review if requested. The script can be executed without loading its implementation unless it needs diagnosis or modification.
 
 Read [references/intake-examples.md](references/intake-examples.md) only when an intake edge case applies. Use `assets/review-context.json` and `assets/review-plan-template.md` as working templates, not instructions to load every asset. `assets/study-app/` is the runnable template; inspect individual runtime files only when customizing or debugging them. For framework maintenance in the full repository, start with its root `AGENTS.md` and task-specific file map instead.
 
@@ -32,6 +32,8 @@ Match the actual response format. An essay, oral, coding, proof, or practical ex
 Write a review plan using `assets/review-plan-template.md`. Adapt scheduling to the exam horizon and real availability. Exact intervals and selection ratios are adjustable heuristics. Three immediate correct answers are not proof of delayed retention, and the app's mastery score is not a probability of passing.
 
 ## 4. Create the agreed deliverable
+
+For an existing SoS! class, inspect its exported authoring context/course file and return an additions-only patch when the user asks to add material. Preserve old IDs and questions; do not rewrite the app or regenerate the entire bank unnecessarily. The browser's Create with AI screen supplies the prompt and context, then validates imported additions. Read the incremental-update contract in [references/authoring.md](references/authoring.md).
 
 Honor the requested medium. For an offline browser tool, read [references/authoring.md](references/authoring.md), author a source-linked bank JSON, and use `scripts/create_review.py` with the bundled `assets/study-app` template. No network download or runtime account is required. This script needs Python 3.10+; without Python, copy the template and adapt the bank using the documented schema, or provide a chat/document review if that is the user's preferred medium.
 

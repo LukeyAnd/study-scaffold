@@ -46,7 +46,6 @@ For the full project, give the agent this starting instruction:
 
 The installed skill's `SKILL.md` gives its own six-step reading and execution order. Generated reviews include a local `AGENTS.md` pointing to course context, sources, bank data, and runtime files; the framework's test/packaging tools are not claimed to exist in those smaller folders. Some hosts discover these files automatically; otherwise explicitly ask the agent to read them.
 
-For a WordPress Elementor destination, use the optional [Elementor runbook](ELEMENTOR.md) after the agent entry point. It describes an embed/staging workflow and storage checks; it does not install or publish to a WordPress site by itself.
 
 ## Research and reproducible builds
 

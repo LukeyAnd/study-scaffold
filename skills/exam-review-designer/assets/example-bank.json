@@ -1,6 +1,7 @@
 {
   "id": "arithmetic-demo-v1",
   "title": "Arithmetic schema demonstration",
+  "subject": "Mathematics",
   "reviewStatus": "Demonstration only — not a course review",
   "topics": [{"id": "percentages", "name": "Percentages"}],
   "objectives": [{"id": "percent-of-quantity", "description": "Calculate a percentage of a quantity"}],

@@ -1,8 +1,9 @@
-/* To use this bank, replace banks/tax.js with banks/example.js in index.html. */
+/* A small second class and a replaceable bank example. */
 (function () {
-  globalThis.STUDY_BANK = {
+  const bank = {
     id: 'example-math-v1', // Stable id; change it when the curriculum changes substantially.
     title: 'Everyday math',
+    subject: 'Mathematics',
     reviewStatus: 'Starter bank · replace with your material',
     topics: [{ id: 'arithmetic', name: 'Arithmetic' }, { id: 'percentages', name: 'Percentages' }],
     glossary: { Percentage: 'A quantity expressed as a fraction of one hundred.' },
@@ -28,4 +29,6 @@
       }
     ]
   };
+  globalThis.STUDY_BANK ||= bank;
+  (globalThis.STUDY_COURSES ||= []).push(bank);
 })();

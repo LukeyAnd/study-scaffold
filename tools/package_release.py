@@ -6,14 +6,15 @@ from those canonical files. No progress, private intake files, or Git data is in
 """
 import argparse
 import hashlib
+import re
 import shutil
 import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
-TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "help.js", "styles.css", "favicon.svg")
-TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "AGENTS.md", "AGENT_GUIDE.md", "ELEMENTOR.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
+TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg")
+TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
 SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills", "downloads")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".yaml", ".yml"}
 
@@ -25,6 +26,7 @@ def sync_skill():
         data = (ROOT / name).read_bytes()
         if name == "index.html":
             data = data.replace(b"banks/tax.js", b"banks/course.js")
+            data = re.sub(rb'\s*<script defer src="banks/example\.js(?:\?[^\"]*)?"></script>', b'', data)
         if not (target / name).exists() or (target / name).read_bytes() != data:
             (target / name).write_bytes(data)
     for source, dest in ((ROOT / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):

@@ -5,6 +5,7 @@ dist/
 study-progress-*.json
 study-stored-*.json
 sos-*.json
+course-*.json
 .DS_Store
 Thumbs.db
 skill-observations/

@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "help.js", "styles.css", "favicon.svg")
+TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg")
 ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}\Z")
 
 
@@ -35,6 +35,7 @@ def read_json(path):
 
 def validate_bank(bank):
     require(isinstance(bank, dict) and identifier(bank.get("id")) and text(bank.get("title")), "Bank needs a stable id and title.")
+    require("subject" not in bank or text(bank["subject"]), "Subject must be nonempty text when supplied.")
     sets = {}
     for field in ("topics", "objectives", "sources", "questions"):
         entries = bank.get(field)

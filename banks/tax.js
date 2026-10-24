@@ -1453,5 +1453,7 @@ const GENERATORS = [
 ];
 
 
-globalThis.STUDY_BANK = { id: 'tax-midterm-v1', title: 'Tax midterm', description: 'Nine modules. Multiple ways to think.', reviewStatus: 'Example content · not independently reviewed', topics: TOPICS.map(t => ({ ...t, name: t.name.replace(/^\d+\. /, '') })), glossary: GLOSSARY, questions: GENERATORS };
+const bank = { id: 'tax-midterm-v1', title: 'Tax midterm', subject: 'Accounting', description: 'Nine modules. Multiple ways to think.', reviewStatus: 'Example content · not independently reviewed', topics: TOPICS.map(t => ({ ...t, name: t.name.replace(/^\d+\. /, '') })), glossary: GLOSSARY, questions: GENERATORS };
+globalThis.STUDY_BANK ||= bank;
+(globalThis.STUDY_COURSES ||= []).push(bank);
 })();
