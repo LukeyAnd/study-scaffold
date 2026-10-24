@@ -5,6 +5,7 @@ SoS! is a dependency-free browser study app and a portable review-authoring skil
 ## Read in this order
 
 1. Identify the requested outcome: create a course review, change the app, or prepare a release/integration. Inspect the working tree before editing; preserve unrelated work.
+   Use [START_HERE.md](START_HERE.md) and [SETUP.md](SETUP.md) for first-run/setup requests. Studying/importing/prompt generation needs no runtime installation. Standalone generation needs only Python; preview can reuse Node or Python. Check actual executables before installing anything.
 2. Use the routing table in [AGENT_GUIDE.md](AGENT_GUIDE.md). Read only the relevant route and its linked files. Do not load the example tax bank, every reference, or generated snapshots by default.
 3. For a new course review, begin at [skills/exam-review-designer/SKILL.md](skills/exam-review-designer/SKILL.md). That file defines the intake → sources → blueprint → authoring → verification sequence.
 4. Read the relevant implementation and tests before changing behavior. Canonical runtime files are at the repository root. `skills/exam-review-designer/assets/study-app/` is a generated copy; update the root first, then rebuild.
@@ -23,7 +24,7 @@ SoS! is a dependency-free browser study app and a portable review-authoring skil
 
 ## Verify and finish
 
-For runtime/engine changes run `npm test`. For skill, builder, packaging, or documentation-reference changes run `python -m unittest discover -s tests -p "*test.py"`. Node 20+ and Python 3.10+ are sufficient; no dependency installation is needed. See [AGENT_GUIDE.md](AGENT_GUIDE.md) for targeted browser checks and the packaging order.
+For runtime/engine changes run `node --test tests/*.test.cjs` (`npm test` is an equivalent shortcut). For skill, builder, packaging, or documentation-reference changes run `python -m unittest discover -s tests -p "*test.py"`. Node 20+ and Python 3.10+ are sufficient; no dependency installation is needed. See [AGENT_GUIDE.md](AGENT_GUIDE.md) for targeted browser checks and the packaging order.
 
 If delivery includes the app or skill ZIP, run `python tools/package_release.py` after source changes and rerun package tests. This synchronizes runtime/research snapshots and both ZIPs. Do not hand-edit generated copies or ZIP contents.
 

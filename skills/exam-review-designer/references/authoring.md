@@ -2,6 +2,8 @@
 
 The skill ZIP contains an offline app template. The script assembles a new review from a validated bank, resolved intake context, and a plan. It does not generate or verify subject knowledge on its own.
 
+Use [setup.md](setup.md) if the Python builder is needed or setup fails. It distinguishes browser/JSON use (no runtimes), standalone generation (Python only), and optional preview (Node or Python). The skill includes `scripts/setup.ps1` and a standard-library `scripts/serve.py`; keep tooling out of generated learner folders.
+
 A full bank may include a nonempty `subject` string to group the class in the app. `title` is the class name; its `topics` are the modules. The bank ID identifies its separate learning workspace. A generated app also supports importing other course JSON through All classes, or returning additions through Create with AI.
 
 ## Inputs and command

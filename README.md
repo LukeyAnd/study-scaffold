@@ -14,6 +14,8 @@ The `exam-review-designer` skill helps an agent inspect course material, gather 
 
 ## Get started
 
+**New here? Read [START_HERE.md](START_HERE.md).** Studying needs only a browser. [SETUP.md](SETUP.md) gives agents a minimal dependency check and opt-in installation for optional building/development tasks. The ZIP includes `Start SoS.cmd` for Windows; opening `index.html` also works.
+
 Start with **Create my review**, then use **What to upload** in the prompt builder. An exam guide/objectives, relevant assigned notes/textbook excerpts, and the exam format are a useful starting point; worked solutions, rubrics and representative questions improve the fit. See [SOURCE_GUIDE.md](SOURCE_GUIDE.md) for source authority, research policy and question-level accuracy checks. The tax and math banks are optional examples, not the framework's curriculum.
 
 Choose a subject/class from the **Class** dropdown; **All classes…** shows its modules and imports. **Options → Create with AI** generates a prompt for a new course or additions-only file, so material can be added without rewriting the app. See [COURSES.md](COURSES.md).
@@ -24,13 +26,15 @@ Choose a subject/class from the **Class** dropdown; **All classes…** shows its
 
 Keep the files together. Moving between local files, browsers, and a hosted website can create separate browser-storage locations. Open **Library**, choose **Data & backups**, and use **Save backup file / Load backup** to transfer progress. Your progress does not sync automatically.
 
-For a consistent local web address, optionally install Node.js 20 or newer and run:
+For a consistent local web address, optionally reuse Node.js 20+ or Python 3.10+ and run one of:
 
 ```sh
-npm run serve
+node tools/serve.cjs
+# or
+python tools/serve.py
 ```
 
-Open `http://127.0.0.1:4173`. There are no npm packages to install. If that port is busy, set the `PORT` environment variable to another port.
+Open the printed `http://127.0.0.1:4173` address. There are no npm/pip packages to install. If the port is busy, first check for an existing preview or choose `--port 4175`. `npm run serve` remains an optional convenience.
 
 ## What is included
 

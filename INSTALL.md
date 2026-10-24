@@ -1,5 +1,7 @@
 # Download and use the review framework
 
+For the shortest first-run path, use [START_HERE.md](START_HERE.md). No runtimes need installing to study or generate a prompt in the browser. [SETUP.md](SETUP.md) covers only the tools required for an optional builder/preview/development task and includes a read-only check plus explicit installation mode.
+
 There are two downloads. Choose the **app ZIP** to practice now or inspect the project. Choose the **skill ZIP** to teach your agent how to gather context and build a new course review.
 
 | Download | Use |

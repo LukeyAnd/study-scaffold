@@ -6,6 +6,7 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 
 | Requested outcome | Read first | Then inspect only what is relevant |
 | --- | --- | --- |
+| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](SETUP.md), [setup helper](tools/setup.ps1), [first-run evidence](FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
 | Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
 | Change appearance or interaction | [DESIGN.md](DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
 | Change adaptive selection or scheduling | [RESEARCH.md](RESEARCH.md) | [core.js](core.js), [engine tests](tests/engine.test.cjs); [app.js](app.js) only for the affected flow |
@@ -33,13 +34,13 @@ For course creation, the skill owns the authoring procedure; do not rewrite the 
 
 | Change | Evidence to collect |
 | --- | --- |
-| Engine, scheduling, or runtime behavior | `npm test`; inspect the relevant UI path when it changes |
+| Engine, scheduling, or runtime behavior | `node --test tests/*.test.cjs` (or `npm test`); inspect the relevant UI path when it changes |
 | Storage or timing | Unit checks plus browser reload, saved feedback without duplicate submission, selected-answer recovery, expired exam, export/import, stale second tab, and unavailable-storage behavior as applicable |
 | Interface | Exercise affected menus/keyboard behavior and a narrow/mobile layout; verify no overflow, readable questions, and usable light/dark states |
 | Skill, builder, packaging, or local documentation links | `python -m unittest discover -s tests -p "*test.py"`; generate a small review when generation changes |
 | Authored course questions | Independently solve and inspect source/version, ambiguity, distractors, and objective coverage; software validation cannot establish subject correctness |
 
-For local browser inspection, run `npm run serve` and open the printed localhost address. Use the configured host's actual browser/tool capabilities. If a port is busy, choose another and keep it stable when testing persistence. No browser automation package is a runtime requirement. State unavailable checks explicitly.
+For local browser inspection, run `node tools/serve.cjs` or `python tools/serve.py` and open the printed localhost address. Use the configured host's actual browser/tool capabilities. If a port is busy, choose another with `--port 4175` and keep it stable when testing persistence. No npm install or browser automation package is a runtime requirement. State unavailable checks explicitly.
 
 ## 5. Package and deliver when included in scope
 

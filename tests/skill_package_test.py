@@ -100,6 +100,9 @@ assert.equal(seen.size,2);"""
     def test_template_and_research_snapshots_match_canonical_sources(self):
         self.assertEqual((SKILL / "references" / "research-methodology.md").read_bytes(), (ROOT / "RESEARCH.md").read_bytes())
         self.assertEqual((SKILL / "references" / "source-quality.md").read_bytes(), (ROOT / "SOURCE_GUIDE.md").read_bytes())
+        self.assertEqual((SKILL / "references" / "setup.md").read_bytes(), (ROOT / "SETUP.md").read_bytes())
+        for name in ("setup.ps1", "serve.py"):
+            self.assertEqual((SKILL / "scripts" / name).read_bytes(), (ROOT / "tools" / name).read_bytes())
         for name in builder.TEMPLATE_FILES:
             expected = (ROOT / name).read_bytes()
             if name == "index.html":
@@ -129,7 +132,7 @@ assert.equal(seen.size,2);"""
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken reference in {doc.name}: {link}")
 
     def test_repository_agent_routes_resolve(self):
-        for doc in (ROOT / "AGENTS.md", ROOT / "AGENT_GUIDE.md"):
+        for doc in (ROOT / "AGENTS.md", ROOT / "AGENT_GUIDE.md", ROOT / "START_HERE.md", ROOT / "SETUP.md", ROOT / "FIRST_RUN_TEST.md"):
             for link in re.findall(r"\]\(([^)]+)\)", doc.read_text(encoding="utf-8")):
                 if "://" not in link and not link.startswith("#"):
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken agent route in {doc.name}: {link}")

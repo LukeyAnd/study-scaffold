@@ -5,6 +5,7 @@ This is a generated, local-first SoS! review. Follow the user's requested outcom
 ## Read in this order
 
 1. [README.md](README.md): how to launch this particular review and its limits.
+   Studying and importing course JSON need only a browser. On Windows, double-click `Start SoS.cmd`; otherwise open `index.html`. If a local server is needed, reuse an available Node or Python runtime. The original skill's `references/setup.md` and `scripts/setup.ps1` guide tool checks; Python is needed only to rebuild a standalone review. This generated folder does not contain the full repository's setup or test tools.
 2. [review-context.json](review-context.json): resolved scope, exam constraints, assumptions, and open questions. Reuse these facts; ask only about gaps that affect the requested work.
 3. [REVIEW_PLAN.md](REVIEW_PLAN.md), then [SOURCES.md](SOURCES.md): intended coverage, practice sequence, and source locations. Inspect the actual relevant source before asserting course correctness; a listed source is not proof of access.
    Read [QUESTION_AUDIT.md](QUESTION_AUDIT.md) for checks actually performed. The builder's initial template is unreviewed; fill it from actual source/solution/distractor checks rather than treating its existence as approval.

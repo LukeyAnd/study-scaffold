@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg")
+TEMPLATE_FILES = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
 ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}\Z")
 
 
@@ -127,7 +127,7 @@ def create_review(bank_path, context_path, plan_path, output):
     (target / "REVIEW_PLAN.md").write_text(plan, encoding="utf-8")
     (target / "SOURCES.md").write_text("# Source register\n\n" + "\n\n".join(f"## {s['id']}: {s['title']}\n\n{s['locator']}\n\nVersion: {s.get('version', 'not specified')}" for s in bank["sources"]) + "\n", encoding="utf-8")
     (target / "README.md").write_text(
-        "# Your exam review\n\nOpen index.html in a browser with the files kept together. No installation or internet connection is needed.\n\n"
+        "# Your exam review\n\nOpen index.html in a browser with the files kept together, or double-click Start SoS.cmd on Windows. Studying needs no Node.js, Python, SQL, npm packages, installation or internet connection.\n\n"
         "Read REVIEW_PLAN.md for the scope, assumptions, schedule, and assessment limits. Source locations appear in explanations and SOURCES.md. QUESTION_AUDIT.md starts unreviewed; fill it with actual content checks before claiming question accuracy.\n\n"
         "This app scores four-option MCQs. Use companion tasks for written/oral assessment. Learning scores are heuristics, not pass probabilities.\n\n"
         "Progress and the unfinished session save in this browser. Open Library, choose Data & backups, and save a dated JSON backup before changing devices or locations. Response time is recorded automatically; no confidence rating is needed.\n\n"

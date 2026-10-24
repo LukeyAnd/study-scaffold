@@ -11,5 +11,10 @@ const server=http.createServer((req,res)=>{
     fs.readFile(filename,(err,data)=>{if(err){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':mime[path.extname(filename)]||'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(data);});
   }catch(_){res.writeHead(400);res.end('Bad request');}
 });
-const port=Number(process.env.PORT)||4173;
-server.listen(port,'127.0.0.1',()=>console.log(`Study Scaffold: http://127.0.0.1:${port}`));
+const portIndex=process.argv.indexOf('--port');
+const port=Number(portIndex>=0?process.argv[portIndex+1]:process.env.PORT??4173);
+if(!Number.isInteger(port)||port<0||port>65535){console.error('Choose a port from 0 to 65535 with --port NUMBER.');process.exitCode=1;}
+else{
+  server.on('error',error=>{console.error(`Cannot open preview port ${port}: ${error.code||error.message}. Keep an existing SoS preview open or choose --port NUMBER.`);process.exitCode=1;});
+  server.listen(port,'127.0.0.1',()=>console.log(`SoS preview: http://127.0.0.1:${server.address().port} (Ctrl+C to stop)`));
+}
