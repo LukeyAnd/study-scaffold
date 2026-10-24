@@ -2,7 +2,7 @@
 
 A quiet, dependency-free study app that adapts as you practice. Open it in a browser, replace the question bank with your material, and share the folder with anyone.
 
-**[Download the project](https://github.com/LukeyAnd/study-scaffold/archive/refs/heads/main.zip)** · **[Source](https://github.com/LukeyAnd/study-scaffold)**
+**[Open the app](https://lukeyand.github.io/study-scaffold/)** · **[Download the project](https://github.com/LukeyAnd/study-scaffold/archive/refs/heads/main.zip)** · **[Source](https://github.com/LukeyAnd/study-scaffold)**
 
 ## Get started
 
@@ -121,7 +121,7 @@ The suite exercises all 54 supplied generators across 100 random variations each
 
 Send the repository link or a ZIP of the project. Each learner gets their own progress in their own browser. Progress files and screenshots are ignored by Git.
 
-For a hosted link, the project is ready for **GitHub Pages**: in the repository's **Settings → Pages**, choose **Deploy from a branch**, then **main** and **/(root)**. A static host can serve the same files. Hosting does not add progress syncing or accounts. The app's own code sends no study data to a server; the hosting provider will still receive normal page requests.
+This repository is configured for **GitHub Pages** at **https://lukeyand.github.io/study-scaffold/**. For your own fork, open **Settings → Pages**, choose **Deploy from a branch**, then **main** and **/(root)**. A static host can serve the same files. Hosting does not add progress syncing or accounts. The app's own code sends no study data to a server; the hosting provider will still receive normal page requests.
 
 ## Storage limits and known tradeoffs
 

@@ -4,6 +4,7 @@
   const $ = (s, root = document) => root.querySelector(s);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   const main = $('#main');
+  const decodeSegment = value => { try { return decodeURIComponent(value || ''); } catch (_) { return ''; } };
   let bank;
   try { bank = E.validateBank(globalThis.STUDY_BANK); } catch (error) { main.textContent = `Cannot load study bank: ${error.message}`; return; }
   const key = `study-scaffold:${bank.id}:v1`;
@@ -123,7 +124,7 @@
   function download(content,name,type='application/json') {const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
   function eventList(filter,title) {const events=state.events.filter(filter);main.innerHTML=heading('ANSWER HISTORY',title,`${events.length} matching answers in the retained history. Select a scenario to practice it.`)+`<section class="card">${events.length?events.slice(-100).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle||e.id)}<small>${new Date(e.at).toLocaleString()} · ${esc(topicName(qMap.get(e.id)?.topic))} · ${esc(e.confidence)}</small></span><div class="actions"><span class="tag ${e.correct?'green':'red'}">${e.correct?'Correct':'Incorrect'}</span>${btn('Practice','start-one',`data-id="${esc(e.id)}"`)}</div></div>`).join(''):'<p class="empty">No matching answers yet.</p>'}${events.length>100?'<p class="note">Showing the latest 100 matching answers.</p>':''}</section>`; }
   function render(){const path=location.hash.slice(1)||'overview';const [page,kind,id]=path.split('/'); document.querySelectorAll('[data-route]').forEach(a=>{const active=a.dataset.route===page||(page==='detail'&&a.dataset.route==='insights');if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});$('#breadcrumb').textContent=({overview:'Your learning, in focus',practice:'Room to think',insights:'Evidence, made useful',builder:'A session that fits',library:'Everything in its place',detail:'From overview to understanding'})[page]||'Your workspace';
-    if(page==='overview')overview();else if(page==='practice')renderPractice();else if(page==='insights')insights();else if(page==='builder')builder();else if(page==='library')library();else if(page==='detail')detail(kind,decodeURIComponent(id||''));else if(page==='answers')eventList(()=>true,'Every answer tells a story.');else if(page==='confident')eventList(e=>e.confidence==='sure'&&!e.correct,'Confident mistakes, worth revisiting.');else{route('overview');return;} document.title=`${page==='detail'?(kind==='topic'?topicName(decodeURIComponent(id||'')):decodeURIComponent(id||'Detail')):page.charAt(0).toUpperCase()+page.slice(1)} · Study Scaffold`;
+    if(page==='overview')overview();else if(page==='practice')renderPractice();else if(page==='insights')insights();else if(page==='builder')builder();else if(page==='library')library();else if(page==='detail')detail(kind,decodeSegment(id));else if(page==='answers')eventList(()=>true,'Every answer tells a story.');else if(page==='confident')eventList(e=>e.confidence==='sure'&&!e.correct,'Confident mistakes, worth revisiting.');else{route('overview');return;} document.title=`${page==='detail'?(kind==='topic'?topicName(decodeSegment(id)):decodeSegment(id)||'Detail'):page.charAt(0).toUpperCase()+page.slice(1)} · Study Scaffold`;
   }
   const actions={overview:()=>route('overview'),insights:()=>route('insights'),library:()=>route('library'),builder:()=>route('builder'),
     'start-adaptive':()=>start(bank.questions),
@@ -158,6 +159,7 @@
   $('#theme-button').textContent=`Switch to ${document.body.classList.contains('dark')?'light':'dark'} theme`;
   $('#focus-button').addEventListener('click',()=>{document.body.classList.toggle('focus');const focus=document.body.classList.contains('focus');$('#focus-button').textContent=focus?'Exit focus mode':'Focus mode';$('#focus-button').setAttribute('aria-pressed',String(focus));});
   window.addEventListener('hashchange',()=>{render();main.focus();window.scrollTo({top:0});});
+  $('.skip-link').addEventListener('click',e=>{e.preventDefault();main.focus();});
   window.addEventListener('beforeunload',e=>{if(session&&!session.ended){e.preventDefault();e.returnValue='';}});
   window.addEventListener('storage',e=>{if(e.key===key)notify('Progress changed in another tab. Export this tab’s data or reload before continuing.');});
   render();
