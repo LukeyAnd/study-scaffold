@@ -113,26 +113,24 @@ def create_review(bank_path, context_path, plan_path, output):
     template = SKILL_ROOT / "assets" / "study-app"
     agent_guide = SKILL_ROOT / "assets" / "review-agent-guide.md"
     audit_template = SKILL_ROOT / "assets" / "question-audit-template.md"
-    require(all((template / f).is_file() for f in TEMPLATE_FILES) and agent_guide.is_file() and audit_template.is_file(), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
+    human_readme = SKILL_ROOT / "assets" / "review-readme.md"
+    preview = SKILL_ROOT / "scripts" / "serve.py"
+    require(all((template / f).is_file() for f in TEMPLATE_FILES) and all(p.is_file() for p in (agent_guide, audit_template, human_readme, preview)), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
     compiled = compile_bank(bank)
     target.mkdir(parents=True)
     for filename in TEMPLATE_FILES:
         shutil.copyfile(template / filename, target / filename)
     shutil.copyfile(agent_guide, target / "AGENTS.md")
     shutil.copyfile(audit_template, target / "QUESTION_AUDIT.md")
+    shutil.copyfile(human_readme, target / "README.md")
+    (target / "tools").mkdir()
+    shutil.copyfile(preview, target / "tools" / "serve.py")
     (target / "banks").mkdir()
     (target / "banks" / "course.js").write_text(compiled, encoding="utf-8")
     (target / "bank.json").write_text(json.dumps(bank, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (target / "review-context.json").write_text(json.dumps(context, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (target / "REVIEW_PLAN.md").write_text(plan, encoding="utf-8")
     (target / "SOURCES.md").write_text("# Source register\n\n" + "\n\n".join(f"## {s['id']}: {s['title']}\n\n{s['locator']}\n\nVersion: {s.get('version', 'not specified')}" for s in bank["sources"]) + "\n", encoding="utf-8")
-    (target / "README.md").write_text(
-        "# Your exam review\n\nOpen index.html in a browser with the files kept together, or double-click Start SoS.cmd on Windows. Studying needs no Node.js, Python, SQL, npm packages, installation or internet connection.\n\n"
-        "Read REVIEW_PLAN.md for the scope, assumptions, schedule, and assessment limits. Source locations appear in explanations and SOURCES.md. QUESTION_AUDIT.md starts unreviewed; fill it with actual content checks before claiming question accuracy.\n\n"
-        "This app scores four-option MCQs. Use companion tasks for written/oral assessment. Learning scores are heuristics, not pass probabilities.\n\n"
-        "Progress and the unfinished session save in this browser. Open Library, choose Data & backups, and save a dated JSON backup before changing devices or locations. Response time is recorded automatically; no confidence rating is needed.\n\n"
-        "This folder includes course context and a source-linked question bank. Check it for private or restricted material before sharing.\n",
-        encoding="utf-8")
     shutil.copyfile(SKILL_ROOT / "LICENSE", target / "LICENSE")
     return target
 

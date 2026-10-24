@@ -17,6 +17,7 @@ Checked October 24, 2026 on Windows with Chrome, PowerShell 5.1, and existing ho
 | Move a progress backup into a second empty profile | Reimported course and restored backup recover submitted feedback; tested at 375 px without horizontal overflow |
 | Build with only the extracted skill and its example inputs | Generates a standalone review in a fresh folder, with source/context/plan files, an explicitly unreviewed question-audit template, and the Windows launcher |
 | Generated review opened independently | Loads its own assets, presents the authored course, and shows question feedback with sources |
+| Generated preview moved and restarted (v1.0.1) | The included server serves the moved review, stops, and serves its bank again on the same address/port after restart |
 | Both optional preview servers | Serve HTML/JavaScript, reject private paths, and need no additional packages; a busy Python port produces an actionable error |
 
 The arithmetic example is a software fixture. These checks do not establish the correctness or exam coverage of a learner's course. Follow the source and question-audit workflow for that review.

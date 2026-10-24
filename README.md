@@ -2,9 +2,9 @@
 
 A minimal study framework built around **your own course sources**. Create a review with your preferred AI, check its questions, and practice adaptively in a browser.
 
-**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.0.0.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)**
+**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.0.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)**
 
-## Download and start
+## For humans — download and start
 
 1. Download the ZIP above, or use **Code → Download ZIP** for the latest repository version.
 2. Extract the **entire folder**. Open `index.html` in a modern browser; Windows users can also double-click `Start SoS.cmd`.
@@ -14,6 +14,43 @@ A minimal study framework built around **your own course sources**. Create a rev
 **Studying needs only a browser.** No account, API key, Node.js, Python, SQL, or package installation is required. Keep the extracted files together. If local-file browser behavior causes trouble, use the [optional localhost preview](SETUP.md#optional-preview) or hosted app.
 
 Start with an exam guide/objectives, relevant assigned notes or textbook excerpts, and the exam format. Worked solutions and rubrics improve the fit. The browser does not read PDFs or call an AI itself. See [what to upload and verify](SOURCE_GUIDE.md).
+
+## For humans — start or restart local study
+
+These are commands **you run in a terminal after the review is built**, rather than instructions to paste into an AI chat. Opening `index.html` directly is still an option; a local server gives the browser a consistent address for your study workspace.
+
+### Start
+
+1. Open a terminal **in the extracted project or generated review folder** that contains `index.html` and `tools/`. On Windows, open that folder in File Explorer, type `powershell` in its address bar, and press Enter. On macOS/Linux, open Terminal and use `cd` to enter that folder.
+2. Run **one** command below, using a runtime you already have. The Python command works in both the full project and newly generated reviews; the Node command is available in the full project.
+
+With Python 3.10+:
+
+```sh
+python tools/serve.py --port 4173
+```
+
+If your computer uses the `python3` command instead, substitute `python3` for `python`. In the full project, Node.js 20+ is an alternative:
+
+```sh
+node tools/serve.cjs --port 4173
+```
+
+3. Open **http://127.0.0.1:4173** in your browser. Keep the terminal open while studying. You do not need to install npm/pip packages or rerun the review builder. If the command is not recognized, see [SETUP.md](SETUP.md) before installing tools.
+
+### Stop and return later
+
+- **Stop:** press **Ctrl+C** in that terminal. This stops the local server; it does not delete saved browser progress.
+- **Restart:** open a terminal in the same review folder and run the same command again. You can press **Up Arrow**, then **Enter**, if that command is still in the terminal's history.
+- **Resume:** reopen **http://127.0.0.1:4173** in the same browser profile, select your class, and choose **Resume session** when one is unfinished. A timed exam keeps its original deadline while the server is stopped.
+- **If the browser cannot connect:** check that the command is still running. If the port is already in use, first check whether your review is already open at that address; see [preview troubleshooting](SETUP.md#optional-preview) before switching ports.
+
+### What happens behind the scenes
+
+- The server serves the review's files **on your computer only**. It does not publish the review online or run an AI.
+- Your browser runs the questions, adaptive selection, charts, and study session. Progress is saved in that browser's local database, rather than in the terminal/server.
+- Use the same folder, browser profile, and address/port when returning. `localhost`, `127.0.0.1`, another port, and a directly opened file can have separate saves. Export a backup before changing where you study or clearing browser data.
+- If an agent gives you a generated review folder, follow **that folder's README**. Its included Python preview works independently of the original project or installed skill.
 
 ## What it does
 
@@ -27,9 +64,9 @@ Start with an exam guide/objectives, relevant assigned notes or textbook excerpt
 
 [FEATURES.md](FEATURES.md) breaks down current capabilities, boundaries, and proposed improvements.
 
-## Use the included agent skill
+## For humans — create a review with an AI
 
-The same ZIP contains `skills/exam-review-designer/`. Give your agent this instruction:
+The same ZIP contains `skills/exam-review-designer/`. Paste the following into **your AI chat, not your terminal**:
 
 > Read skills/exam-review-designer/SKILL.md and follow its workflow. Build a review from my sources, ask only for consequential missing context, verify the questions and sources, and report what you actually checked. Reuse existing tools and install only a missing requirement needed for this task.
 
@@ -46,7 +83,7 @@ For repeated use, copy that folder into your agent's supported skills directory;
 
 ## First release and limits
 
-**v1.0.0 is the first public release.** Earlier package version numbers were development bookkeeping. See [CHANGELOG.md](CHANGELOG.md), [release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
+**v1.0.0 was the first public release; v1.0.1 adds human restart instructions and a portable preview for generated reviews.** Earlier package version numbers were development bookkeeping. See [CHANGELOG.md](CHANGELOG.md), [first-release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
 
 - Adaptation uses transparent heuristics. Mastery scores and response speed do not predict passing or certify durable retention.
 - The app scores MCQs; other exam formats need companion practice. Static answer keys are inspectable, so exam mode is for personal study.
@@ -64,7 +101,11 @@ For repeated use, copy that folder into your agent's supported skills directory;
 | Learning evidence and proposed next steps | [RESEARCH.md](RESEARCH.md) |
 | An agent changing this repository | [AGENTS.md](AGENTS.md), [AGENT_GUIDE.md](AGENT_GUIDE.md) |
 
-## Develop and verify
+## For AI agents
+
+For repository work, read [AGENTS.md](AGENTS.md), then the matching route in [AGENT_GUIDE.md](AGENT_GUIDE.md). For course creation, follow [the skill workflow](skills/exam-review-designer/SKILL.md). Hand the learner a runnable folder with a human README and the actual local-preview command; keep source checking and agent implementation instructions in their own files.
+
+## For developers — verify changes
 
 The app uses plain HTML, CSS, and JavaScript with no third-party runtime dependencies. Optional preview needs either Node.js 20+ or Python 3.10+:
 

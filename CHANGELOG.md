@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 — October 24, 2026
+
+- Added clearly separated human terminal instructions and AI-agent routes in the repository README.
+- Documented starting, stopping and restarting a local session, keeping a stable address, and where browser progress is saved.
+- Every generated review now includes a human README and its own dependency-free Python preview in `tools/serve.py`, so it can be served after the original skill/project is moved or unavailable.
+- Added a generated-review server restart check; app runtime and learning behavior are unchanged.
+
 ## 1.0.0 — October 24, 2026
 
 First public release of SoS!, a source-first browser study framework and optional review-authoring agent skill. Earlier package versions described development iterations; there were no earlier GitHub releases.

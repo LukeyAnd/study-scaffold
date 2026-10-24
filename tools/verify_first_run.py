@@ -75,7 +75,7 @@ def main():
         built = subprocess.run([sys.executable, str(skill / 'scripts' / 'create_review.py'), '--bank', str(skill / 'assets' / 'example-bank.json'), '--context', str(context), '--plan', str(plan), '--output', str(output)], capture_output=True, text=True, timeout=30)
         if built.returncode:
             raise RuntimeError('Extracted skill could not build a review:\n' + (built.stdout + built.stderr)[-4000:])
-        assert (output / 'Start SoS.cmd').is_file()
+        assert (output / 'Start SoS.cmd').is_file() and (output / 'tools' / 'serve.py').is_file()
         assert (output / 'QUESTION_AUDIT.md').read_text(encoding='utf-8').startswith('# Question audit')
         results['standaloneSkillGeneration'] = True
         if os.name == 'nt' and shutil.which('powershell.exe'):
@@ -92,7 +92,7 @@ def main():
             node = os.environ.get('STUDY_NODE') or shutil.which('node')
             if not node:
                 raise RuntimeError('Browser QA needs host Node; set STUDY_NODE. The study app does not require it.')
-            with preview([sys.executable, str(app / 'tools' / 'serve.py'), '--port', '0']) as app_url, preview([sys.executable, str(skill / 'scripts' / 'serve.py'), '--root', str(output), '--port', '0']) as review_url:
+            with preview([sys.executable, str(app / 'tools' / 'serve.py'), '--port', '0']) as app_url, preview([sys.executable, str(output / 'tools' / 'serve.py'), '--port', '0']) as review_url:
                 checked = subprocess.run([node, str(ROOT / 'tools' / 'first_run_browser.cjs'), app_url, review_url, str(skill / 'assets' / 'example-bank.json')], capture_output=True, text=True, timeout=150)
                 if checked.returncode:
                     raise RuntimeError('First-run browser check failed:\n' + (checked.stdout + checked.stderr)[-6000:])

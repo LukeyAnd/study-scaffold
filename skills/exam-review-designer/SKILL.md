@@ -51,6 +51,8 @@ Keep `review-context.json`, a source register, and `REVIEW_PLAN.md` with the gen
 
 The builder also writes a short `AGENTS.md` into the generated review, from `assets/review-agent-guide.md`. Keep that guide with the shared folder so the next agent can locate course context, sources, bank data, runtime files, and recovery guidance. If assembling manually without Python, adapt the same guide to the files actually delivered and remove links to absent files.
 
+The generated human `README.md` comes from `assets/review-readme.md` and explains starting, stopping and restarting the included `tools/serve.py`. Give the learner the actual review folder and launch command; distinguish terminal commands for humans from prompts for their AI chat. Keep the preview with the complete folder so later sessions do not depend on the installed skill's location. For manual assembly, copy `assets/review-readme.md` to `README.md` and `scripts/serve.py` to `tools/serve.py`, and verify that the delivered instructions match the actual files.
+
 ## 5. Verify observable results
 
 Independently solve each item, check the source and version, examine ambiguity and distractors, and verify blueprint coverage. Run available bank/engine checks and inspect the generated interface if possible. A schema check does not verify subject correctness. If browser inspection is unavailable, state that limit rather than claiming visual verification.

@@ -29,6 +29,7 @@ SoS! helps students turn their own course material into a review, practice it in
 - Agents use available question widgets or chat to gather consequential missing context.
 - Source guidance covers editions/dates, exact locators, conflicting information, and an inspectable question audit. Correctness still requires actual review.
 - The Python builder creates a standalone browser review with course data, context, a review plan, a source register, an initially unreviewed audit template, and agent handoff instructions.
+- Generated reviews include a human start/stop/restart guide and their own Python preview server, so local hosting does not depend on finding the original project or skill.
 - The agent workflow can prepare companion tasks for other exam formats; the browser app currently scores multiple-choice questions only.
 
 ## Adaptive practice and feedback

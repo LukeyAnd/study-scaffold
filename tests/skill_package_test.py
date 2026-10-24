@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import urllib.request
 import zipfile
 from pathlib import Path
 
@@ -48,13 +49,14 @@ class SkillPackageTests(unittest.TestCase):
         for resource in re.findall(r'(?:src|href)="([^"]+)"', (output / "index.html").read_text(encoding="utf-8")):
             if not resource.startswith(("#", "http:", "https:")):
                 self.assertTrue((output / resource.split('?', 1)[0]).is_file(), f"Missing runtime asset: {resource}")
-        for name in ("AGENTS.md", "QUESTION_AUDIT.md", "SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE"):
+        for name in ("AGENTS.md", "QUESTION_AUDIT.md", "SOURCES.md", "REVIEW_PLAN.md", "bank.json", "review-context.json", "LICENSE", "tools/serve.py"):
             self.assertTrue((output / name).is_file(), name)
         self.assertEqual((output / "AGENTS.md").read_bytes(), (SKILL / "assets" / "review-agent-guide.md").read_bytes())
         self.assertEqual((output / "QUESTION_AUDIT.md").read_bytes(), (SKILL / "assets" / "question-audit-template.md").read_bytes())
-        for link in re.findall(r"\]\(([^)]+)\)", (output / "AGENTS.md").read_text(encoding="utf-8")):
-            if "://" not in link and not link.startswith("#"):
-                self.assertTrue((output / link.split("#")[0]).exists(), f"Broken generated agent route: {link}")
+        for name in ("AGENTS.md", "README.md"):
+            for link in re.findall(r"\]\(([^)]+)\)", (output / name).read_text(encoding="utf-8")):
+                if "://" not in link and not link.startswith("#"):
+                    self.assertTrue((output / link.split("#")[0]).exists(), f"Broken generated route in {name}: {link}")
         node = os.environ.get("STUDY_NODE") or shutil.which("node")
         if not node:
             self.skipTest("Generated files checked; set STUDY_NODE to execute the generated bank through the engine.")
@@ -74,6 +76,21 @@ assert.equal(seen.size,2);"""
             builder.create_review(self.bank_path, self.context_path, self.plan_path, output)
         self.assertEqual(marker.read_text(encoding="utf-8"), "user content")
         self.assertEqual(len(list(output.iterdir())), 1)
+
+    def test_generated_preview_can_move_and_restart_on_the_same_address(self):
+        from tools.verify_first_run import preview
+        output = builder.create_review(self.bank_path, self.context_path, self.plan_path, self.folder / "review")
+        moved = self.folder / "moved review with spaces"
+        shutil.move(str(output), moved)
+        command = [os.sys.executable, str(moved / "tools" / "serve.py"), "--port"]
+        with preview([*command, "0"]) as address:
+            with urllib.request.urlopen(address, timeout=5) as response:
+                self.assertEqual(response.read(), (moved / "index.html").read_bytes())
+            port = address.rsplit(":", 1)[1]
+        with preview([*command, port]) as restarted:
+            self.assertEqual(restarted, address)
+            with urllib.request.urlopen(restarted + "/banks/course.js", timeout=5) as response:
+                self.assertEqual(response.read(), (moved / "banks" / "course.js").read_bytes())
 
     def test_unknown_sources_objectives_and_duplicate_choices_are_rejected(self):
         for field, value in (("sourceRefs", [{"sourceId": "missing", "locator": "page 1"}]), ("objectiveIds", ["missing"])):
@@ -115,7 +132,7 @@ assert.equal(seen.size,2);"""
         with zipfile.ZipFile(DIST / "exam-review-designer.zip") as archive:
             names = archive.namelist()
             self.assertEqual({Path(n).parts[0] for n in names}, {"exam-review-designer"})
-            for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "assets/review-agent-guide.md", "assets/question-audit-template.md", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/source-quality.md", "references/intake.md"):
+            for name in ("SKILL.md", "LICENSE", "scripts/create_review.py", "scripts/serve.py", "assets/review-readme.md", "assets/review-agent-guide.md", "assets/question-audit-template.md", "assets/study-app/index.html", "assets/study-app/core.js", "references/research-methodology.md", "references/source-quality.md", "references/intake.md"):
                 self.assertIn("exam-review-designer/" + name, names)
             for name in names:
                 self.assertNotIn("..", Path(name).parts)

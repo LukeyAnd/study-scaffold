@@ -56,7 +56,15 @@ python tools/serve.py
 
 Open the printed `http://127.0.0.1:4173` address. Keep that address/port consistent for progress. Stop the server with Ctrl+C. If the port is busy, first check whether the existing SoS preview is already the one you need; otherwise use `--port 4175` with either server. `npm run serve` is a convenience, but calling Node directly avoids Windows `npm.ps1` policy issues.
 
-For a generated review folder, the installed skill's Python preview can serve the output:
+Newly generated review folders include their own preview. Open a terminal in that review folder and run:
+
+```sh
+python tools/serve.py --port 4173
+```
+
+Press Ctrl+C to stop. Later, run the same command in the same folder and reopen the same address in the same browser profile. Progress lives in the browser, so stopping the server does not delete it. The human README in each generated folder explains this sequence. Python may be named `python3` on your system.
+
+For an older generated review without that helper, the installed skill's Python preview can still serve the output:
 
 ```sh
 python /path/to/exam-review-designer/scripts/serve.py --root "/path/to/generated review" --port 4173
