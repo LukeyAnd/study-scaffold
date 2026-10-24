@@ -10,6 +10,8 @@ The interface uses a minimal SoS! wordmark, double-spaced typography, consistent
 
 The `exam-review-designer` skill helps an agent inspect course material, gather missing context through question widgets or chat, map objectives, and build a source-linked review. Its self-contained ZIP includes the research, intake/plan templates, a Python builder, and the offline app template. The methodology distinguishes research findings from this app's adjustable heuristics. See the [download page](https://lukeyand.github.io/study-scaffold/downloads/) for both packages.
 
+See [suggested student improvements](RESEARCH.md#suggested-next-steps-for-students) for the researched next-step priorities and their evidence limits. These are proposals, not implemented features.
+
 **For AI agents:** start with [AGENTS.md](AGENTS.md), then use the task-specific reading order in [AGENT_GUIDE.md](AGENT_GUIDE.md). The skill has its own numbered workflow, and every generated course review includes an `AGENTS.md` with a local file map. Keep these routes current when the program or workflow changes.
 
 ## Get started
