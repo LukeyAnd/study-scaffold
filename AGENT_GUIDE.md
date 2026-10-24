@@ -56,6 +56,8 @@ Review this map and `AGENTS.md` when runtime files/entry points, storage contrac
 
 At a context handoff, record only the requested outcome, resolved constraints, relevant files, completed changes, actual checks, and the next unresolved step. Do not paste the whole conversation or private course data into a public guide. This can be a brief message or the host's normal task record; it does not require a new planning-file hierarchy.
 
+Keep [FEATURES.md](FEATURES.md) and the README summary aligned with current capabilities. Clearly separate implemented behavior from research proposals when features change.
+
 ## Why the instructions are arranged this way
 
 Checked October 24, 2026. OpenAI documents staged skill loading and repository-level instructions. This project's short entry point, task routes, and on-demand references apply that guidance; they do not guarantee identical discovery or execution in every AI host. [Skills](https://learn.chatgpt.com/docs/build-skills), [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [development workflow guidance](https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex).

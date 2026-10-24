@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
 TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
-TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "START_HERE.md", "SETUP.md", "FIRST_RUN_TEST.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
+TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "START_HERE.md", "SETUP.md", "FIRST_RUN_TEST.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
 SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills", "downloads")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".ps1", ".cmd", ".yaml", ".yml"}
 

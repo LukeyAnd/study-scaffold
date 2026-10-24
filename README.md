@@ -8,6 +8,8 @@ The interface uses a minimal SoS! wordmark, double-spaced typography, consistent
 
 **[Download app ZIP](https://lukeyand.github.io/study-scaffold/downloads/study-scaffold.zip)** · **[Download agent skill ZIP](https://lukeyand.github.io/study-scaffold/downloads/exam-review-designer.zip)** · **[Install the skill](INSTALL.md)** · **[Research & methodology](RESEARCH.md)**
 
+**[Features & scope](FEATURES.md)** — a section-by-section overview of what the app and agent skill do, how data is saved, and what remains proposed.
+
 The `exam-review-designer` skill helps an agent inspect course material, gather missing context through question widgets or chat, map objectives, and build a source-linked review. Its self-contained ZIP includes the research, intake/plan templates, a Python builder, and the offline app template. The methodology distinguishes research findings from this app's adjustable heuristics. See the [download page](https://lukeyand.github.io/study-scaffold/downloads/) for both packages.
 
 See [suggested student improvements](RESEARCH.md#suggested-next-steps-for-students) for the researched next-step priorities and their evidence limits. These are proposals, not implemented features.
@@ -40,20 +42,14 @@ Open the printed `http://127.0.0.1:4173` address. There are no npm/pip packages 
 
 ## What is included
 
-- A consolidated overview with a recommended session, compact mastery/accuracy/coverage metrics, and an expandable category map.
-- Subject/class selection with independent sessions and a local course library; validated course import and append-only additions.
-- A local prompt generator with source/ID context export for the learner's preferred AI tool.
-- Modules drawn from your supplied scope; optional examples demonstrate nine tax modules and two math modules. Thinking-skill labels include calculation, reverse reasoning, error spotting, comparison, application, and concepts.
-- Adaptive practice that re-evaluates the next question after each answer.
-- Per-scenario review scheduling and an anti-repeat window that shrinks to fit the available pool.
-- Selectable Insights views with clickable mastery bars, skill breakdowns, daily activity charts, and answer history.
-- Quizzes from recommended material, recent mistakes, due reviews, or a random selection.
-- Exam mode with an optional time limit and explanations withheld until the end.
-- Results with question-by-question review and a shortcut to retry missed scenarios.
-- Double-spaced questions, answers, and explanations; responsive layout; focus mode; light and dark themes; keyboard support.
-- Automatic active response timing with no confidence-rating step; timing charts do not penalize learning scores.
-- A local browser database that resumes the exact unfinished session, seven dated restore points, and readable JSON backup files. No analytics or external network requests.
-- A subject-independent engine, a small replacement-bank example, and automated engine tests.
+Read [FEATURES.md](FEATURES.md) for the full scope, organized into short sections and bullet points.
+
+- **Your material:** subjects, classes, modules, source-linked course imports, and additions without rewriting the app.
+- **AI authoring:** a local prompt generator and an optional agent skill with intake, source verification, review planning, and standalone review generation.
+- **Study sessions:** adaptive MCQ practice, targeted quizzes, timed/untimed exams, explanatory feedback, and answer review.
+- **Insights:** clickable category/skill breakdowns, activity charts, mistakes, session history, and descriptive timing.
+- **Continuity:** separate class workspaces, exact-session recovery, dated restore points, and portable JSON backups.
+- **Simple delivery:** spacious browser UI, offline downloads, setup guidance, public source, and reusable content templates.
 
 ## How adaptation works
 
@@ -136,6 +132,7 @@ midterm_trainer.html       Unchanged supplied original, kept for reference
 DESIGN.md                  Design decisions and suggested next improvements
 REVIEW.md                  Code-review findings and implementation notes
 RESEARCH.md                Cited learning methodology and research limits
+FEATURES.md                Current capabilities, boundaries, and proposed additions
 STORAGE.md                 Session recovery, dated backups, and timing data
 INSTALL.md                 Skill installation and download guide
 skills/exam-review-designer/ Portable intake, authoring workflow, and app template
