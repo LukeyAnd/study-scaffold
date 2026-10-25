@@ -1,6 +1,8 @@
 # Review of the supplied trainer
 
-The original HTML is preserved in `midterm_trainer.html`. The new app is a separate implementation using its 54 example scenario generators.
+This is a historical implementation review. For current behavior use [features](../../FEATURES.md), the [agent route map](../../AGENT_GUIDE.md), and [release evidence](RELEASE_REVIEW.md).
+
+The original HTML is preserved in `archive/midterm_trainer.html`. The new app is a separate implementation using its 54 example scenario generators.
 
 ## Findings addressed
 
@@ -21,7 +23,7 @@ The original HTML is preserved in `midterm_trainer.html`. The new app is a separ
 
 ## Efficiency choices
 
-No framework runtime, build pipeline, npm dependencies, charting library, external fonts, or network-based adaptive service. Topic and skill pools are indexed once. The question bank is loaded once; only the selected scenario is materialized. Detailed answer history is bounded to 5,000 events and recent session history to 100. Small views re-render using a single delegated set of event handlers. The timer updates its own text rather than re-rendering the question. Queued IndexedDB writes save the workspace at meaningful transitions and ten-second active checkpoints; daily restore history is bounded to seven dates. See [STORAGE.md](STORAGE.md).
+No framework runtime, build pipeline, npm dependencies, charting library, external fonts, or network-based adaptive service. Topic and skill pools are indexed once. The question bank is loaded once; only the selected scenario is materialized. Detailed answer history is bounded to 5,000 events and recent session history to 100. Small views re-render using a single delegated set of event handlers. The timer updates its own text rather than re-rendering the question. Queued IndexedDB writes save the workspace at meaningful transitions and ten-second active checkpoints; daily restore history is bounded to seven dates. See [STORAGE.md](../guides/STORAGE.md).
 
 The current full-view rendering is appropriate for a small curriculum. If thousands of scenarios are introduced, paginate scenario and answer histories and move large-bank loading behind a subject picker.
 

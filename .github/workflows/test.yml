@@ -1,4 +1,4 @@
-name: Verify first release
+name: Verify SoS!
 on: [push, pull_request]
 permissions:
   contents: read

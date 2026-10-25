@@ -21,6 +21,9 @@ Checked October 24, 2026 on Windows with Chrome, PowerShell 5.1, and existing ho
 | Clarity notes (v1.1.0) | Pasted transcript/image, decoded preview, saved Blob reload, exact-session recovery, end-session queue, manual AI prompt, resolution, image backup into a second profile, class isolation, stale-save rejection and recoverable storage failure passed; drawer checked at 375/768/1360 px |
 | Question design (v1.1.0) | Largest-remainder quotas conserve the requested count; length clues in both directions, ties, family weighting, numeric/unsegmented text, malformed input, strict warnings and report no-overwrite behavior passed; generated review includes its advisory screen |
 | Both optional preview servers | Serve HTML/JavaScript, reject private paths, and need no additional packages; a busy Python port produces an actionable error |
+| Large-course workflow (v1.2.0) | Imported 5,000 synthetic families; scenario views render 50 rows, support page/filter/focus changes at mobile width, and save a unique 1,000-question quiz |
+| Failed workspace changes (v1.2.0) | Injected write failures preserve the live/saved session on import/restore; a failed reset rolls back both workspace and dated restore points; retry/reload and successful reset pass |
+| Preview directory aliases (v1.2.0) | Node/Python previews reject aliases to hidden or outside files, tested with Windows junctions locally and portable symlink fixtures in the tests |
 
 The arithmetic example is a software fixture. These checks do not establish the correctness or exam coverage of a learner's course. Follow the source and question-audit workflow for that review.
 
@@ -39,9 +42,13 @@ The last command extracts the ignored local QA archive from `dist/`, checks the 
 
 For browser QA only, a test host may supply Playwright and Chrome/Chromium, set `STUDY_NODE` to its Node executable, `SOS_PLAYWRIGHT` to the host's Playwright module, and optionally `SOS_BROWSER` to a browser executable; then run `python tools/verify_first_run.py --browser`. Browser automation is a maintainer tool, never a dependency of the app or a generated review. This verification writes only temporary files under `.validation` and removes its extracted folders afterward.
 
+## Replay and benchmark
+
+`tests/planner.test.cjs` runs 600 deterministic comparisons with the prior sampler over mixed synthetic histories, plus boundary and scale cases. Run `node tools/benchmark.cjs` from the full repository to compare a 5,000-family/1,000-question plan on this host. It checks matching selections before reporting median timings from three runs. Timings vary by computer and runtime; there is no timing threshold in unit tests. This is software regression testing, not a student-outcome study or exam-readiness validation.
+
 ## Limits
 
-- Version 1.1.1 packages the guided-start prompt, revised skill metadata and continuation rules in the generated agent guide and AI prompts. Package tests check the entry files and metadata limit; existing generation and browser flows remain verifiable with the commands above. The [intake scenarios](skills/exam-review-designer/references/intake-examples.md) describe expected conversational behavior, not executed model evaluations. Fresh ChatGPT/Claude installation, automatic skill selection and attachment-only first-turn behavior were not live-tested.
+- Version 1.1.1 packages the guided-start prompt, revised skill metadata and continuation rules in the generated agent guide and AI prompts. Package tests check the entry files and metadata limit; existing generation and browser flows remain verifiable with the commands above. The [intake scenarios](../../skills/exam-review-designer/references/intake-examples.md) describe expected conversational behavior, not executed model evaluations. Fresh ChatGPT/Claude installation, automatic skill selection and attachment-only first-turn behavior were not live-tested.
 
 - This was an isolated-folder/profile test on the existing computer, not a fresh Windows VM or an actual OS installation test. Missing tools were simulated using an empty PATH and restricted discovery.
 - The opt-in installation route was checked with `-WhatIf`; WinGet downloads, agreements, PATH refresh, and successful installation still need a real clean-machine check. Recheck current official package availability before installing.

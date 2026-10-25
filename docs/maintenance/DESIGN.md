@@ -21,11 +21,12 @@ The visual direction is a calm reading workspace: warm off-white canvas, white c
 - One Data & backups view for saved status, a location-aware backup action, file import, and dated restoration. An unfinished session becomes the primary Overview action, making resumption visible without another setup flow.
 - Real form controls, visible focus rings, labels, a skip link, text alternatives for chart bars, and reduced-motion support.
 - No decorative imagery, autoplay, gamification badges, external font requests, or charting libraries. All charts use native HTML/CSS.
+- Scenario details render at most 50 rows at once. A native Page dropdown and visible range count appear only for longer lists, retaining focus on page changes and resetting on filter/category changes.
 
 ## Suggested next improvements
 
 1. **Structured content editor.** Course switching, validated JSON import, AI prompts and additions-only updates now exist. A future form editor could support deliberate per-question revisions with content review.
-2. **Explicit learning objectives and sources.** Add objectives, difficulty, authoritative references, author review status, and a content revision date. This would make drill-downs more meaningful than inferring thinking skills from titles.
+2. **Richer objective reporting.** Source/objective links and author review status already exist. Future objective-level drill-downs and reviewed content revision dates could make coverage clearer; intended difficulty still needs evidence before calibration claims.
 3. **Longer-term learning trends.** When enough attempts exist, show rolling accuracy and review adherence with sample counts. Avoid an impressive-looking readiness percentage before evidence supports it.
 4. **Accessible chart comparisons.** Add a data-table view and filters for time window or category when the history grows. The current chart bars are keyboard-operable and expose values through accessible labels.
 5. **Optional account-free device sync.** A deliberate export/link or encrypted sync model could help learners move between devices. Keep the current offline mode available and make data transmission opt-in.

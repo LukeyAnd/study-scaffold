@@ -1,6 +1,6 @@
 // Optional local server for a stable localhost storage origin. No dependencies.
 const http=require('node:http');const fs=require('node:fs');const path=require('node:path');
-const root=path.resolve(__dirname,'..');
+const root=fs.realpathSync(path.resolve(__dirname,'..'));
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.md':'text/plain'};
 const server=http.createServer((req,res)=>{
   try {
@@ -8,7 +8,12 @@ const server=http.createServer((req,res)=>{
     const filename=path.resolve(root,'.'+(decoded==='/'?'/index.html':decoded));
     const relative=path.relative(root,filename);
     if(relative.startsWith('..')||path.isAbsolute(relative)||relative.split(path.sep).some(p=>p.startsWith('.'))){res.writeHead(403);res.end('Forbidden');return;}
-    fs.readFile(filename,(err,data)=>{if(err){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':mime[path.extname(filename)]||'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(data);});
+    fs.realpath(filename,(err,real)=>{
+      if(err){res.writeHead(404);res.end('Not found');return;}
+      const resolved=path.relative(root,real);
+      if(resolved.startsWith('..')||path.isAbsolute(resolved)||resolved.split(path.sep).some(p=>p.startsWith('.'))){res.writeHead(403);res.end('Forbidden');return;}
+      fs.readFile(real,(error,data)=>{if(error){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':mime[path.extname(real)]||'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(data);});
+    });
   }catch(_){res.writeHead(400);res.end('Bad request');}
 });
 const portIndex=process.argv.indexOf('--port');

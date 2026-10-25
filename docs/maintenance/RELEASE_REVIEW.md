@@ -1,6 +1,6 @@
 # First release review
 
-Target: **SoS! v1.0.0**, October 24, 2026. The release is a reusable, local-first MCQ study framework with an optional agent authoring workflow. Proposed future features remain listed separately in [RESEARCH.md](RESEARCH.md).
+Target: **SoS! v1.0.0**, October 24, 2026. The release is a reusable, local-first MCQ study framework with an optional agent authoring workflow. Proposed future features remain listed separately in [RESEARCH.md](../methodology/RESEARCH.md).
 
 ## Scope and disposition
 
@@ -37,14 +37,14 @@ Checked locally on Windows with Chrome, PowerShell 5.1, and existing host Node/P
 - Full screen-reader/assistive-technology and accessibility conformance audits remain outstanding. Keyboard and responsive smoke checks do not establish WCAG conformance.
 - Local Chrome testing does not establish Safari/Firefox/mobile-device compatibility. macOS installation/first-run flows were not exercised here; Linux CI is software/package coverage, not a desktop-browser test.
 - Question correctness and source/version alignment require review of each learner's course. Optional examples are demonstrations; tax content is unverified. Structural checks cannot certify answers.
-- Progress is browser-local and may be cleared. Export backups; custom course files travel separately. There is no device sync or simultaneous-history merge. Detailed history is bounded as documented in [STORAGE.md](STORAGE.md).
+- Progress is browser-local and may be cleared. Export backups; custom course files travel separately. There is no device sync or simultaneous-history merge. Detailed history is bounded as documented in [STORAGE.md](../guides/STORAGE.md).
 - Mastery and spacing are heuristic. Success in one session is not proof of delayed retention or an exam pass probability. Static answers are visible to a determined reader.
 
 ## Owner and student review
 
 No additional permission is needed for the already authorized public framework release. A useful final personal review is a five-minute trial: download/extract the GitHub ZIP, create/import a small course, answer a question, reload, and export a backup. Before relying on a real course, review its question audit and important answers against the governing sources. Before sharing that course, confirm permission to share its content; permission to publish this framework does not cover private student material.
 
-Report reproducible software issues through the repository's Issues page using nonprivate examples. Keep this report and [CHANGELOG.md](CHANGELOG.md) consistent with any later changes; test results are evidence for the checked version, not a promise about future edits.
+Report reproducible software issues through the repository's Issues page using nonprivate examples. Keep this report and [CHANGELOG.md](../../CHANGELOG.md) consistent with any later changes; test results are evidence for the checked version, not a promise about future edits.
 
 ## Version 1.1.0 follow-up
 
@@ -67,3 +67,23 @@ Checked October 24, 2026. The skill now begins the requested workflow, completes
 - **31 Node tests and 25 Python tests passed**, covering existing runtime behavior, prompt generation, builder/package synchronization, required archive entry files and the documented 200-character description limit. The portable skill passed the host's validator.
 - Extracted-package first-run checks passed, including standalone generation and setup helpers. Live cross-host installation/activation was not evaluated. Intake examples are manual acceptance scenarios, not independent model-test results.
 - Official OpenAI and Claude documentation was inspected for activation and package structure. Enabling/importing a skill differs from attaching its source; no universal silent-upload trigger is promised. Private course files are not published and no extra runtime dependency was added.
+
+## Version 1.2.0 repository and shipping review
+
+Checked October 24, 2026. Longer documents now live in guides/methodology/maintenance folders; the original prototype and explicit one-time adapter are archived. The root README, launchers, short agent entry points and runtime stay at stable locations. Agent routes, generated templates, setup messages, methodology links, packaging and documentation checks use the new layout. A repeated README startup section and outdated roadmap claims were removed.
+
+Findings repaired:
+
+- Quiz planning rebuilt candidate weights and arrays for each selection. A cached sum tree now samples without replacement in O(n + k log n), preserving the existing selection policy. Course topic/skill indexes are also built in one pass.
+- Scenario drill-downs rendered every row. They now render 50 at a time with a native Page selector, visible range, retained focus and page reset on category/filter changes.
+- Import/date restoration applied memory state before a successful save, and reset cleared restore points separately. Replacements now commit first; reset writes the empty workspace and clears restore points in one transaction. Failed writes retain the previous live/saved session and report an error.
+- Preview aliases could reach outside/hidden files despite the lexical URL guard. Both preview implementations now check the resolved target; Windows directory-junction tests exercise the boundary.
+- The historical adapter could overwrite the example bank by default. It now needs an explicit new output and refuses existing files; it is not part of the build route.
+
+Verification performed:
+
+- **35 Node and 27 Python tests passed**, including 600 seeded planner replays against the previous sampler, boundary cases, a unique 5,000-question plan, historical no-overwrite behavior, folder/reference/package checks and preview alias protection.
+- **Extracted QA ZIP browser checks passed:** 5,000-family import, 50-row paging and keyboard/mobile behavior, unique 1,000-question quiz persistence; injected import/restore/reset failures and retries; prior onboarding, exact resume, source feedback, charts, notes/image backup, class isolation, stale saves, timing/expiry and unavailable-storage paths.
+- **Synthetic benchmark:** Node v24.22.1 on this Windows host, 5,000 families, 1,000 questions, median of three runs: previous sampler 333.68 ms, optimized sampler 1.08 ms. Selections matched. This is one warmed host benchmark, not a promise about every workload or evidence of better learning.
+
+The existing limitations remain: learner-specific content needs source review; the legacy tax example is unverified; live ChatGPT/Claude skill activation, other browser engines, direct-file launch, actual OS installation and full accessibility conformance are not established by these checks. Before calling a published build verified, check its CI, hosted assets and downloaded source ZIP at that exact commit.

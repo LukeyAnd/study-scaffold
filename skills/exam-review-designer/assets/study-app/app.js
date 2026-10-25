@@ -20,17 +20,17 @@
   let preferred;try{preferred=localStorage.getItem('sos-active-course');}catch(_){}
   const requested=new URLSearchParams(location.search).get('course');
   let bank=(courseEntries.get(requested||preferred)||courseEntries.values().next().value).bank;
-  const byTopic = new Map(bank.topics.map(t => [t.id, bank.questions.filter(q => q.topic === t.id)]));
-  const bySkill = new Map([...new Set(bank.questions.map(E.skill))].map(s => [s, bank.questions.filter(q => E.skill(q) === s)]));
-  const qMap = new Map(bank.questions.map(q => [q.id, q]));
-  const topicName = id => bank.topics.find(t => t.id === id)?.name || id;
+  const topicNames = new Map(bank.topics.map(t => [t.id,t.name]));
+  const byTopic = new Map(bank.topics.map(t => [t.id,[]])),bySkill = new Map(),qMap = new Map();
+  for(const q of bank.questions){const skill=E.skill(q);byTopic.get(q.topic).push(q);if(!bySkill.has(skill))bySkill.set(skill,[]);bySkill.get(skill).push(q);qMap.set(q.id,q);}
+  const topicName = id => topicNames.get(id) || id;
   let state = E.empty(bank.id), session = null, current = null, recent = [], results = null, clock = null, activeDay = null;
   let planPreview = [], builderTopic = null, practiceTopic = 'all', practiceSkill = 'all';
   let overviewCategory='all', insightsMode='categories', libraryMode='topics', scenarioFilter='all', resultFilter='all', builderSkill=null;
   let noticeTimer, storageWarning = '', storageLocked=false, activeSince=null, submitting=false, switching=false, checkpoints=[];
   let subjectFilter='all',courseDraft=null;
   let promptMode='add',promptCourse=bank.id;
-  let needsCourseSelection=false;
+  let needsCourseSelection=false,workspaceBusy=false,scenarioPage=0,scenarioContext='';
   const storage=await S.open(bank.id,()=>{storageWarning='Progress changed in another tab. Reload this tab before continuing.';notify(storageWarning);updateStorageStatus();});
   const clarityStore=await StudyClarity.open(bank.id);
   const clarityUI=StudyClarityUI.create({store:clarityStore,bank,icon,help:info,notify,onToggle:syncTime,
@@ -52,7 +52,7 @@
   function flushTime() {if(activeSince!==null&&current){current.elapsedMs+=Math.max(0,performance.now()-activeSince);activeSince=null;} }
   function syncTime() {
     const wasActive=activeSince!==null;flushTime();
-    const active=current&&!current.answered&&session&&!session.ended&&location.hash==='#practice'&&document.visibilityState==='visible'&&document.hasFocus()&&!document.querySelector('.help-dialog[open], .clarity-drawer[open]');
+    const active=!workspaceBusy&&current&&!current.answered&&session&&!session.ended&&location.hash==='#practice'&&document.visibilityState==='visible'&&document.hasFocus()&&!document.querySelector('.help-dialog[open], .clarity-drawer[open]');
     if(active)activeSince=performance.now();else if(wasActive&&current&&!current.answered)current.pauses++;
   }
   function capture() {flushTime();const data=S.snapshot(bank,state,session,current,recent,results);syncTime();return data;}
@@ -63,18 +63,35 @@
     try {checkpoints=await storage.checkpoints();const select=$('#restore-date');if(select)select.innerHTML='<option value="">Choose a saved date</option>'+checkpoints.map((d,i)=>`<option value="${i}">${esc(new Date(d.savedAt).toLocaleString())}</option>`).join('');}catch(_){notify('Restore points could not be loaded. Export your current progress.');}
   }
   async function save(daily=false) {
-    if(needsCourseSelection||storageLocked||storage.conflict)return false;
+    if(needsCourseSelection||workspaceBusy||storageLocked||storage.conflict)return false;
     try {const data=capture();await storage.save(data,daily);storedData=data;storageWarning='';updateStorageStatus();if(daily&&$('#restore-date'))await refreshCheckpoints();return true;}
     catch(error){storageWarning=error.message;updateStorageStatus();notify(storageWarning);return false;}
   }
-  function canEdit(){if(storageLocked||storage.conflict){notify(storageWarning||'Reload before continuing.');return false;}return true;}
+  async function replaceWorkspace(candidate,{clearCheckpoints=false}={}) {
+    if(workspaceBusy||storage.conflict)return false;
+    let prepared;
+    try{prepared=S.validate(candidate,bank);prepared.savedAt=Date.now();}
+    catch(error){storageWarning=error.message;notify(storageWarning);updateStorageStatus();return false;}
+    workspaceBusy=true;flushTime();main.inert=true;
+    try {
+      // Commit before replacing live state; a failed write leaves the exact
+      // current session and dated restore points available for recovery.
+      await storage.save(prepared,false,{clearCheckpoints});
+      clearInterval(clock);applyWorkspace(prepared);storedData=prepared;
+      storageLocked=false;storageWarning='';await storage.removeLegacy();
+      return true;
+    } catch(error) {storageWarning=error.message;notify(storageWarning);return false;}
+    finally {workspaceBusy=false;main.inert=false;updateStorageStatus();resumeClock();syncTime();}
+  }
+  function canEdit(){if(workspaceBusy){notify('Updating saved workspace. Please wait.');return false;}if(storageLocked||storage.conflict){notify(storageWarning||'Reload before continuing.');return false;}return true;}
   function updateCoursePicker(){
     $('#course-select').innerHTML='<option value="__browse__">All classes…</option>'+C.groups([...courseEntries.values()]).map(g=>`<optgroup label="${esc(g.name)}">${g.items.map(e=>`<option value="${esc(e.bank.id)}">${esc(e.bank.title)}</option>`).join('')}</optgroup>`).join('');
     $('#course-select').value=needsCourseSelection?'__browse__':bank.id;
     $('#content-status').textContent=needsCourseSelection?'No class selected':bank.reviewStatus||'Personal study workspace';
   }
   async function switchCourse(id){
-    if(switching||!courseEntries.has(id))return;
+    if(switching||workspaceBusy){updateCoursePicker();return;}
+    if(!courseEntries.has(id))return;
     if(id===bank.id&&courseEntries.get(id).bank===bank){needsCourseSelection=false;try{localStorage.setItem('sos-active-course',id);}catch(_){}updateCoursePicker();route('overview');return;}
     if(submitting){notify('Finishing the current save. Try switching again in a moment.');updateCoursePicker();return;}
     switching=true;flushTime();
@@ -176,9 +193,12 @@
   function dayDetail(day) { const events = state.events.filter(e => dayKey(e.at)===day); return `<div class="day-summary"><strong>${esc(day)}</strong><p>${events.length} answers · ${events.filter(e=>e.correct).length} correct</p></div>${events.slice(-30).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle || e.id)}<small>${esc(topicName(qMap.get(e.id)?.topic))}</small></span><span>${e.correct?'Correct':'Incorrect'}</span></div>`).join('')}${events.length>30?'<p class="small muted">Showing the latest 30 answers for this day.</p>':''}`; }
   function scenarioRows(questions) {
     const filtered=questions.filter(q=>{const [label]=status(q);return scenarioFilter==='all'||(scenarioFilter==='review'&&(label==='Needs review'||label==='Review due'))||(scenarioFilter==='new'&&label==='New')||(scenarioFilter==='secure'&&label==='Secure');});
-    return filtered.map(q=>{const r=E.recordFor(state,q.id);return disclosure(esc(q.angle||q.id),`<div class="scenario-facts"><span>${esc(E.skill(q))}</span><span>${quantity(r?.attempts||0,'attempt')} · ${r?.correct||0} correct</span></div><div class="track"><div class="fill" style="width:${E.mastery(r)}%"></div></div><div class="preview-footer"><span>${E.mastery(r)}% mastery</span>${btn('Practice variation','start-one',`data-id="${esc(q.id)}"`)}</div>`,'book',tag(q));}).join('')||'<div class="empty">No scenarios match this view.</div>';
+    const pages=Math.ceil(filtered.length/50);scenarioPage=Math.max(0,Math.min(scenarioPage,pages-1));
+    const paging=pages>1?`<div class="workbench-toolbar"><span role="status">${scenarioPage*50+1}–${Math.min((scenarioPage+1)*50,filtered.length)} of ${filtered.length} scenarios</span><label class="inline-select"><span>Page</span><select id="scenario-page" aria-label="Scenario page">${Array.from({length:pages},(_,i)=>`<option value="${i}" ${i===scenarioPage?'selected':''}>${i+1} of ${pages}</option>`).join('')}</select></label></div>`:'';
+    return paging+(filtered.slice(scenarioPage*50,(scenarioPage+1)*50).map(q=>{const r=E.recordFor(state,q.id);return disclosure(esc(q.angle||q.id),`<div class="scenario-facts"><span>${esc(E.skill(q))}</span><span>${quantity(r?.attempts||0,'attempt')} · ${r?.correct||0} correct</span></div><div class="track"><div class="fill" style="width:${E.mastery(r)}%"></div></div><div class="preview-footer"><span>${E.mastery(r)}% mastery</span>${btn('Practice variation','start-one',`data-id="${esc(q.id)}"`)}</div>`,'book',tag(q));}).join('')||'<div class="empty">No scenarios match this view.</div>');
   }
   function detail(kind,id) {
+    const context=kind+'/'+id;if(scenarioContext!==context){scenarioContext=context;scenarioPage=0;}
     const qs=kind==='skill'?bySkill.get(id):byTopic.get(id);if(!qs){route('overview');return;}
     const name=kind==='skill'?id:topicName(id),summary=E.summary(qs,state);
     view.html=heading('',name,'Expand a scenario for its results and practice options.')+
@@ -214,7 +234,7 @@
     if(!canEdit())return;
     if(session&&!session.ended&&!confirm('Replace the unfinished session? Submitted answers stay in your learning history.'))return;
     if (!pool.length) { notify('No questions match those filters. Choose another focus.');return; }
-    session={mode, pool:[...pool], queue:adaptive?null:[...pool], total:adaptive?Math.min(count,pool.length):pool.length, answers:[], position:0, startedAt:Date.now(), deadline:minutes?Date.now()+minutes*60000:0, ended:false};results=null;recent=[]; nextQuestion();route('practice');save();
+    session={mode, pool:[...pool], queue:adaptive?null:[...pool], total:adaptive?Math.min(count,pool.length):pool.length, answers:[], position:0, startedAt:Date.now(), deadline:minutes?Date.now()+minutes*60000:0, ended:false};results=null;recent=[]; nextQuestion();route('practice');
     clearInterval(clock); if (session.deadline) clock=setInterval(tick,1000);
   }
   function nextQuestion() {
@@ -227,7 +247,7 @@
     if(location.hash==='#practice') {renderPractice(); main.focus();window.scrollTo({top:0});}syncTime();save();
   }
   function remaining() {if(!session?.deadline)return 'Untimed';const seconds=Math.max(0,Math.ceil((session.deadline-Date.now())/1000));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} left`;}
-  function tick() { if(!session||session.ended)return;const el=$('#timer');if(el)el.textContent=remaining();if(session.deadline&&Date.now()>=session.deadline){finish();notify('Time is up. Your session has been submitted.');} }
+  function tick() { if(workspaceBusy||!session||session.ended)return;const el=$('#timer');if(el)el.textContent=remaining();if(session.deadline&&Date.now()>=session.deadline){finish();notify('Time is up. Your session has been submitted.');} }
   function renderPractice() {
     if(results){renderResults();return;} if(!session||!current){practiceLanding();return;}
     const c=current; const isExam=session.mode==='exam'; const feedback=c.answered&&!isExam;
@@ -382,10 +402,10 @@
     'restore-date':async()=>{
       const index=$('#restore-date').value;if(index===''||!checkpoints[Number(index)]){notify('Choose a saved date first.');return;}
       if(!canEdit()||!confirm('Restore this date? Current progress and the unfinished session will be replaced. Save a backup first if you need it.'))return;
-      const data=checkpoints[Number(index)];clearInterval(clock);applyWorkspace(data);storageLocked=false;await save();resumeClock();render();notify('Saved date restored.');
+      if(await replaceWorkspace(checkpoints[Number(index)])){render();notify('Saved date restored.');}
     },
     'export-stored':()=>download(storageLocked&&(storage.rawBackup||storage.legacy)?storage.rawBackup||storage.legacy:JSON.stringify(storedData||capture(),null,2),`sos-stored-${bank.id}.json`),
-    reset:async()=>{if(!storage.conflict&&confirm('Delete learning progress and dated restore points for this bank in this browser? Clarity notes remain; delete them separately. Save a backup first if you want to keep progress.')){state=E.empty(bank.id);session=null;current=null;results=null;recent=[];activeSince=null;storageLocked=false;clearInterval(clock);await storage.clearCheckpoints();await save();await storage.removeLegacy();storedData=null;render();notify('This bank’s progress has been reset.');}}
+    reset:async()=>{if(!workspaceBusy&&!storage.conflict&&confirm('Delete learning progress and dated restore points for this bank in this browser? Clarity notes remain; delete them separately. Save a backup first if you want to keep progress.')){const empty=S.snapshot(bank,E.empty(bank.id),null,null,[],null);if(await replaceWorkspace(empty,{clearCheckpoints:true})){render();notify('This bank’s progress has been reset.');}}}
 
   };
   const $$=s=>[...document.querySelectorAll(s)];
@@ -402,7 +422,8 @@
     if(e.target.id==='overview-category'){overviewCategory=e.target.value;$('#overview-map-content').innerHTML=overviewMap();}
     if(e.target.id==='insight-view'){insightsMode=e.target.value;$('#insight-content').innerHTML=insightContent();}
     if(e.target.id==='library-view'){libraryMode=e.target.value;$('#library-content').innerHTML=libraryContent();if(libraryMode==='data'){updateStorageStatus();refreshCheckpoints();}}
-    if(e.target.id==='scenario-filter'){scenarioFilter=e.target.value;const [,kind,id]=location.hash.slice(1).split('/');const qs=kind==='skill'?bySkill.get(decodeSegment(id)):byTopic.get(decodeSegment(id));$('#scenario-content').innerHTML=scenarioRows(qs||[]);}
+    if(e.target.id==='scenario-page'){scenarioPage=Number(e.target.value);const [,kind,id]=location.hash.slice(1).split('/');const qs=kind==='skill'?bySkill.get(decodeSegment(id)):byTopic.get(decodeSegment(id));$('#scenario-content').innerHTML=scenarioRows(qs||[]);$('#scenario-page')?.focus();}
+    if(e.target.id==='scenario-filter'){scenarioFilter=e.target.value;scenarioPage=0;const [,kind,id]=location.hash.slice(1).split('/');const qs=kind==='skill'?bySkill.get(decodeSegment(id)):byTopic.get(decodeSegment(id));$('#scenario-content').innerHTML=scenarioRows(qs||[]);}
 if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&current&&!current.answered&&canEdit()){flushTime();const selected=Number(e.target.value);if(current.firstChoiceMs===null)current.firstChoiceMs=current.elapsedMs;else if(current.selected!==selected)current.changes++;current.selected=selected;$('#check-answer').disabled=submitting;syncTime();save();}
     if(e.target.id==='import-file'){
       const file=e.target.files[0];if(!file)return;
@@ -411,8 +432,7 @@ if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&c
         const imported=S.validate(JSON.parse(await file.text()),bank);
         if(storage.conflict)throw Error('Reload this tab before importing.');
         if(!confirm('Replace this bank’s progress and unfinished session with the selected backup?'))return;
-        clearInterval(clock);applyWorkspace(imported);storageLocked=false;
-        if(await save()){await storage.removeLegacy();storedData=null;resumeClock();render();notify('Backup loaded.');}
+        if(await replaceWorkspace(imported)){render();notify('Backup loaded.');}
       }catch(error){if($('#data-status'))$('#data-status').textContent=`Import failed: ${error.message}`;}finally{if($('#import-file'))$('#import-file').value='';}
     }
 

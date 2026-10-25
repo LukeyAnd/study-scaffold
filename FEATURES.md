@@ -36,7 +36,7 @@ SoS! helps students turn their own course material into a review, practice it in
 
 ## Adaptive practice and feedback
 
-- AI authoring prompts plan a mix of foundational, application and explicit best-answer questions, independently varying option-length profiles. An optional Python screen flags conspicuous key lengths and bank-wide longest-answer clues; the builder includes its report. These are editorial heuristics, not calibrated difficulty or factual verification. See [QUESTION_DESIGN.md](QUESTION_DESIGN.md).
+- AI authoring prompts plan a mix of foundational, application and explicit best-answer questions, independently varying option-length profiles. An optional Python screen flags conspicuous key lengths and bank-wide longest-answer clues; the builder includes its report. These are editorial heuristics, not calibrated difficulty or factual verification. See [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md).
 
 - Answer four-option multiple-choice questions, with randomized answer order and authored/generated variations where available.
 - Practice across the class or focus on a category and thinking skill.
@@ -57,6 +57,7 @@ SoS! helps students turn their own course material into a review, practice it in
 - See estimated mastery, answer accuracy, explored scenarios, and due reviews in the overview.
 - Open category and thinking-skill breakdowns, activity charts, session history, answer history, mistakes, and secure-scenario views.
 - Click relevant bars/rows to inspect the underlying category, scenarios, day, or answers.
+- Browse long scenario lists in 50-row pages using a labeled dropdown; filters reset the page and keyboard focus is retained when changing pages.
 - Inspect descriptive response-time summaries. Active viewing time, first-choice time, revisions, and interruptions are recorded automatically; speed does not become a confidence score or change learning scores/scheduling.
 - Use the Library for modules, authored glossary/reference material, sources, and data controls.
 
@@ -65,13 +66,14 @@ SoS! helps students turn their own course material into a review, practice it in
 - Open **Need clarity?** beside a question and save text, pasted device-dictation transcripts, or PNG/JPEG/WebP images linked to that exact question and concept.
 - Return during or after a session through **Library → Clarity notes**. Filter by module/status and practice the linked existing question families.
 - Copy a context prompt for your preferred AI, deliberately attach images, and paste a checked explanation into **What helped**. Mark a note resolved without changing scores.
-- Notes/images stay local and have a separate JSON backup. The text-only fallback disables images. No microphone recording, automatic AI research, cloud sync or live tutoring is included. See [CLARITY.md](CLARITY.md).
+- Notes/images stay local and have a separate JSON backup. The text-only fallback disables images. No microphone recording, automatic AI research, cloud sync or live tutoring is included. See [CLARITY.md](docs/guides/CLARITY.md).
 
 ## Local saves and backups
 
 - Automatically save progress and the exact unfinished question, answer order, and selected answer when the save completes.
 - Use the browser's IndexedDB database, with localStorage fallback and visible storage-error reporting.
 - Restore from the latest seven saved study dates when IndexedDB is available, or export/import readable JSON backups.
+- Imports and restores replace the live session only after saving succeeds. A progress reset updates the workspace and clears dated restore points together; failed writes preserve the previous workspace.
 - Export imported/extended course data separately. To move a custom class and progress, import the course on the destination first, then load its progress backup.
 - Progress belongs to the browser profile and origin. Devices, browsers, local files, and different URLs do not automatically share it; simultaneous histories are not merged.
 
@@ -88,7 +90,7 @@ SoS! helps students turn their own course material into a review, practice it in
 - Follow the beginner guide and task-specific agent file map. The Windows setup helper checks existing tools and offers explicit installation of missing requirements.
 - Building a standalone review needs Python 3.10+; optional localhost preview can use Node.js 20+ or Python. Neither route requires npm/pip packages.
 - Keep question data separate from the app; replace content or add classes without rebuilding the interface.
-- Use the research methodology and source-quality workflow when creating or checking material. See [START_HERE.md](START_HERE.md), [SETUP.md](SETUP.md), and [SOURCE_GUIDE.md](SOURCE_GUIDE.md).
+- Use the research methodology and source-quality workflow when creating or checking material. See [START_HERE.md](START_HERE.md), [SETUP.md](docs/guides/SETUP.md), and [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md).
 
 ## Current boundaries
 
@@ -104,6 +106,6 @@ SoS! helps students turn their own course material into a review, practice it in
 - A worked-example repair route, numeric/written response formats, and genuinely reserved assessment questions.
 - Question flagging, richer objective/source coverage views, a mistake notebook, and additional reading preferences.
 
-These are recommendations, not implemented features. See the [researched priorities and evidence limits](RESEARCH.md#suggested-next-steps-for-students).
+These are recommendations, not implemented features. See the [researched priorities and evidence limits](docs/methodology/RESEARCH.md#suggested-next-steps-for-students).
 
-Keep this overview current when capabilities change; implementation contracts remain in [COURSES.md](COURSES.md) and [STORAGE.md](STORAGE.md).
+Keep this overview current when capabilities change; implementation contracts remain in [COURSES.md](docs/guides/COURSES.md) and [STORAGE.md](docs/guides/STORAGE.md).

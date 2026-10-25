@@ -2,7 +2,7 @@
 
 ## Start with your AI
 
-Attach the repository ZIP and your course material, then say **Start my SoS! review** using the installed skill or [copyable start prompt](START_WITH_AI.md). The agent will inspect what is available, guide you through missing context, and do the work it can. When it needs you, it should ask the next essential question or give one exact action. Begin with `SKILL.md` alone if necessary; add the full folder when its resources are needed. [INSTALL.md](INSTALL.md) explains host activation and its limits.
+Attach the repository ZIP and your course material, then say **Start my SoS! review** using the installed skill or [copyable start prompt](START_WITH_AI.md). The agent will inspect what is available, guide you through missing context, and do the work it can. When it needs you, it should ask the next essential question or give one exact action. Begin with `SKILL.md` alone if necessary; add the full folder when its resources are needed. [INSTALL.md](docs/guides/INSTALL.md) explains host activation and its limits.
 
 ## Study or create an AI prompt
 
@@ -14,7 +14,7 @@ Attach the repository ZIP and your course material, then say **Start my SoS! rev
 
 ## Have an agent build a standalone review
 
-The same GitHub ZIP includes `skills/exam-review-designer/`. Give the agent that folder, or install it following [INSTALL.md](INSTALL.md). Copy this block into your AI chat using GitHub's upper-right copy icon:
+The same GitHub ZIP includes `skills/exam-review-designer/`. Give the agent that folder, or install it following [INSTALL.md](docs/guides/INSTALL.md). Copy this block into your AI chat using GitHub's upper-right copy icon:
 
 ```text
 Use the Exam Review Designer skill to start my review now. Inspect my course files,
@@ -24,10 +24,10 @@ a builder or preview is needed, reuse available tools and verify the result. Del
 the review with source checks and the actual file/import/launch steps for my device.
 ```
 
-The builder needs **Python 3.10+ with its standard library**. The generated review needs only a browser. The skill can also return an importable course JSON without using the builder. Skill installation instructions are in [INSTALL.md](INSTALL.md).
+The builder needs **Python 3.10+ with its standard library**. The generated review needs only a browser. The skill can also return an importable course JSON without using the builder. Skill installation instructions are in [INSTALL.md](docs/guides/INSTALL.md).
 
 ## Agent setup or developer work
 
-Read [SETUP.md](SETUP.md) for the task-based dependency check, explicit installation option, preview alternatives, and troubleshooting. Start at [AGENTS.md](AGENTS.md) for repository changes. Setup should not replace source review or silently add databases, global npm packages, Docker, or another framework.
+Read [SETUP.md](docs/guides/SETUP.md) for the task-based dependency check, explicit installation option, preview alternatives, and troubleshooting. Start at [AGENTS.md](AGENTS.md) for repository changes. Setup should not replace source review or silently add databases, global npm packages, Docker, or another framework.
 
-For upload and correctness guidance, use [SOURCE_GUIDE.md](SOURCE_GUIDE.md). For the tested first-run paths and their limits, use [FIRST_RUN_TEST.md](FIRST_RUN_TEST.md).
+For upload and correctness guidance, use [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md). For the tested first-run paths and their limits, use [FIRST_RUN_TEST.md](docs/maintenance/FIRST_RUN_TEST.md).

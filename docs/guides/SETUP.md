@@ -2,6 +2,8 @@
 
 Choose the task before installing anything. These are the actual project requirements, not a generic web-development stack.
 
+Run repository commands from the folder containing `index.html`, not from `docs/guides/`. For an installed skill, use the explicitly shown paths relative to that skill's folder instead.
+
 | Task | Required | Not required |
 | --- | --- | --- |
 | Study, import JSON, generate/copy an AI prompt | A modern browser and the extracted app, or the hosted page | Node.js, Python, npm/pip packages, SQL, API keys |

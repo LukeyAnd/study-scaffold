@@ -63,7 +63,7 @@
     if(!db&&local){try{rawBackup=local.getItem(key);try{initial=JSON.parse(rawBackup||'null');}catch(_){initial={data:{invalidBackup:rawBackup},revision:0};}}catch(_){local=null;mode='Memory only';}}
     if(initial){revision=Number.isInteger(initial.revision)?initial.revision:0;savedAt=initial.data?.savedAt||0;}
     let legacy=null;try{legacy=root.localStorage?.getItem(legacyKey);}catch(_){}
-    function save(data,daily=false) {
+    function save(data,daily=false,{clearCheckpoints=false}={}) {
       // Snapshot before queueing so later UI changes cannot mutate an earlier write.
       const copy=clone(data);
       const operation=chain.then(async()=>{
@@ -71,20 +71,24 @@
         if(!db&&!local)throw Error('Storage is unavailable. Export a backup before closing.');
         const next=revision+1, row={revision:next,data:copy}, day=dateKey(copy.savedAt);
         if(db)await new Promise((resolve,reject)=>{
+          let failure;
           const tx=db.transaction(['workspaces','snapshots'],'readwrite');
           const work=tx.objectStore('workspaces'), snaps=tx.objectStore('snapshots');
           const req=work.get(bankId);
           req.onsuccess=()=>{
+            try {
             if((req.result?.revision||0)!==revision){conflict=true;tx.abort();onConflict();return;}
             work.put(row,bankId);
+            if(clearCheckpoints)snaps.delete(IDBKeyRange.bound([bankId,''],[bankId,'\uffff']));
             if(daily) {
               snaps.put(copy,[bankId,day]);
               const days=snaps.getAllKeys(IDBKeyRange.bound([bankId,''],[bankId,'\uffff']));
               days.onsuccess=()=>days.result.slice(0,-7).forEach(key=>snaps.delete(key));
             }
+            } catch(error) {failure=error;tx.abort();}
           };
           tx.oncomplete=resolve;
-          tx.onabort=()=>reject(Error(conflict?'Progress changed in another tab. Reload before continuing.':'Could not save local progress. Export a backup before closing.'));
+          tx.onabort=()=>reject(Error(conflict?'Progress changed in another tab. Reload before continuing.':failure?'Could not update saved progress. Your previous workspace was kept.':'Could not save local progress. Export a backup before closing.'));
           tx.onerror=()=>{};
         });
         else {

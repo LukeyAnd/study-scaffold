@@ -127,7 +127,11 @@ For optional AI tutoring, offer a relevant hint or source excerpt and then ask f
 
 Start with Today and delayed-retention evidence, while checking accessibility in the same work. Then pilot the repair route; add new response formats only for an actual course need. Compare completion burden and performance on source-reviewed, equivalent unseen tasks after a delay. Record prior knowledge, support used and actual study time; prefer a controlled/counterbalanced comparison when making causal claims. Also test whether a new user can choose a class, start an appropriate session, recover after a missed day and find a backup without help. Feature usage, more clicks, streaks and satisfaction are not substitutes for retained learning. Do not convert these pilot results into pass probabilities.
 
-## Source register
+## Implementation updates
+
+### Planner implementation review — October 24, 2026
+
+The quiz/exam planner caches the existing priorities once and samples without replacement through a sum tree, reducing planning work from repeated full scans to O(n + k log n) for n candidates and k selections. It preserves the prior weighting and selection policy; 600 deterministic replays against the previous sampler cover recommended, missed, due and uniform selection over mixed synthetic histories. In the full framework repository, `node tools/benchmark.cjs` compares the two samplers on the current host. These are software regression/scale checks, not a backtest against student outcomes, evidence of improved retention, or a calibrated pass prediction.
 
 ### Question construction update — October 24, 2026
 
@@ -136,6 +140,8 @@ The [question-design algorithm](QUESTION_DESIGN.md) adds independent reasoning/l
 SoS! adapts those principles; the 30/45/25 task mix, 70/30 length mix and all numeric warning thresholds are project heuristics, not tested optima. Alternatives can be partly true when an explicit scenario criterion establishes one best key. Deliberate wording-cue drills belong outside scored practice. Length screening cannot determine subject correctness, eliminate every cue or calibrate difficulty; record the actual semantic review in the question audit.
 
 The new clarity-note workflow supports saving a question-linked doubt for later source-checked explanation. Its benefit has not been evaluated experimentally; it does not replace delayed independent retrieval or change mastery when a note is marked resolved. AI handoff is manual and should request hints before direct answers.
+
+## Source register
 
 **R1.** Roediger, H. L., & Karpicke, J. D. (2006). *Test-enhanced learning: Taking memory tests improves long-term retention*. Psychological Science, 17, 249–255. [Publisher abstract](https://www.psychologicalscience.org/journals/psychological-science/j.1467-9280.2006.01693.x/). DOI: 10.1111/j.1467-9280.2006.01693.x. Access: original article abstract. Laboratory prose-learning experiments; immediate and delayed outcomes differ.
 

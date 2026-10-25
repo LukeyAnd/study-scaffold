@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build portable app and skill ZIPs from explicit, public source files.
 
-Run after editing the app or RESEARCH.md. Generated skill snapshots are synchronized
+Run after editing runtime, documentation, setup or distribution sources. Generated skill snapshots are synchronized
 from those canonical files. No progress, private intake files, or Git data is included.
 """
 import argparse
@@ -14,8 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
 TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "clarity.js", "clarity-ui.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
-TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "CLARITY.md", "QUESTION_DESIGN.md", "START_HERE.md", "START_WITH_AI.md", "SETUP.md", "FIRST_RUN_TEST.md", "CHANGELOG.md", "RELEASE_REVIEW.md", "AGENTS.md", "AGENT_GUIDE.md", "COURSES.md", "SOURCE_GUIDE.md", "RESEARCH.md", "STORAGE.md", "INSTALL.md", "DESIGN.md", "REVIEW.md", "LICENSE", "midterm_trainer.html")
-SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills")
+TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "START_HERE.md", "START_WITH_AI.md", "CHANGELOG.md", "AGENTS.md", "AGENT_GUIDE.md", "LICENSE")
+SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills", "docs", "archive")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".ps1", ".cmd", ".yaml", ".yml"}
 
 
@@ -29,14 +29,14 @@ def sync_skill():
             data = re.sub(rb'\s*<script defer src="banks/example\.js(?:\?[^\"]*)?"></script>', b'', data)
         if not (target / name).exists() or (target / name).read_bytes() != data:
             (target / name).write_bytes(data)
-    for source, dest in ((ROOT / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "SOURCE_GUIDE.md", SKILL / "references" / "source-quality.md"), (ROOT / "SETUP.md", SKILL / "references" / "setup.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):
+    for source, dest in ((ROOT / "docs" / "methodology" / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "docs" / "methodology" / "SOURCE_GUIDE.md", SKILL / "references" / "source-quality.md"), (ROOT / "docs" / "guides" / "SETUP.md", SKILL / "references" / "setup.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
     for name in ("setup.ps1", "serve.py"):
         source, dest = ROOT / "tools" / name, SKILL / "scripts" / name
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
-    shutil.copyfile(ROOT / "QUESTION_DESIGN.md", SKILL / "references" / "QUESTION_DESIGN.md")
+    shutil.copyfile(ROOT / "docs" / "methodology" / "QUESTION_DESIGN.md", SKILL / "references" / "QUESTION_DESIGN.md")
 
 
 def eligible(path):

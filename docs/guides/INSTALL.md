@@ -1,8 +1,8 @@
 # Download and use the review framework
 
-For the shortest first-run path, use [START_HERE.md](START_HERE.md). No runtimes need installing to study or generate a prompt in the browser. [SETUP.md](SETUP.md) covers only the tools required for an optional builder/preview/development task and includes a read-only check plus explicit installation mode.
+For the shortest first-run path, use [START_HERE.md](../../START_HERE.md). No runtimes need installing to study or generate a prompt in the browser. [SETUP.md](SETUP.md) covers only the tools required for an optional builder/preview/development task and includes a read-only check plus explicit installation mode.
 
-Download the [current release ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.1.zip), or use **Code → Download ZIP** on the repository for the latest source. Extract the entire `study-scaffold-...` folder.
+Download the [current release ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.2.0.zip), or use **Code → Download ZIP** on the repository for the latest source. Extract the entire `study-scaffold-...` folder.
 
 - **Study:** open the extracted folder's `index.html` or `Start SoS.cmd` on Windows.
 - **Use an agent:** give it `skills/exam-review-designer/SKILL.md` and its accompanying folder, or install that folder below.
@@ -29,7 +29,7 @@ https://github.com/LukeyAnd/study-scaffold/tree/main/skills/exam-review-designer
 
 ## Use ChatGPT, Claude or another agent
 
-For an ordinary chat attachment, use the short [start prompt](START_WITH_AI.md). The agent is instructed to begin immediately, carry out available work, and end learner handoffs with the next important question or exact action. Uploading a ZIP alone is not a universal activation event.
+For an ordinary chat attachment, use the short [start prompt](../../START_WITH_AI.md). The agent is instructed to begin immediately, carry out available work, and end learner handoffs with the next important question or exact action. Uploading a ZIP alone is not a universal activation event.
 
 **ChatGPT/Codex:** enabled skills can be selected explicitly or matched to a request. Standalone skill availability varies by surface; OpenAI recommends plugins for broader distribution. Use your host's skill selector or the attached-file start prompt rather than assuming a repository ZIP is an installed plugin. [Official OpenAI guidance](https://learn.chatgpt.com/docs/build-skills).
 
@@ -72,7 +72,7 @@ The installed skill's `SKILL.md` gives its own six-step reading and execution or
 
 ## Research and reproducible builds
 
-Read [RESEARCH.md](RESEARCH.md) for the evidence, methodology, source register, and limits of the existing algorithm. The repository is the maintained source; skill-template snapshots are regenerated from the app and research file.
+Read [RESEARCH.md](../methodology/RESEARCH.md) for the evidence, methodology, source register, and limits of the existing algorithm. The repository is the maintained source; skill-template snapshots are regenerated from the app and research file.
 
 Maintainers can refresh portable snapshots and build ignored local QA archives using Python's standard library:
 

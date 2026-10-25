@@ -110,7 +110,7 @@ if ($Install -and $missing.Count -gt 0 -and -not $WhatIfPreference) {
         $installError = 'The supplied executable path is invalid or incompatible. Correct that path before installing another runtime.'
     } else {
         $winget = Get-Command winget -CommandType Application -ErrorAction SilentlyContinue
-        if (-not $winget) { $installError = 'WinGet is unavailable. Use the official installer links in SETUP.md; no installation was attempted.' }
+        if (-not $winget) { $installError = 'WinGet is unavailable. Use the official installer links in docs/guides/SETUP.md (or references/setup.md in the skill); no installation was attempted.' }
         else {
             foreach ($package in $packages) {
                 if ($PSCmdlet.ShouldProcess($package, 'Install missing runtime from the WinGet community source for this user')) {
@@ -148,7 +148,7 @@ else {
     foreach ($tool in $report.tools) { Write-Output ($tool.name + ': ' + $tool.reason); if ($tool.path) { Write-Output ('  ' + $tool.path + ' [' + $tool.version + ']') } }
     if ($installError) { Write-Output $installError }
     Write-Output $next
-    if (-not $report.ready) { Write-Output 'Read SETUP.md (or references/setup.md in the skill). Installation is opt-in with -Install; -Install -WhatIf only shows the plan.' }
+    if (-not $report.ready) { Write-Output 'Read docs/guides/SETUP.md in the repository (or references/setup.md in the skill). Installation is opt-in with -Install; -Install -WhatIf only shows the plan.' }
 }
 if ($installError) { exit 1 }
 if ($report.ready) { exit 0 }

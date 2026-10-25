@@ -2,7 +2,7 @@
 
 Use the **Class** dropdown; **All classes…** opens the subject filter and module previews. Included examples are Accounting → Tax midterm (nine modules) and Mathematics → Everyday math (two starter modules). Each class keeps its own mastery, history, unfinished session, results, and dated restore points. Switching saves the current workspace before loading the next. The original tax ID remains `tax-midterm-v1`.
 
-Fresh users start at **Create my review**, with example classes collapsed. Build from your own exam scope, assigned sources and expected tasks. The prompt builder's **What to upload** section recommends an exam guide/objectives, substantive notes or textbook sections, solutions/rubrics, representative questions, and optional attempts/feedback. **Source policy** defaults to supplied materials only; supplementary authoritative research is an explicit choice. See [SOURCE_GUIDE.md](SOURCE_GUIDE.md).
+Fresh users start at **Create my review**, with example classes collapsed. Build from your own exam scope, assigned sources and expected tasks. The prompt builder's **What to upload** section recommends an exam guide/objectives, substantive notes or textbook sections, solutions/rubrics, representative questions, and optional attempts/feedback. **Source policy** defaults to supplied materials only; supplementary authoritative research is an explicit choice. See [SOURCE_GUIDE.md](../methodology/SOURCE_GUIDE.md).
 
 The last class is remembered when browser preferences are available; `?course=ID` selects a class that exists on the device. A URL alone does not transfer private course content.
 
@@ -23,7 +23,7 @@ The prompt also requests `QUESTION_AUDIT.md` with exact source/version evidence 
 
 ## Course import and storage
 
-Import a `bank.json` using the [authoring schema](skills/exam-review-designer/references/authoring.md). Set its subject/class name before adding it. The browser validates IDs, references, variants and explanations. Files are limited to 5 MB; JSON is data and never evaluated as code.
+Import a `bank.json` using the [authoring schema](../../skills/exam-review-designer/references/authoring.md). Set its subject/class name before adding it. The browser validates IDs, references, variants and explanations. Files are limited to 5 MB; JSON is data and never evaluated as code.
 
 Course records live in IndexedDB `sos-course-library`, object store `courses`, separate from learning workspaces. localStorage is the fallback. When persistent storage is unavailable, import reports an error. IndexedDB revisions reject stale catalog writes; other tabs should reload to discover catalog changes. There is no device-history merge or cloud sync.
 
@@ -52,9 +52,9 @@ Use **Open updated class** after importing. An existing session retains its orig
 
 ## Agent file map
 
-- [courses.js](courses.js): validation/compilation, subject grouping, compatibility and append-only merging.
-- [prompts.js](prompts.js): local prompt/context generation.
-- [storage.js](storage.js): catalog persistence and independent workspaces.
-- [app.js](app.js): selector, import and prompt UI.
+- [courses.js](../../courses.js): validation/compilation, subject grouping, compatibility and append-only merging.
+- [prompts.js](../../prompts.js): local prompt/context generation.
+- [storage.js](../../storage.js): catalog persistence and independent workspaces.
+- [app.js](../../app.js): selector, import and prompt UI.
 
 Update agent routes and the portable template when these contracts change. Edit canonical root runtime files and rebuild; do not hand-edit generated snapshots.

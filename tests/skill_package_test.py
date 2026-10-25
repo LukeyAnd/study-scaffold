@@ -119,9 +119,9 @@ assert.equal(seen.size,2);"""
         self.assertFalse(output.exists())
 
     def test_template_and_research_snapshots_match_canonical_sources(self):
-        self.assertEqual((SKILL / "references" / "research-methodology.md").read_bytes(), (ROOT / "RESEARCH.md").read_bytes())
-        self.assertEqual((SKILL / "references" / "source-quality.md").read_bytes(), (ROOT / "SOURCE_GUIDE.md").read_bytes())
-        self.assertEqual((SKILL / "references" / "setup.md").read_bytes(), (ROOT / "SETUP.md").read_bytes())
+        self.assertEqual((SKILL / "references" / "research-methodology.md").read_bytes(), (ROOT / "docs" / "methodology" / "RESEARCH.md").read_bytes())
+        self.assertEqual((SKILL / "references" / "source-quality.md").read_bytes(), (ROOT / "docs" / "methodology" / "SOURCE_GUIDE.md").read_bytes())
+        self.assertEqual((SKILL / "references" / "setup.md").read_bytes(), (ROOT / "docs" / "guides" / "SETUP.md").read_bytes())
         for name in ("setup.ps1", "serve.py"):
             self.assertEqual((SKILL / "scripts" / name).read_bytes(), (ROOT / "tools" / name).read_bytes())
         for name in builder.TEMPLATE_FILES:
@@ -162,7 +162,7 @@ assert.equal(seen.size,2);"""
         self.assertLessEqual(len(fields["description"].strip()), 200)
 
     def test_repository_agent_routes_resolve(self):
-        for doc in ROOT.glob("*.md"):
+        for doc in [*ROOT.glob("*.md"), *(ROOT / "docs").rglob("*.md"), *(ROOT / "archive").glob("*.md")]:
             for link in re.findall(r"\]\(([^)]+)\)", doc.read_text(encoding="utf-8")):
                 if "://" not in link and not link.startswith("#"):
                     self.assertTrue((doc.parent / link.split("#")[0]).exists(), f"Broken agent route in {doc.name}: {link}")
@@ -170,7 +170,7 @@ assert.equal(seen.size,2);"""
     def test_app_zip_contains_methodology_and_no_learning_data_or_nested_archives(self):
         with zipfile.ZipFile(DIST / "study-scaffold.zip") as archive:
             names = archive.namelist()
-            for name in ("index.html", "FEATURES.md", "START_WITH_AI.md", "AGENTS.md", "AGENT_GUIDE.md", "SOURCE_GUIDE.md", "RESEARCH.md", "INSTALL.md", "skills/exam-review-designer/SKILL.md", "skills/exam-review-designer/agents/openai.yaml", "skills/exam-review-designer/LICENSE"):
+            for name in ("index.html", "FEATURES.md", "START_WITH_AI.md", "AGENTS.md", "AGENT_GUIDE.md", "docs/methodology/SOURCE_GUIDE.md", "docs/methodology/RESEARCH.md", "docs/guides/INSTALL.md", "skills/exam-review-designer/SKILL.md", "skills/exam-review-designer/agents/openai.yaml", "skills/exam-review-designer/LICENSE"):
                 self.assertIn("study-scaffold/" + name, names)
             self.assertFalse(any(n.endswith(".zip") or "/.git/" in n or "/__pycache__/" in n for n in names))
             self.assertFalse(any("/downloads/" in n or "/dist/" in n for n in names))

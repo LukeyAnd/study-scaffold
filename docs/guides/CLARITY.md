@@ -15,7 +15,7 @@
 - Open a note and use **Ask your AI** to copy or download a context prompt. Attach selected images separately when useful; prompts include filenames, not image bytes.
 - Your preferred AI receives only what you explicitly share. Ask for a hint, explanation, or source-backed research there; SoS! makes no automatic AI request.
 - Check the returned explanation against your course sources, paste it into **What helped**, and mark the note resolved when ready. Notes and resolution never change mastery or scheduling.
-- To add new scored questions, use **Create with AI → Add material** and the [source-checking workflow](SOURCE_GUIDE.md).
+- To add new scored questions, use **Create with AI → Add material** and the [source-checking workflow](../methodology/SOURCE_GUIDE.md).
 
 ## Save and transfer
 
@@ -34,6 +34,6 @@
 
 ## Implementation
 
-- [clarity.js](clarity.js) owns capture, validation, backup and persistence.
-- [clarity-ui.js](clarity-ui.js) owns the drawer and queue.
-- [Model tests](tests/clarity.test.cjs) and [browser checks](tools/clarity_browser.cjs) cover persistence, images, backup, conflicts, class isolation and save failures.
+- [clarity.js](../../clarity.js) owns capture, validation, backup and persistence.
+- [clarity-ui.js](../../clarity-ui.js) owns the drawer and queue.
+- [Model tests](../../tests/clarity.test.cjs) and [browser checks](../../tools/clarity_browser.cjs) cover persistence, images, backup, conflicts, class isolation and save failures.

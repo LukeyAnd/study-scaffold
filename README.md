@@ -2,7 +2,7 @@
 
 A minimal study framework built around **your own course sources**. Create a review with your preferred AI, check its questions, and practice adaptively in a browser.
 
-**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.1.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
+**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.2.0.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
 
 ## For humans — start with your AI
 
@@ -15,7 +15,7 @@ Inspect my files, do the work you can, and end with the next essential
 question or a specific action when you need me. Begin now.
 ```
 
-See [START_WITH_AI.md](START_WITH_AI.md) for the guided flow and [INSTALL.md](INSTALL.md) for host setup. An ordinary attachment does not guarantee skill installation or activation in every AI product.
+See [START_WITH_AI.md](START_WITH_AI.md) for the guided flow and [INSTALL.md](docs/guides/INSTALL.md) for host setup. An ordinary attachment does not guarantee skill installation or activation in every AI product.
 
 ## For humans — download and start
 
@@ -24,9 +24,9 @@ See [START_WITH_AI.md](START_WITH_AI.md) for the guided flow and [INSTALL.md](IN
 3. Choose **Create my review**. Copy the generated prompt to your preferred AI and attach your course sources there.
 4. Review the returned questions, then import the course JSON through **All classes → Add a class** and start studying.
 
-**Studying needs only a browser.** No account, API key, Node.js, Python, SQL, or package installation is required. Keep the extracted files together. If local-file browser behavior causes trouble, use the [optional localhost preview](SETUP.md#optional-preview) or hosted app.
+**Studying needs only a browser.** No account, API key, Node.js, Python, SQL, or package installation is required. Keep the extracted files together. If local-file browser behavior causes trouble, use the [optional localhost preview](docs/guides/SETUP.md#optional-preview) or hosted app.
 
-Start with an exam guide/objectives, relevant assigned notes or textbook excerpts, and the exam format. Worked solutions and rubrics improve the fit. The browser does not read PDFs or call an AI itself. See [what to upload and verify](SOURCE_GUIDE.md).
+Start with an exam guide/objectives, relevant assigned notes or textbook excerpts, and the exam format. Worked solutions and rubrics improve the fit. The browser does not read PDFs or call an AI itself. See [what to upload and verify](docs/methodology/SOURCE_GUIDE.md).
 
 ## How it works
 
@@ -80,14 +80,14 @@ If your computer uses the `python3` command instead, substitute `python3` for `p
 node tools/serve.cjs --port 4173
 ```
 
-3. Open **http://127.0.0.1:4173** in your browser. Keep the terminal open while studying. You do not need to install npm/pip packages or rerun the review builder. If the command is not recognized, see [SETUP.md](SETUP.md) before installing tools.
+3. Open **http://127.0.0.1:4173** in your browser. Keep the terminal open while studying. You do not need to install npm/pip packages or rerun the review builder. If the command is not recognized, see [SETUP.md](docs/guides/SETUP.md) before installing tools.
 
 ### Stop and return later
 
 - **Stop:** press **Ctrl+C** in that terminal. This stops the local server; it does not delete saved browser progress.
 - **Restart:** open a terminal in the same review folder and run the same command again. You can press **Up Arrow**, then **Enter**, if that command is still in the terminal's history.
 - **Resume:** reopen **http://127.0.0.1:4173** in the same browser profile, select your class, and choose **Resume session** when one is unfinished. A timed exam keeps its original deadline while the server is stopped.
-- **If the browser cannot connect:** check that the command is still running. If the port is already in use, first check whether your review is already open at that address; see [preview troubleshooting](SETUP.md#optional-preview) before switching ports.
+- **If the browser cannot connect:** check that the command is still running. If the port is already in use, first check whether your review is already open at that address; see [preview troubleshooting](docs/guides/SETUP.md#optional-preview) before switching ports.
 
 ### What happens behind the scenes
 
@@ -108,20 +108,6 @@ node tools/serve.cjs --port 4173
 
 [FEATURES.md](FEATURES.md) breaks down current capabilities, boundaries, and proposed improvements.
 
-## For humans — create a review with an AI
-
-The same ZIP contains `skills/exam-review-designer/`. Paste the following into **your AI chat, not your terminal**:
-
-```text
-Read skills/exam-review-designer/SKILL.md and follow its workflow. Build a review from
-my sources, ask only for consequential missing context, verify the questions and
-sources, and report what you actually checked. Reuse existing tools and install only a
-missing requirement needed for this task. Begin now and keep working when you can;
-end each learner handoff with the next essential question or one exact action.
-```
-
-For repeated use, copy that folder into your agent's supported skills directory; see [INSTALL.md](INSTALL.md). A standalone review build uses Python 3.10+ standard library; the resulting review needs only a browser. Importable course JSON can be authored without running the builder.
-
 ## Saves and privacy
 
 - Progress stays in the current browser profile and origin. It does not automatically sync across devices, URLs, or browsers.
@@ -129,15 +115,15 @@ For repeated use, copy that folder into your agent's supported skills directory;
 - The app's own code sends no study data to a server. Hosted use still makes normal page requests. Anything pasted into another AI follows that service's policies.
 - Keep private notes, learner history, and backups out of public commits and issue reports.
 
-[STORAGE.md](STORAGE.md) explains recovery, storage fallback, dated snapshots, and retained-history limits.
+[STORAGE.md](docs/guides/STORAGE.md) explains recovery, storage fallback, dated snapshots, and retained-history limits.
 
 ## First release and limits
 
-**v1.1.1 adds guided agent startup and concrete next-step handoffs.** Version 1.1.0 introduced local clarity notes and question-design cue checks. See [CHANGELOG.md](CHANGELOG.md), [first-release review](RELEASE_REVIEW.md), and [first-run checks](FIRST_RUN_TEST.md).
+**v1.2.0 simplifies the repository, scales quiz planning and protects workspace replacement.** Guided AI startup, clarity notes and source-aware question design remain included. See [CHANGELOG.md](CHANGELOG.md), [first-release review](docs/maintenance/RELEASE_REVIEW.md), and [first-run checks](docs/maintenance/FIRST_RUN_TEST.md).
 
-Use **Need clarity?** beside a question to save something to revisit, then open **Library → Clarity notes**. Copy its context to your preferred AI and paste back a source-checked explanation. Notes/images have their own backup, separate from progress. See [CLARITY.md](CLARITY.md).
+Use **Need clarity?** beside a question to save something to revisit, then open **Library → Clarity notes**. Copy its context to your preferred AI and paste back a source-checked explanation. Notes/images have their own backup, separate from progress. See [CLARITY.md](docs/guides/CLARITY.md).
 
-Question authoring now includes a varied reasoning/answer-length plan and an editorial screen for longest-answer clues. Best-answer comparisons require a stated criterion and one defensible key. See [QUESTION_DESIGN.md](QUESTION_DESIGN.md).
+Question authoring now includes a varied reasoning/answer-length plan and an editorial screen for longest-answer clues. Best-answer comparisons require a stated criterion and one defensible key. See [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md).
 
 - Adaptation uses transparent heuristics. Mastery scores and response speed do not predict passing or certify durable retention.
 - The app scores MCQs; other exam formats need companion practice. Static answer keys are inspectable, so exam mode is for personal study.
@@ -147,12 +133,24 @@ Question authoring now includes a varied reasoning/answer-length plan and an edi
 
 ## Guides
 
+The root keeps the app, launchers and short entry points. Longer material is grouped under [docs/](docs/README.md):
+
+```text
+docs/guides/        Setup, classes, progress and notes
+docs/methodology/   Sources, question design and learning evidence
+docs/maintenance/   Design decisions and release verification
+skills/            Self-contained review-authoring skill
+tests/             Regression checks and the previous planner reference
+tools/             Preview, packaging, browser QA and benchmark
+archive/           Historical prototype and explicit one-time adapter
+```
+
 | Need | Start here |
 | --- | --- |
-| First run or setup help | [START_HERE.md](START_HERE.md), [SETUP.md](SETUP.md) |
-| Sources, uploads, and question checking | [SOURCE_GUIDE.md](SOURCE_GUIDE.md) |
-| Classes and adding material | [COURSES.md](COURSES.md) |
-| Learning evidence and proposed next steps | [RESEARCH.md](RESEARCH.md) |
+| First run or setup help | [START_HERE.md](START_HERE.md), [SETUP.md](docs/guides/SETUP.md) |
+| Sources, uploads, and question checking | [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md) |
+| Classes and adding material | [COURSES.md](docs/guides/COURSES.md) |
+| Learning evidence and proposed next steps | [RESEARCH.md](docs/methodology/RESEARCH.md) |
 | An agent changing this repository | [AGENTS.md](AGENTS.md), [AGENT_GUIDE.md](AGENT_GUIDE.md) |
 
 ## For AI agents
@@ -172,10 +170,12 @@ python -m unittest discover -s tests -p "*test.py"
 python tools/verify_first_run.py
 ```
 
+Optional maintainer checks: `node tools/benchmark.cjs` replays and times large-bank planning; `python tools/verify_first_run.py --browser` uses host-provided Chrome/Playwright for fresh-user, scale and recovery checks. See [verification details](docs/maintenance/FIRST_RUN_TEST.md) for prerequisites and limits.
+
 The packaging command refreshes portable skill snapshots and writes ignored QA archives to `dist/`. Those archives are not committed or hosted. Distribution uses GitHub's source ZIP, which includes the complete app, skill, research, and instructions. GitHub Actions runs checks on Windows and Linux.
 
 ## Share and report issues
 
 Share the [repository](https://github.com/LukeyAnd/study-scaffold) or its GitHub ZIP. Each student gets their own local progress. For a bug, [open an issue](https://github.com/LukeyAnd/study-scaffold/issues) with the browser/OS, steps, expected result, and actual result; use a small nonprivate example.
 
-MIT source-code license; see [LICENSE](LICENSE). Check permission before sharing your own course materials or generated reviews. The original Gemini-generated example is retained for provenance in `midterm_trainer.html`.
+MIT source-code license; see [LICENSE](LICENSE). Check permission before sharing your own course materials or generated reviews. The original Gemini-generated example is retained for provenance in [archive/](archive/README.md).

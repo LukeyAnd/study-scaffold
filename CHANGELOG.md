@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 — October 24, 2026
+
+- Grouped longer guides under `docs/guides`, `docs/methodology` and `docs/maintenance`; moved the historical prototype/adapter into `archive`. Kept the app, launchers, README and short agent entry points at the root, with updated routes and package tests.
+- Replaced repeated quiz-planning scans with cached weighted sampling through a sum tree. Added 600 seeded replays against the prior sampler and a reproducible large-bank benchmark.
+- Indexed classes in one pass and paged scenario details in sets of 50 with a labeled native dropdown, filter reset and retained keyboard focus.
+- Made import/date restoration commit before replacing the live workspace. Progress reset now updates the workspace and clears restore points atomically; failures keep the previous session recoverable.
+- Added browser failure injection and a 5,000-family/1,000-question scale workflow. The historical adapter now requires an explicit new output and refuses overwrites.
+- Hardened both optional previews against directory aliases that resolve to hidden or outside files, with cross-platform regression fixtures.
+
 ## 1.1.1 — October 24, 2026
 
 - Made learner startup and handoffs explicit: begin the requested review immediately, complete authorized work autonomously, and ask the next essential question or give one exact learner action when needed.
@@ -38,4 +47,4 @@ First public release of SoS!, a source-first browser study framework and optiona
 - Fixed learning-record lookup for question IDs that match inherited JavaScript property names.
 - Corrected selected-incorrect answer colors so selection styling cannot override answer feedback.
 
-The release is a study scaffold, with content verification, browser-storage, learning-measurement, and platform-testing limits described in [RELEASE_REVIEW.md](RELEASE_REVIEW.md).
+The release is a study scaffold, with content verification, browser-storage, learning-measurement, and platform-testing limits described in [RELEASE_REVIEW.md](docs/maintenance/RELEASE_REVIEW.md).

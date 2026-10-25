@@ -21,7 +21,7 @@ With only `SKILL.md`, the agent can begin the conversation and source review. Th
 3. If you need to do something, it ends with the exact question or action. For example: attach a specific page, resolve a source conflict, or import the returned `bank.json` through **All classes → Add a class**.
 4. It delivers the review with actual checks and limits, then gives you the next study action. Sources, questions and private learner history are not published automatically.
 
-An attached file and an installed skill are different host features. Automatic activation depends on the AI product, enabled capabilities and the request. This package cannot force a host to read an archive or start a conversation after a silent upload. The short prompt above provides a fallback. See [INSTALL.md](INSTALL.md) for host-specific options.
+An attached file and an installed skill are different host features. Automatic activation depends on the AI product, enabled capabilities and the request. This package cannot force a host to read an archive or start a conversation after a silent upload. The short prompt above provides a fallback. See [INSTALL.md](docs/guides/INSTALL.md) for host-specific options.
 
 ## For the AI
 

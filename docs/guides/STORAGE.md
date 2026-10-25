@@ -20,6 +20,8 @@ Timed exams retain their absolute deadline, even while the app is closed. A past
 
 ## Storage model
 
+Backup import and date restoration commit the replacement before changing the live session. If writing fails, the previous live/saved workspace remains available for export, and the action reports the failure. Progress reset commits the empty workspace and clears its restore points in one IndexedDB transaction; either both succeed or both roll back. Clarity notes and course data use separate databases and remain untouched.
+
 The default is **IndexedDB**, an asynchronous, transactional database built into the browser. It needs no SQL server, Python, installation, account, or network service. Database `sos-study` has two object stores:
 
 | Store | Key | Value |
@@ -56,7 +58,7 @@ Each new answer event records:
 | `interrupted` | Whether the question had a recorded view interruption or was resumed |
 | `timingVersion` | `1`, distinguishing active timing from older wall-clock durations |
 
-**Insights → Response time** displays median active submission time by thinking skill, using correct answers without recorded interruptions. Bars expose the underlying timed answers; the history also includes interrupted and incorrect answers. Results depend on task length, complexity, reading, input method, and access needs. Small samples are descriptive only. Timing and revisions do not penalize mastery, change review intervals, infer confidence, or predict exam grades. The study policy still uses observed accuracy, recent mistakes, due dates, coverage, and repeated evidence. See [RESEARCH.md](RESEARCH.md).
+**Insights → Response time** displays median active submission time by thinking skill, using correct answers without recorded interruptions. Bars expose the underlying timed answers; the history also includes interrupted and incorrect answers. Results depend on task length, complexity, reading, input method, and access needs. Small samples are descriptive only. Timing and revisions do not penalize mastery, change review intervals, infer confidence, or predict exam grades. The study policy still uses observed accuracy, recent mistakes, due dates, coverage, and repeated evidence. See [RESEARCH.md](../methodology/RESEARCH.md).
 
 ## Browser documentation
 

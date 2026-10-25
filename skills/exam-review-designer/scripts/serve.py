@@ -20,7 +20,7 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, OSError):
             self.send_error(400)
             return
-        if not candidate.is_relative_to(root) or any(part.startswith('.') for part in Path(relative).parts):
+        if not candidate.is_relative_to(root) or any(part.startswith('.') for part in Path(relative).parts) or any(part.startswith('.') for part in candidate.relative_to(root).parts):
             self.send_error(403)
             return
         if not candidate.is_file():

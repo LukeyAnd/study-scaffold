@@ -59,13 +59,32 @@
     return eligible.at(-1);
   }
   function plan(pool, state, count, target = 'recommended', rng = Math.random, now = Date.now()) {
-    let candidates = [...pool];
+    const seen = new Set();
+    let candidates = pool.filter(q => !seen.has(q.id) && seen.add(q.id));
     if (target === 'missed') candidates = candidates.filter(q => recordFor(state, q.id)?.recent.at(-1) === false);
     if (target === 'due') candidates = candidates.filter(q => recordFor(state, q.id)?.attempts && recordFor(state, q.id).due <= now);
+    const limit = Math.min(candidates.length, Math.max(0, Math.floor(count) || 0));
+    if (!limit) return [];
+    // The state and time stay fixed throughout planning. Cache weights once,
+    // then sample without replacement using a sum tree: O(n + k log n).
+    // Rebuilding parents from their children avoids negative rounding residue
+    // from repeatedly subtracting weights at already-selected positions.
+    let size = 1;
+    while (size < candidates.length) size *= 2;
+    const tree = new Float64Array(size * 2), uniform = target === 'balanced';
+    candidates.forEach((q, i) => { tree[size + i] = uniform ? 1 : priority(q, state, now); });
+    for (let i = size - 1; i; i--) tree[i] = tree[i * 2] + tree[i * 2 + 1];
     const chosen = [];
-    while (candidates.length && chosen.length < count) {
-      const q = target === 'balanced' ? candidates[Math.floor(rng() * candidates.length)] : choose(candidates, state, [], rng, now);
-      chosen.push(q); candidates = candidates.filter(x => x.id !== q.id);
+    while (chosen.length < limit) {
+      let draw = Math.max(0, Math.min(1 - Number.EPSILON, rng())) * tree[1], node = 1;
+      while (node < size) {
+        const left = node * 2;
+        if (tree[left] > 0 && (draw < tree[left] || !uniform && draw === tree[left])) node = left;
+        else { draw -= tree[left]; node = left + 1; }
+      }
+      chosen.push(candidates[node - size]);
+      tree[node] = 0;
+      while (node > 1) { node = Math.floor(node / 2); tree[node] = tree[node * 2] + tree[node * 2 + 1]; }
     }
     return chosen;
   }

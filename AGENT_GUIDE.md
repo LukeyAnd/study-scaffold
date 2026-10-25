@@ -6,20 +6,20 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 
 | Requested outcome | Read first | Then inspect only what is relevant |
 | --- | --- | --- |
-| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](SETUP.md), [setup helper](tools/setup.ps1), [first-run evidence](FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
-| Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
+| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](docs/guides/SETUP.md), [setup helper](tools/setup.ps1), [first-run evidence](docs/maintenance/FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
+| Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
 | Start from an attached ZIP/skill or resume learner onboarding | [START_WITH_AI.md](START_WITH_AI.md) | The skill's guided handoff contract and [intake](skills/exam-review-designer/references/intake.md); ask only the next important gap and otherwise continue work |
-| Change appearance or interaction | [DESIGN.md](DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
-| Change adaptive selection or scheduling | [RESEARCH.md](RESEARCH.md) | [core.js](core.js), [engine tests](tests/engine.test.cjs); [app.js](app.js) only for the affected flow |
-| Change question quality, answer cues or intended demand mix | [QUESTION_DESIGN.md](QUESTION_DESIGN.md) | [Source guide](SOURCE_GUIDE.md), [audit script](skills/exam-review-designer/scripts/audit_questions.py), [prompts.js](prompts.js), [authoring contract](skills/exam-review-designer/references/authoring.md) |
-| Capture or revisit confusion, images and AI explanation handoff | [CLARITY.md](CLARITY.md) | [clarity.js](clarity.js), [clarity-ui.js](clarity-ui.js), affected calls in [app.js](app.js), [model tests](tests/clarity.test.cjs), [browser checks](tools/clarity_browser.cjs) |
-| Change saves, resume, timing, or backups | [STORAGE.md](STORAGE.md) | [storage.js](storage.js), [core.js](core.js), affected parts of [app.js](app.js), [storage tests](tests/storage.test.cjs) |
-| Change classes, JSON imports or AI prompts | [COURSES.md](COURSES.md) | [courses.js](courses.js), [prompts.js](prompts.js), [course tests](tests/courses.test.cjs), relevant storage/UI calls |
+| Change appearance or interaction | [DESIGN.md](docs/maintenance/DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
+| Change adaptive selection or scheduling | [RESEARCH.md](docs/methodology/RESEARCH.md) | [core.js](core.js), [engine tests](tests/engine.test.cjs), [seeded planner replay](tests/planner.test.cjs), [benchmark](tools/benchmark.cjs); [app.js](app.js) only for the affected flow |
+| Change question quality, answer cues or intended demand mix | [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md) | [Source guide](docs/methodology/SOURCE_GUIDE.md), [audit script](skills/exam-review-designer/scripts/audit_questions.py), [prompts.js](prompts.js), [authoring contract](skills/exam-review-designer/references/authoring.md) |
+| Capture or revisit confusion, images and AI explanation handoff | [CLARITY.md](docs/guides/CLARITY.md) | [clarity.js](clarity.js), [clarity-ui.js](clarity-ui.js), affected calls in [app.js](app.js), [model tests](tests/clarity.test.cjs), [browser checks](tools/clarity_browser.cjs) |
+| Change saves, resume, timing, or backups | [STORAGE.md](docs/guides/STORAGE.md) | [storage.js](storage.js), [core.js](core.js), affected parts of [app.js](app.js), [storage tests](tests/storage.test.cjs), [browser failure injection](tools/workspace_browser.cjs) |
+| Change classes, JSON imports or AI prompts | [COURSES.md](docs/guides/COURSES.md) | [courses.js](courses.js), [prompts.js](prompts.js), [course tests](tests/courses.test.cjs), relevant storage/UI calls |
 | Change bank shape or review generation | [Authoring contract](skills/exam-review-designer/references/authoring.md) | [Builder](skills/exam-review-designer/scripts/create_review.py), [example bank](skills/exam-review-designer/assets/example-bank.json), [package tests](tests/skill_package_test.py) |
-| Change installation or release distribution | [INSTALL.md](INSTALL.md) | [Packager](tools/package_release.py), [package tests](tests/skill_package_test.py), [release review](RELEASE_REVIEW.md); distribute through GitHub's source ZIP |
-| Understand a prior implementation decision | Relevant route above | [REVIEW.md](REVIEW.md) provides background; inspect current code before relying on historical descriptions |
+| Change installation or release distribution | [INSTALL.md](docs/guides/INSTALL.md) | [Packager](tools/package_release.py), [package tests](tests/skill_package_test.py), [release review](docs/maintenance/RELEASE_REVIEW.md); distribute through GitHub's source ZIP |
+| Understand a prior implementation decision | Relevant route above | [REVIEW.md](docs/maintenance/REVIEW.md) provides background; inspect current code before relying on historical descriptions |
 
-Use targeted symbol/file searches for large sources. `banks/tax.js` and `midterm_trainer.html` are examples/history; read them only when the task involves that content. Generated app copies are output artifacts, not a second source of truth.
+Use targeted symbol/file searches for large sources. `banks/tax.js` and `archive/midterm_trainer.html` are examples/history; read them only when the task involves that content. The archive adapter requires a new explicit output and is not a build step. Generated app copies are output artifacts, not a second source of truth. Longer guides are grouped in [docs/](docs/README.md); their repository commands run from the project root.
 
 ## 2. Establish a concrete outcome
 
