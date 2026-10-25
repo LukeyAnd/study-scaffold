@@ -38,7 +38,7 @@ Read [references/intake.md](references/intake.md). Inspect supplied sources and 
 
 Use a real question widget if the host provides one and its input type fits; otherwise use concise ordinary chat. Batch a few related questions, generally no more than three at once. Request files in normal chat when widgets accept only text. Do not fabricate tool calls or treat a preselected option as an answer. Continue useful source inspection while waiting; do not invent unresolved facts.
 
-Use `assets/review-context.json` to record resolved context, source locations, missing information, and explicit assumptions. Do not collect unrelated personal details. If the learner has no sources, ask for material or offer a clearly labeled general/provisional review. Do not claim course alignment from a course title alone. If the user already supplied enough context, begin without a questionnaire.
+Copy `assets/review-context.json` into the learner’s workspace as `review-context.json`; update that copy to record resolved context, source locations, missing information, and explicit assumptions. Do not collect unrelated personal details. If the learner has no sources, ask for material or offer a clearly labeled general/provisional review. Do not claim course alignment from a course title alone. If the user already supplied enough context, begin without a questionnaire.
 
 Default to supplied sources only. Record whether authoritative supplemental research is permitted; distinguish it from the governing course material. Inspect the actual source passage and version, resolve consequential conflicts, and withhold disputed or unsupported items. Model memory or agreement between AI answers is not source evidence.
 

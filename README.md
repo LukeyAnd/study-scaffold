@@ -2,7 +2,7 @@
 
 A minimal study framework built around **your own course sources**. Create a review with your preferred AI, check its questions, and practice adaptively in a browser.
 
-**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.2.0.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
+**[Download ZIP from GitHub](https://github.com/LukeyAnd/study-scaffold/archive/refs/tags/v1.2.1.zip)** · **[Try the app](https://lukeyand.github.io/study-scaffold/)** · **[Features & scope](FEATURES.md)** · **[Workflow](#how-it-works)**
 
 ## For humans — start with your AI
 
@@ -119,11 +119,11 @@ node tools/serve.cjs --port 4173
 
 ## First release and limits
 
-**v1.2.0 simplifies the repository, scales quiz planning and protects workspace replacement.** Guided AI startup, clarity notes and source-aware question design remain included. See [CHANGELOG.md](CHANGELOG.md), [first-release review](docs/maintenance/RELEASE_REVIEW.md), and [first-run checks](docs/maintenance/FIRST_RUN_TEST.md).
+**v1.2.1 strengthens progress recovery, spaced review, question screening and portable backups.** Guided AI startup, clarity notes and source-aware question design remain included. See [CHANGELOG.md](CHANGELOG.md), [release review](docs/maintenance/RELEASE_REVIEW.md), and [first-run checks](docs/maintenance/FIRST_RUN_TEST.md).
 
 Use **Need clarity?** beside a question to save something to revisit, then open **Library → Clarity notes**. Copy its context to your preferred AI and paste back a source-checked explanation. Notes/images have their own backup, separate from progress. See [CLARITY.md](docs/guides/CLARITY.md).
 
-Question authoring now includes a varied reasoning/answer-length plan and an editorial screen for longest-answer clues. Best-answer comparisons require a stated criterion and one defensible key. See [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md).
+Question authoring now includes a varied reasoning/answer-length plan and an editorial screen for longest- and shortest-answer clues. Best-answer comparisons require a stated criterion and one defensible key. See [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md).
 
 - Adaptation uses transparent heuristics. Mastery scores and response speed do not predict passing or certify durable retention.
 - The app scores MCQs; other exam formats need companion practice. Static answer keys are inspectable, so exam mode is for personal study.

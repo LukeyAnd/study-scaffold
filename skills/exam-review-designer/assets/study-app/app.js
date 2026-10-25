@@ -30,7 +30,7 @@
   let noticeTimer, storageWarning = '', storageLocked=false, activeSince=null, submitting=false, switching=false, checkpoints=[];
   let subjectFilter='all',courseDraft=null;
   let promptMode='add',promptCourse=bank.id;
-  let needsCourseSelection=false,workspaceBusy=false,scenarioPage=0,scenarioContext='';
+  let needsCourseSelection=false,workspaceBusy=false,scenarioPage=0,scenarioContext='',storageUnreadable=false,recoveryPlan=null,recoveryCopy=null;
   const storage=await S.open(bank.id,()=>{storageWarning='Progress changed in another tab. Reload this tab before continuing.';notify(storageWarning);updateStorageStatus();});
   const clarityStore=await StudyClarity.open(bank.id);
   const clarityUI=StudyClarityUI.create({store:clarityStore,bank,icon,help:info,notify,onToggle:syncTime,
@@ -40,7 +40,7 @@
   try {
     if(!storedData&&storage.legacy)storedData=JSON.parse(storage.legacy);
     if(storedData)applyWorkspace(storedData);
-  } catch(error) { storageLocked=true;storageWarning='Saved data could not be loaded. Export the stored backup before replacing it.'; }
+  } catch(error) { storageLocked=true;storageUnreadable=true;storageWarning='Saved data could not be loaded. Open Library → Data & backups to save a recovery copy before replacing it.';try{recoveryPlan=S.reconcile(storedData,bank);}catch(_){} }
   needsCourseSelection=!requested&&!preferred&&!storage.initial&&!storage.legacy&&bank.example===true;
   if(needsCourseSelection)promptMode='new';
   try { document.body.classList.toggle('dark', localStorage.getItem('study-scaffold:theme') === 'dark'); } catch (_) {}
@@ -55,7 +55,7 @@
     const active=!workspaceBusy&&current&&!current.answered&&session&&!session.ended&&location.hash==='#practice'&&document.visibilityState==='visible'&&document.hasFocus()&&!document.querySelector('.help-dialog[open], .clarity-drawer[open]');
     if(active)activeSince=performance.now();else if(wasActive&&current&&!current.answered)current.pauses++;
   }
-  function capture() {flushTime();const data=S.snapshot(bank,state,session,current,recent,results);syncTime();return data;}
+  function capture(detached=true) {flushTime();const data=S.snapshot(bank,state,session,current,recent,results,Date.now(),detached);syncTime();return data;}
   function updateStorageStatus() {
     const el=$('#data-status');if(el)el.textContent=storageWarning||`${storage.mode}${storage.savedAt?' · Saved '+new Date(storage.savedAt).toLocaleString():''}`;
   }
@@ -64,10 +64,12 @@
   }
   async function save(daily=false) {
     if(needsCourseSelection||workspaceBusy||storageLocked||storage.conflict)return false;
-    try {const data=capture();await storage.save(data,daily);storedData=data;storageWarning='';updateStorageStatus();if(daily&&$('#restore-date'))await refreshCheckpoints();return true;}
+    try {const data=capture(false);await storage.save(data,daily);storageWarning='';updateStorageStatus();if(daily&&$('#restore-date'))await refreshCheckpoints();return true;}
     catch(error){storageWarning=error.message;updateStorageStatus();notify(storageWarning);return false;}
   }
   async function replaceWorkspace(candidate,{clearCheckpoints=false}={}) {
+    if(workspaceBusy||storage.conflict)return false;
+    if(storageUnreadable){let raw;try{raw=await storage.readStored();}catch(error){notify(error.message);return false;}if(recoveryCopy!==raw){recoveryCopy=null;notify('Save a stored recovery copy and check the file before replacing unreadable progress.');return false;}}
     if(workspaceBusy||storage.conflict)return false;
     let prepared;
     try{prepared=S.validate(candidate,bank);prepared.savedAt=Date.now();}
@@ -78,7 +80,7 @@
       // current session and dated restore points available for recovery.
       await storage.save(prepared,false,{clearCheckpoints});
       clearInterval(clock);applyWorkspace(prepared);storedData=prepared;
-      storageLocked=false;storageWarning='';await storage.removeLegacy();
+      storageLocked=false;storageUnreadable=false;recoveryPlan=null;recoveryCopy=null;storageWarning='';await storage.removeLegacy();
       return true;
     } catch(error) {storageWarning=error.message;notify(storageWarning);return false;}
     finally {workspaceBusy=false;main.inert=false;updateStorageStatus();resumeClock();syncTime();}
@@ -119,10 +121,10 @@
   function route(path) { if (location.hash === `#${path}`) render(); else location.hash = path; }
   const quantity = (n, word, plural = word + 's') => `${n} ${n === 1 ? word : plural}`;
   function ratio(value) { return value === null ? '—' : `${value}%`; }
-  function status(q) { const r = E.recordFor(state,q.id); if (!r?.attempts) return ['New', '']; if (r.recent.at(-1) === false) return ['Needs review', 'red']; if (r.due <= Date.now()) return ['Review due', 'amber']; if (E.mastery(r) >= 80 && r.attempts >= 3) return ['Secure', 'green']; return ['Developing', 'amber']; }
+  function status(q) { const r = E.recordFor(state,q.id); if (!r?.attempts) return ['New', '']; if (r.recent.at(-1) === false) return ['Needs review', 'red']; if (r.due <= Date.now()) return ['Review due', 'amber']; if (E.secure(r)) return ['Secure', 'green']; return ['Developing', 'amber']; }
   function tag(q) { const [text, color] = status(q); return `<span class="tag ${color}">${text}</span>`; }
   function moduleRows(groups = bank.topics.map(t => ({ ...t, questions: byTopic.get(t.id) })), type = 'topic') {
-    return groups.map((t, i) => { const s = E.summary(t.questions, state); return `<button class="module-row" data-action="detail" data-kind="${type}" data-id="${esc(t.id)}" aria-label="${esc(t.name)}: ${s.mastery}% estimated mastery, ${s.seen} of ${s.total} scenarios attempted. View details."><span class="row-icon">${icon(type==='skill'?'sliders':'book')}</span><span><span class="module-name">${esc(t.name)} <span class="module-meta">${s.seen}/${s.total} explored</span></span><span class="track" style="display:block"><span class="fill" style="display:block;width:${s.mastery}%"></span></span></span><span class="module-value">${s.seen ? s.mastery + '%' : 'New'} ${icon('right')}</span></button>`; }).join('');
+    return groups.map((t, i) => { const s = E.summary(t.questions, state); return `<button class="module-row" data-action="detail" data-kind="${type}" data-id="${esc(t.id)}" aria-label="${esc(t.name)}: ${s.mastery}% practice estimate, ${s.seen} of ${s.total} scenarios attempted. View details."><span class="row-icon">${icon(type==='skill'?'sliders':'book')}</span><span><span class="module-name">${esc(t.name)} <span class="module-meta">${s.seen}/${s.total} explored</span></span><span class="track" style="display:block"><span class="fill" style="display:block;width:${s.mastery}%"></span></span></span><span class="module-value">${s.seen ? s.mastery + '%' : 'New'} ${icon('right')}</span></button>`; }).join('');
   }
   function dayKey(date) { const d = new Date(date); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
   function activity() {
@@ -152,7 +154,7 @@
     const focus=practiced[0]?.name||'All categories';
     const unfinished=session&&!session.ended;
     view.html=heading('','Overview','Start a recommended session. Select a category to look closer.')+
-      `<section class="card overview-hub"><div class="hub-lead"><div class="heading-line"><span class="section-icon">${icon('play')}</span><h2>${unfinished?'Continue session':'Next session'}</h2>${info('Recommended session',['Practice prioritizes recent mistakes, due reviews and new scenarios.','Progress scores are study heuristics, not exam predictions.'])}</div><div class="hub-focus">${esc(unfinished?topicName(current.q.topic):focus)}</div><div class="hub-meta"><span>${unfinished?`Question ${session.position+1} of ${session.total}`:quantity(Math.min(10,bank.questions.length),'question')}</span><span class="tag">Adaptive</span>${summary.due?`<button class="text-button" data-action="review">${summary.due} due</button>`:''}</div><div class="actions">${btn(unfinished?'Resume session':'Start practice',unfinished?'resume':'start-adaptive','',true)}${menu('Session options',btn('Build a quiz','builder')+btn('Due reviews','review'))}</div></div><div class="hub-metrics" aria-label="Learning summary">${metric('Mastery',summary.mastery+'%','insights','chart')}${metric('Accuracy',ratio(summary.accuracy),'all-answers','check')}${metric('Explored',`${summary.seen}<span> / ${summary.total}</span>`,'library','book')}</div></section>`+
+      `<section class="card overview-hub"><div class="hub-lead"><div class="heading-line"><span class="section-icon">${icon('play')}</span><h2>${unfinished?'Continue session':'Next session'}</h2>${info('Recommended session',['Practice prioritizes recent mistakes, due reviews and new scenarios.','Progress scores are study heuristics, not exam predictions.'])}</div><div class="hub-focus">${esc(unfinished?topicName(current.q.topic):focus)}</div><div class="hub-meta"><span>${unfinished?`Question ${session.position+1} of ${session.total}`:quantity(Math.min(10,bank.questions.length),'question')}</span><span class="tag">Adaptive</span>${summary.due?`<button class="text-button" data-action="review">${summary.due} due</button>`:''}</div><div class="actions">${btn(unfinished?'Resume session':'Start practice',unfinished?'resume':'start-adaptive','',true)}${menu('Session options',btn('Build a quiz','builder')+btn('Due reviews','review'))}</div></div><div class="hub-metrics" aria-label="Learning summary">${metric('Practice estimate',summary.mastery+'%','insights','chart')}${metric('Accuracy',ratio(summary.accuracy),'all-answers','check')}${metric('Explored',`${summary.seen}<span> / ${summary.total}</span>`,'library','book')}</div></section>`+
       `<section class="card overview-map"><div class="workbench-toolbar"><div class="heading-line"><h2>Learning map</h2>${info('Learning map',['The first categories need attention or have not been explored.','Choose a category or expand the rest.'])}</div><label class="inline-select"><span class="visually-hidden">Overview category</span><select id="overview-category">${topicOptions()}</select></label></div><div id="overview-map-content">${overviewMap()}</div></section>`;
     $('#overview-category').value=overviewCategory;
     if(storageWarning)main.insertAdjacentHTML('afterbegin',`<p class="note" role="alert">${esc(storageWarning)}</p>`);
@@ -178,14 +180,14 @@
     if(insightsMode==='mistakes')return answerRows(e=>!e.correct);
     if(insightsMode==='pace')return pace();
     if(insightsMode==='secure') {
-      const qs=bank.questions.filter(q=>E.mastery(E.recordFor(state,q.id))>=80&&(E.recordFor(state,q.id)?.attempts||0)>=3);
+      const qs=bank.questions.filter(q=>E.secure(E.recordFor(state,q.id)));
       return qs.length?qs.map(q=>`<div class="session-row"><span>${esc(q.angle)}<small>${esc(topicName(q.topic))}</small></span>${btn('Practice','start-one',`data-id="${esc(q.id)}"`)}</div>`).join(''):'<div class="empty">No secure scenarios yet.</div>';
     }
     return moduleRows();
   }
   function insights() {
     const summary=E.summary(bank.questions,state);
-    view.html=heading('','Insights','Choose one view to explore your results. Select a row or chart bar for details. Secure status needs repeated practice and 80% estimated mastery. Activity retains 5,000 answers and 100 sessions. These measures do not predict an exam grade.')+
+    view.html=heading('','Insights','Choose one view to explore your results. Select a row or chart bar for details. Secure requires repeated practice, at least one correct return when due, 80% practice estimate, and no overdue review. It is not proof of long-term retention. Activity retains 5,000 answers and 100 sessions. These measures do not predict an exam grade.')+
       `<div class="insight-summary">${metric('Accuracy',ratio(summary.accuracy),'all-answers','check')}${metric('Review due',summary.due,'review','clock')}${metric('Secure',summary.secure,'secure','check')}</div>`+
       `<section class="card workbench"><div class="workbench-toolbar"><label class="view-picker" for="insight-view">${icon('chart')}<select id="insight-view" aria-label="Insight view"><option value="categories">Categories</option><option value="skills">Thinking skills</option><option value="activity">Practice activity</option><option value="sessions">Session history</option><option value="answers">Answer history</option><option value="mistakes">Mistakes</option><option value="pace">Response time</option><option value="secure">Secure scenarios</option></select></label><button class="text-button icon-link" data-action="builder">${icon('sliders')}Build a quiz</button></div><div id="insight-content">${insightContent()}</div></section>`;
     $('#insight-view').value=insightsMode;
@@ -355,7 +357,7 @@
       return `<div class="source-register"><div class="heading-line"><h2>Source register</h2>${info('Source register',['These references and review labels are supplied by the author.','SoS! checks structure and reference IDs, not whether a source is true or a question is correct.','Use the question audit and actual source passages to review correctness.'])}</div><div class="source-summary"><span>${linked}/${bank.questions.length} families have source references</span><span>${esc(bank.reviewStatus||'No review status supplied')}</span></div>${sources.length?sources.map(s=>`<article class="source-record"><h3>${esc(s.title)}</h3><div>${esc(s.id)} · ${esc(s.version||'Version not supplied')}</div><div>${esc(s.locator)}</div></article>`).join(''):'<div class="empty">No source register was supplied for this class. Build your review from your own course materials.</div>'}</div>`;
     }
     if(libraryMode==='reference')return `<div class="field reference-search"><label for="glossary-search">Find a term</label><input type="search" id="glossary-search" placeholder="Search definitions"></div><div class="glossary" id="glossary-list">${glossaryRows('')}</div>`;
-    if(libraryMode==='data')return `<div class="data-panel"><div class="heading-line"><h2>Saved progress</h2>${info('Saved progress',['Your progress and unfinished session save automatically in this browser.','Clarity notes and images use their own export under Library → Clarity notes; progress backups do not contain them.','Up to seven daily restore points are kept in the local database after answers or session completion.','Browser storage can be cleared; download a backup to keep an independent copy.','A JSON backup is readable text and can be saved in your chosen folder or cloud drive.','Import replaces this bank’s workspace; it does not merge devices.','Timed exams keep their original deadline after closing the app.'])}</div><p class="status-message" id="data-status" role="status" aria-live="polite"></p><div class="data-toolbar">${btn('Save backup file','export','',true)}<label class="btn file-label">${icon('upload')}Load backup<input class="visually-hidden" id="import-file" type="file" accept="application/json,.json,text/plain,.txt"></label>${menu('More data options',btn('Download backup','download-backup')+btn('Keep browser storage','persist-storage')+btn('Export stored backup','export-stored')+btn('Reload saved progress','reload')+btn('Reset progress','reset'))}</div>${disclosure('Restore a date',`<div class="restore-controls"><div class="field"><label for="restore-date">Saved date</label><select id="restore-date"><option value="">Choose a saved date</option></select></div>${btn('Restore selected date','restore-date')}</div>`,'history')}</div>`;
+    if(libraryMode==='data')return `<div class="data-panel"><div class="heading-line"><h2>Saved progress</h2>${info('Saved progress',['Your progress and unfinished session save automatically in this browser.','Clarity notes and images use their own export under Library → Clarity notes; progress backups do not contain them.','Up to seven daily restore points are kept in the local database after answers or session completion.','Browser storage can be cleared; download a backup to keep an independent copy.','A JSON backup is readable text and can be saved in your chosen folder or cloud drive.','Import replaces this bank’s workspace; it does not merge devices.','Timed exams keep their original deadline after closing the app.'])}</div><p class="status-message" id="data-status" role="status" aria-live="polite"></p>${storageUnreadable?`<div class="recovery-panel"><p role="alert">The saved workspace is preserved. Save a recovery copy and check it before continuing or resetting.</p>${recoveryPlan?btn('Continue with matching history','recover-stored',recoveryCopy?'':'disabled')+info('Matching history',[`${recoveryPlan.removed.length} unavailable families will leave the active workspace; the unchanged recovery copy retains them.`,recoveryPlan.sessionClosed?'An affected session will close; its original questions and deadline remain in the recovery copy.':'Unaffected sessions keep their original questions and deadline.','Malformed history is never silently repaired.']):''}</div>`:''}<div class="data-toolbar">${btn(storageUnreadable?'Save stored recovery copy':'Save backup file','export','',true)}<label class="btn file-label">${icon('upload')}Load backup<input class="visually-hidden" id="import-file" type="file" accept="application/json,.json,text/plain,.txt"></label>${menu('More data options',btn(storageUnreadable?'Download stored recovery copy':'Download backup','download-backup')+btn('Keep browser storage','persist-storage')+btn('Export stored backup','export-stored')+btn('Reload saved progress','reload')+btn('Reset progress','reset'))}</div>${disclosure('Restore a date',`<div class="restore-controls"><div class="field"><label for="restore-date">Saved date</label><select id="restore-date"><option value="">Choose a saved date</option></select></div>${btn('Restore selected date','restore-date')}</div>`,'history')}</div>`;
     return moduleRows();
   }
   function library() {
@@ -371,6 +373,19 @@
   function eventList(filter,title) {const events=state.events.filter(filter);view.html=heading('ANSWER HISTORY',title,`${events.length} matching answers in the retained history. Select a scenario to practice it.`)+`<section class="card">${events.length?events.slice(-100).reverse().map(e=>`<div class="session-row"><span>${esc(qMap.get(e.id)?.angle||e.id)}<small>${new Date(e.at).toLocaleString()} · ${esc(topicName(qMap.get(e.id)?.topic))} · ${e.timingVersion===1?seconds(e.ms)+' active time':'Earlier rating: '+esc(e.confidence)}</small></span><div class="actions"><span class="tag ${e.correct?'green':'red'}">${e.correct?'Correct':'Incorrect'}</span>${btn('Practice','start-one',`data-id="${esc(e.id)}"`)}</div></div>`).join(''):'<p class="empty">No matching answers yet.</p>'}${events.length>100?'<p class="note">Showing the latest 100 matching answers.</p>':''}</section>`; }
   function render(){const path=location.hash.slice(1)||'overview';const [page,kind,id]=path.split('/');if(needsCourseSelection&&!['courses','prompts'].includes(page)){route('courses');return;} document.querySelectorAll('[data-route]').forEach(a=>{const active=a.dataset.route===page||(page==='detail'&&a.dataset.route==='insights')||(['courses','prompts'].includes(page)&&a.dataset.route==='library');if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});$('#breadcrumb').textContent=({overview:'Overview',practice:'Practice',insights:'Insights',builder:'Quiz builder',library:'Library',courses:'All classes',prompts:'AI prompt',detail:'Category detail'})[page]||'Your workspace';
     if(page==='prompts')promptPage();else if(page==='courses')courses();else if(page==='overview')overview();else if(page==='practice')renderPractice();else if(page==='insights')insights();else if(page==='builder')builder();else if(page==='library')library();else if(page==='detail')detail(kind,decodeSegment(id));else if(page==='answers')eventList(()=>true,'Answer history');else if(page==='confident')eventList(e=>e.confidence==='sure'&&!e.correct,'Confident mistakes');else{route('overview');return;} document.title=`${page==='detail'?(kind==='topic'?topicName(decodeSegment(id)):decodeSegment(id)||'Detail'):page.charAt(0).toUpperCase()+page.slice(1)} · SoS!`;
+  }
+  async function exportProgress(pickLocation){
+    try{
+      const unreadable=storageUnreadable,name=`sos-${unreadable?'recovery-':''}${bank.id}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+      // Open the picker during the click's activation, before any database wait.
+      const handle=pickLocation&&window.showSaveFilePicker?await window.showSaveFilePicker({suggestedName:name,types:[{description:unreadable?'Stored recovery copy':'SoS progress backup',accept:{'application/json':['.json']}}]}):null;
+      const content=unreadable?await storage.readStored():JSON.stringify(capture(),null,2);
+      if(handle){
+        const stream=await handle.createWritable();await stream.write(content);await stream.close();
+      }else download(content,name);
+      if(unreadable&&storageUnreadable){recoveryCopy=content;if(location.hash==='#library')render();}
+      notify(unreadable?'Recovery copy saved or download started. Check the file before continuing or resetting.':'Backup saved or download started.');
+    }catch(error){if(error.name!=='AbortError')notify('Backup was not saved. '+error.message);}
   }
   const actions={'clarity-note':()=>{if(current)clarityUI.openQuestion(current.q,current.raw);},'clarity-list':()=>{libraryMode='clarity';route('library');},'new-review':()=>{promptMode='new';route('prompts');},prompts:()=>route('prompts'),'copy-prompt':async()=>{const output=$('#prompt-output');try{await navigator.clipboard.writeText(output.value);notify('Prompt copied.');}catch(_){output.focus();output.select();notify('Prompt selected. Copy it with your browser or keyboard.');}},'download-prompt':()=>download($('#prompt-output').value,'sos-authoring-prompt.txt','text/plain'),'download-context':()=>{const entry=courseEntries.get($('#prompt-course').value);download(JSON.stringify(StudyPrompts.context(entry,Object.fromEntries(new FormData($('#prompt-form')))),null,2),`sos-authoring-context-${entry.bank.id}.json`);},courses:()=>route('courses'),'open-course':b=>switchCourse(b.dataset.id),'export-course':b=>{const raw=courseEntries.get(b.dataset.id)?.raw;if(raw)download(JSON.stringify(raw,null,2),`course-${raw.id}.json`);},overview:()=>route('overview'),insights:()=>route('insights'),library:()=>route('library'),builder:()=>route('builder'),
     'start-adaptive':()=>start(bank.questions),
@@ -392,20 +407,25 @@
     resume:()=>route('practice'),
     'pace-detail':b=>{$('#pace-detail').innerHTML=paceRows(b.dataset.id);},
     reload:()=>location.reload(),
-    export:async()=>{
-      const content=JSON.stringify(capture(),null,2),name=`sos-${bank.id}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
-      if(window.showSaveFilePicker){try{const handle=await window.showSaveFilePicker({suggestedName:name,types:[{description:'SoS progress backup',accept:{'application/json':['.json']}}]});const stream=await handle.createWritable();await stream.write(content);await stream.close();notify('Backup saved.');}catch(error){if(error.name!=='AbortError')notify('Could not save to that location. Use Download backup from More data options.');}}
-      else download(content,name);
+    export:()=>exportProgress(true),
+    'download-backup':()=>exportProgress(false),
+    'recover-stored':async()=>{
+      if(!storageUnreadable||!recoveryCopy||workspaceBusy||storage.conflict)return;
+      try{
+        const raw=await storage.readStored();if(raw!==recoveryCopy){recoveryCopy=null;notify('The stored copy changed. Reload and save its recovery copy before continuing.');return;}
+        const plan=S.reconcile(JSON.parse(raw),bank);
+        if(!confirm(`Continue with matching history and retire ${plan.removed.length} unavailable families? Check that your recovery file is saved. ${plan.sessionClosed?'The affected session will close.':'Unaffected sessions keep their original deadline.'}`))return;
+        if(await replaceWorkspace(plan.data)){render();notify('Matching history restored. The recovery file retains unavailable questions.');}
+      }catch(error){notify(error.message);}
     },
-    'download-backup':()=>download(JSON.stringify(capture(),null,2),`sos-${bank.id}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`),
     'persist-storage':async()=>{try{const granted=await navigator.storage?.persist?.();notify(granted?'Browser storage protection granted. Keep a file backup too.':'Storage protection was not granted. Keep a downloaded backup.');}catch(_){notify('Storage protection is unavailable. Keep a downloaded backup.');}},
     'restore-date':async()=>{
       const index=$('#restore-date').value;if(index===''||!checkpoints[Number(index)]){notify('Choose a saved date first.');return;}
       if(!canEdit()||!confirm('Restore this date? Current progress and the unfinished session will be replaced. Save a backup first if you need it.'))return;
       if(await replaceWorkspace(checkpoints[Number(index)])){render();notify('Saved date restored.');}
     },
-    'export-stored':()=>download(storageLocked&&(storage.rawBackup||storage.legacy)?storage.rawBackup||storage.legacy:JSON.stringify(storedData||capture(),null,2),`sos-stored-${bank.id}.json`),
-    reset:async()=>{if(!workspaceBusy&&!storage.conflict&&confirm('Delete learning progress and dated restore points for this bank in this browser? Clarity notes remain; delete them separately. Save a backup first if you want to keep progress.')){const empty=S.snapshot(bank,E.empty(bank.id),null,null,[],null);if(await replaceWorkspace(empty,{clearCheckpoints:true})){render();notify('This bank’s progress has been reset.');}}}
+    'export-stored':async()=>{try{const content=await storage.readStored();download(content,`sos-stored-${bank.id}.json`);if(storageUnreadable){recoveryCopy=content;if(location.hash==='#library')render();}notify('Stored-copy download started. Check the file before replacing progress.');}catch(error){notify(error.message);}},
+    reset:async()=>{if(storageUnreadable&&!recoveryCopy){notify('Save a stored recovery copy and check the file before resetting.');return;}if(!workspaceBusy&&!storage.conflict&&confirm('Delete learning progress and dated restore points for this bank in this browser? Clarity notes remain; delete them separately. Save a backup first if you want to keep progress.')){const empty=S.snapshot(bank,E.empty(bank.id),null,null,[],null);if(await replaceWorkspace(empty,{clearCheckpoints:true})){render();notify('This bank’s progress has been reset.');}}}
 
   };
   const $$=s=>[...document.querySelectorAll(s)];
@@ -429,9 +449,10 @@ if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&c
       const file=e.target.files[0];if(!file)return;
       try {
         if(file.size>10*1024*1024)throw Error('Choose a backup smaller than 10 MB.');
-        const imported=S.validate(JSON.parse(await file.text()),bank);
+        const original=(await file.text()).replace(/^\uFEFF/,'');let imported,plan;
+        try{imported=S.validate(JSON.parse(original),bank);}catch(error){try{plan=S.reconcile(JSON.parse(original),bank);imported=plan.data;}catch(_){throw error;}}
         if(storage.conflict)throw Error('Reload this tab before importing.');
-        if(!confirm('Replace this bank’s progress and unfinished session with the selected backup?'))return;
+        if(!confirm(plan?`Import matching history and retire ${plan.removed.length} unavailable families? Your selected backup file stays unchanged. ${plan.sessionClosed?'An affected session will close.':''}`:'Replace this bank’s progress and unfinished session with the selected backup?'))return;
         if(await replaceWorkspace(imported)){render();notify('Backup loaded.');}
       }catch(error){if($('#data-status'))$('#data-status').textContent=`Import failed: ${error.message}`;}finally{if($('#import-file'))$('#import-file').value='';}
     }
@@ -449,7 +470,7 @@ if(e.target.closest('#builder-form'))updatePlan();if(e.target.name==='answer'&&c
   document.addEventListener('visibilitychange',()=>{syncTime();if(session&&!session.ended)save();resumeClock();});
   document.addEventListener('click',()=>setTimeout(syncTime,0));
   document.addEventListener('close',syncTime,true);
-  window.addEventListener('storage',e=>{if(e.key===`study-scaffold:${bank.id}:v2`) {storageWarning='Progress changed in another tab. Reload before continuing.';storageLocked=true;notify(storageWarning);}});
+  window.addEventListener('storage',e=>{if(e.key===`study-scaffold:${bank.id}:v2`) {storageWarning='Progress changed in another tab. Reload before continuing.';storageLocked=true;recoveryCopy=null;notify(storageWarning);}});
   setInterval(()=>{if(activeSince!==null)save();},10000);
   if(storage.mode==='Memory only')storageWarning='Storage is unavailable. Progress is in memory only; save a backup before closing.';
   if(!storage.initial&&storedData&&!storageLocked){if(await save())await storage.removeLegacy();}

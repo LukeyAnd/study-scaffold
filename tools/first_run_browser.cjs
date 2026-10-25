@@ -66,6 +66,7 @@ if(!appURL||!reviewURL||!bankPath)throw Error('Use through tools/verify_first_ru
   const tabs=await browser.newContext(),first=await tabs.newPage(),stale=await tabs.newPage();await first.goto(reviewURL);await first.getByRole('heading',{name:'Overview',exact:true}).waitFor();await stale.goto(reviewURL);await stale.getByRole('heading',{name:'Overview',exact:true}).waitFor();activePage=stale;await first.getByRole('button',{name:'Start practice',exact:true}).click();await stale.waitForFunction(()=>document.querySelector('#notice').textContent.includes('another tab'));await stale.getByRole('button',{name:'Start practice',exact:true}).click();assert.equal(await stale.locator('#question-heading').count(),0);await tabs.close();
   await require('./large_course_browser.cjs')(browser,appURL,bankPath);
   await require('./workspace_browser.cjs')(browser,reviewURL);
+  await require('./audit_recovery_browser.cjs')(browser,appURL);
   await require('./clarity_browser.cjs')(browser,reviewURL,bankPath);
   assert.deepEqual(errors,[]);await context.close();await second.close();await generated.close();
   console.log('Passed: fresh onboarding; prompt/course import; exact resume; sources/feedback; backup transfer; chart drill-downs; all main views at 375/768/1360px; dark-theme reload; keyboard help; generated output; timed-exam expiry; localStorage fallback; memory-only warning; stale-tab protection; no missing runtime assets.');

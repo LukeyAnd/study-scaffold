@@ -50,6 +50,19 @@ class QuestionDesignTests(unittest.TestCase):
         row = api["inspect_variant"](variant("这是完整说明" * 7, ["第一个选项", "第二个选项", "第三个选项"]))
         self.assertTrue(any("longer" in x for x in row["warnings"]))
 
+    def test_small_and_large_banks_screen_both_length_directions(self):
+        # One-word gaps avoid item-level warnings but can still leak the key.
+        long = variant("a b c d e f g", ["a b c d e f", "b c d e f g", "c d e f g h"])
+        short = variant("a b c d e f", ["a b c d e f g", "b c d e f g h", "c d e f g h i"])
+        for count in (5, 10, 12):
+            for row, label in ((long, "longest"), (short, "shortest")):
+                report = api["audit"](bank([[row]] * count))
+                self.assertTrue(any(label in warning for warning in report["warnings"]))
+            self.assertFalse(api["audit"](bank([[variant()]] * count))["warnings"])
+        self.assertFalse(api["audit"](bank([[long]] * 4))["warnings"])
+        mixed = api["audit"](bank([[long], [short], [variant()], [variant()]] * 3))
+        self.assertFalse(mixed["warnings"])
+
     def test_normalized_duplicates_are_flagged_but_not_rewritten(self):
         row = api["inspect_variant"](variant("Same answer.", ["  SAME   answer  ", "Different choice", "Another choice"]))
         self.assertTrue(any("duplicate" in x for x in row["warnings"]))

@@ -42,6 +42,7 @@ def inspect_variant(variant):
     # lengths therefore give 1/4, rather than falsely counting every key a win.
     return {"words": words, "characters": chars, "metric": unit,
             "longestStrategy": 1 / len(longest) if 0 in longest else 0,
+            "shortestStrategy": 1 / len(shortest) if 0 in shortest else 0,
             "warnings": warnings}
 
 
@@ -64,21 +65,25 @@ def audit(bank):
             result = inspect_variant(variant)
             rows.append({"variant": index, **result})
         families.append({"id": qid, "variants": rows,
-                         "longestStrategy": statistics.mean(r["longestStrategy"] for r in rows)})
+                         **{strategy: statistics.mean(r[strategy] for r in rows)
+                            for strategy in ("longestStrategy", "shortestStrategy")}})
     rate = statistics.mean(f["longestStrategy"] for f in families)
     # Each family has equal weight so many near-identical variants cannot
     # camouflage another family's cue. This is NOT a significance test.
-    if len(families) >= 12 and rate > .40:
-        warnings.append("Bank-level length cue: choosing a longest option succeeds over 40% in this authored set.")
-    return {"families": families, "longestStrategy": rate, "warnings": warnings}
+    shortest = statistics.mean(f["shortestStrategy"] for f in families)
+    for label, success in (("longest", rate), ("shortest", shortest)):
+        if len(families) >= 12 and success > .40 or len(families) >= 5 and success >= .80:
+            warnings.append(f"Bank-level length cue: choosing a {label} option succeeds {success:.1%} in this authored set.")
+    return {"families": families, "longestStrategy": rate, "shortestStrategy": shortest, "warnings": warnings}
 
 
 def markdown(report):
     lines = ["# Item design screen", "",
              "Editorial warnings only. No subject, source, ambiguity or difficulty approval is implied.", "",
              f"Families: {len(report['families'])}. Longest-choice strategy: {report['longestStrategy']:.1%} (four-choice chance reference: 25%).",
+             f"Shortest-choice strategy: {report['shortestStrategy']:.1%}.",
              "Families have equal weight; variants and ties have equal weight within each family. This is descriptive, not a statistical test.", "",
-             "Thresholds are project heuristics: key/alternative median ratio ≥1.35 plus ≥4 words (or ≥18 characters); overall spread >1.6 with the same minimum gap. Bank warning: >40% across ≥12 families.", "",
+             "Thresholds are project heuristics: key/alternative median ratio ≥1.35 plus ≥4 words (or ≥18 characters); overall spread >1.6 with the same minimum gap. Either longest or shortest strategy warns above 40% across ≥12 families, or at least 80% across ≥5 families. These are editorial triggers, not significance tests.", "",
              "Do not pad answers, reverse the clue, auto-change keys, or remove valid content just to pass. Move shared qualifications into the stem and rewrite alternatives in parallel; re-solve afterwards.", ""]
     lines.extend(f"- {warning}" for warning in report["warnings"])
     for family in report["families"]:

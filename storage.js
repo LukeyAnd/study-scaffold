@@ -6,11 +6,12 @@
   const finite = n => Number.isFinite(n) && n >= 0;
   const dateKey = at => { const d = new Date(at); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
   function packAnswer(c) { return c ? {...c, q:c.q.id} : null; }
-  function snapshot(bank, state, session, current, recent, results, now=Date.now()) {
-    return clone({format:'sos-workspace', version:2, bankId:bank.id, savedAt:now, state,
+  function snapshot(bank, state, session, current, recent, results, now=Date.now(), detached=true) {
+    const data={format:'sos-workspace', version:2, bankId:bank.id, savedAt:now, state,
       session:session && {...session, pool:session.pool.map(q=>q.id), queue:session.queue?.map(q=>q.id)||null, answers:session.answers.map(packAnswer)},
       current:packAnswer(current), recent,
-      results:results && {...results, answers:results.answers.map(packAnswer)}});
+      results:results && {...results, answers:results.answers.map(packAnswer)}};
+    return detached ? clone(data) : data;
   }
   function validate(data, bank) {
     // Version-one progress files remain importable; no session was stored in them.
@@ -37,6 +38,28 @@
     const d=validate(data,bank), map=new Map(bank.questions.map(q=>[q.id,q]));
     const answer=c=>c&&({...c,q:map.get(c.q)});
     return {state:d.state,session:d.session&&{...d.session,pool:d.session.pool.map(id=>map.get(id)),queue:d.session.queue?.map(id=>map.get(id))||null,answers:d.session.answers.map(answer)},current:answer(d.current),recent:d.recent,results:d.results&&{...d.results,answers:d.results.answers.map(answer)}};
+  }
+  function reconcile(input,bank) {
+    // Validate the complete old workspace against every referenced ID BEFORE
+    // retiring anything. Corrupt removed rows must not be silently discarded.
+    const raw=input?.version===1&&!input.format?{format:'sos-workspace',version:2,bankId:bank.id,savedAt:Date.now(),state:input,session:null,current:null,recent:[],results:null}:input;
+    if(!raw||raw.bankId!==bank.id||!raw.state||!raw.state.records||Array.isArray(raw.state.records))throw Error('Choose a workspace for this class.');
+    const currentIds=new Set(bank.questions.map(q=>q.id)),referenced=new Set(currentIds);
+    const add=id=>{if(typeof id!=='string'||!id)throw Error('Invalid question reference in the stored workspace.');referenced.add(id);};
+    const list=(value,read=x=>x)=>{if(value===null||value===undefined)return;if(!Array.isArray(value))throw Error('Invalid stored workspace list.');value.forEach(x=>add(read(x)));};
+    Object.keys(raw.state.records).forEach(add);list(raw.state.events,e=>e?.id);list(raw.recent);
+    list(raw.session?.pool);list(raw.session?.queue);list(raw.session?.answers,a=>a?.q);list(raw.results?.answers,a=>a?.q);if(raw.current)add(raw.current.q);
+    const data=validate(raw,{...bank,questions:[...referenced].map(id=>({id}))});
+    const removed=[...referenced].filter(id=>!currentIds.has(id));
+    if(!removed.length)throw Error('There are no unavailable question families to retire.');
+    for(const id of removed)delete data.state.records[id];
+    data.state.events=data.state.events.filter(e=>currentIds.has(e.id));data.recent=data.recent.filter(id=>currentIds.has(id));
+    const refs=[...(data.session?.pool||[]),...(data.session?.queue||[]),...(data.session?.answers||[]).map(a=>a.q),data.current?.q].filter(id=>id!==undefined);
+    const sessionClosed=refs.some(id=>!currentIds.has(id));
+    if(sessionClosed){data.session=null;data.current=null;}
+    const resultsDropped=!!data.results&&(data.results.total>bank.questions.length||data.results.answers.some(a=>!currentIds.has(a.q)));
+    if(resultsDropped)data.results=null;
+    return {data:validate(data,bank),removed,sessionClosed,resultsDropped};
   }
   function openDB() {
     return new Promise((resolve,reject)=>{
@@ -101,6 +124,16 @@
       chain=operation.catch(()=>{});return operation;
     }
     return {mode,initial:initial?(initial.data||{invalidBackup:initial}):null,legacy,rawBackup,get savedAt(){return savedAt;},get conflict(){return conflict;},save,
+      async readStored(){
+        await chain;
+        let row,text;
+        if(db)row=await get('workspaces',bankId);
+        else if(local){text=local.getItem(key);if(text!==null){try{row=JSON.parse(text);}catch(_){return text;}}}
+        if(row!==undefined&&row!==null)return text!==undefined&&(!row||typeof row!=='object'||!Object.hasOwn(row,'data'))?text:JSON.stringify(row&&Object.hasOwn(row,'data')?row.data:row,null,2);
+        let older;try{older=local?.getItem(legacyKey)??root.localStorage?.getItem(legacyKey);}catch(_){}
+        if(older!==null&&older!==undefined)return older;
+        throw Error('No stored workspace is available to export. Keep this tab open and save its current progress.');
+      },
       async checkpoints(){if(!db)return [];const all=await new Promise((resolve,reject)=>{const req=db.transaction('snapshots').objectStore('snapshots').getAll(IDBKeyRange.bound([bankId,''],[bankId,'\uffff']));req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});return all.sort((a,b)=>b.savedAt-a.savedAt);},
       async flush(){await chain;},
       async clearCheckpoints(){await chain;if(db)await new Promise((resolve,reject)=>{const tx=db.transaction('snapshots','readwrite');tx.objectStore('snapshots').delete(IDBKeyRange.bound([bankId,''],[bankId,'\uffff']));tx.oncomplete=resolve;tx.onabort=()=>reject(tx.error);});},
@@ -128,5 +161,5 @@
       },close(){db?.close();}
     };
   }
-  const api={snapshot,validate,unpack,open,openLibrary,dateKey};root.StudyStorage=api;if(typeof module!=='undefined')module.exports=api;
+  const api={snapshot,validate,reconcile,unpack,open,openLibrary,dateKey};root.StudyStorage=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
