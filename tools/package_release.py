@@ -32,11 +32,12 @@ def sync_skill():
     for source, dest in ((ROOT / "docs" / "methodology" / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "docs" / "methodology" / "SOURCE_GUIDE.md", SKILL / "references" / "source-quality.md"), (ROOT / "docs" / "guides" / "SETUP.md", SKILL / "references" / "setup.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
-    for name in ("setup.ps1", "serve.py"):
+    for name in ("setup.ps1", "build_review.ps1", "serve.py", "serve.cjs"):
         source, dest = ROOT / "tools" / name, SKILL / "scripts" / name
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
     shutil.copyfile(ROOT / "docs" / "methodology" / "QUESTION_DESIGN.md", SKILL / "references" / "QUESTION_DESIGN.md")
+    shutil.copyfile(ROOT / "docs/guides/first-run-commands.md", SKILL / "references/first-run-commands.md")
 
 
 def eligible(path):

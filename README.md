@@ -24,6 +24,8 @@ See [START_WITH_AI.md](START_WITH_AI.md) for the guided flow and [INSTALL.md](do
 3. Choose **Create my review**. Copy the generated prompt to your preferred AI and attach your course sources there.
 4. Review the returned questions, then import the course JSON through **All classes → Add a class** and start studying.
 
+Agents can reuse the [tested first-run commands](docs/guides/first-run-commands.md) to check the complete package, detect missing runtimes, and run the supplied builder/preview commands.
+
 **Studying needs only a browser.** No account, API key, Node.js, Python, SQL, or package installation is required. Keep the extracted files together. If local-file browser behavior causes trouble, use the [optional localhost preview](docs/guides/SETUP.md#optional-preview) or hosted app.
 
 Start with an exam guide/objectives, relevant assigned notes or textbook excerpts, and the exam format. Worked solutions and rubrics improve the fit. The browser does not read PDFs or call an AI itself. See [what to upload and verify](docs/methodology/SOURCE_GUIDE.md).

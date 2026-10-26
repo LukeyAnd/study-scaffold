@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.2.1 — 2026-10-24
+## 1.2.1 — release candidate
+
+First-run setup update, October 26, 2026: validate package completeness, return verified command arrays, preserve structured installer logs, recheck installed executables, provide tested agent code blocks, and deliver setup/Node preview helpers with generated reviews.
+
+Audit fixes prepared October 24, 2026:
 
 - Preserve unreadable progress exports; require a recovery copy before replacement, and explicitly reconcile unavailable question families. Read stored exports afresh after other-tab changes.
 - Prevent early correct repetition from inflating review intervals. Require observed delayed success for Secure status and exclude overdue items consistently.

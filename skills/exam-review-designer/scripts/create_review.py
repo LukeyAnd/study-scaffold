@@ -121,7 +121,7 @@ def create_review(bank_path, context_path, plan_path, output):
     audit_template = SKILL_ROOT / "assets" / "question-audit-template.md"
     human_readme = SKILL_ROOT / "assets" / "review-readme.md"
     preview = SKILL_ROOT / "scripts" / "serve.py"
-    require(all((template / f).is_file() for f in TEMPLATE_FILES) and all(p.is_file() for p in (agent_guide, audit_template, human_readme, preview)), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
+    require(all((template / f).is_file() for f in TEMPLATE_FILES) and all(p.is_file() for p in (agent_guide, audit_template, human_readme, preview, SKILL_ROOT / 'scripts/setup.ps1', SKILL_ROOT / 'scripts/serve.cjs')), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
     compiled = compile_bank(bank)
     screen = runpy.run_path(str(SKILL_ROOT / "scripts" / "audit_questions.py"))
     design_report = screen["markdown"](screen["audit"](bank))
@@ -134,6 +134,8 @@ def create_review(bank_path, context_path, plan_path, output):
     shutil.copyfile(human_readme, target / "README.md")
     (target / "tools").mkdir()
     shutil.copyfile(preview, target / "tools" / "serve.py")
+    for name in ('setup.ps1', 'serve.cjs'):
+        shutil.copyfile(SKILL_ROOT / 'scripts' / name, target / 'tools' / name)
     (target / "banks").mkdir()
     (target / "banks" / "course.js").write_text(compiled, encoding="utf-8")
     (target / "bank.json").write_text(json.dumps(bank, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

@@ -52,3 +52,13 @@ If your computer uses `python3` instead, substitute `python3` for `python`. If n
 For guided study, inspect the existing context and sources, continue the work you can, and ask only the next essential question or give one exact learner action at a handoff. Reuse prior answers. Do not end at a summary of what the skill could do. Deliver actual files or save/import steps appropriate to the host; an agent's cloud localhost server is not this learner's computer.
 
 Read [AGENTS.md](AGENTS.md) for the ordered file map and modification contracts. The human instructions above are launch/restart guidance, not a replacement for course context, source review or question audits. Keep this README and the included preview command current when changing the delivered files.
+
+## Optional Windows setup check
+
+If an AI agent is helping you, it can use this read-only command in this folder to check that all delivered files are present. Browser-only studying needs no Node/Python:
+
+```powershell
+powershell -NoProfile -File tools/setup.ps1 -Task Study -Json
+```
+
+For an optional localhost server, replace `Study` with `Preview`. The report checks existing Node/Python versions and provides the exact executable and arguments. Node users can also run `node tools/serve.cjs --port 4173`. Installation is opt-in with `-Install` only when a required runtime is missing. Stop with Ctrl+C and restart the same command on the same port.

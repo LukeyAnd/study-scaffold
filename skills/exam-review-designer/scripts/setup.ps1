@@ -4,6 +4,7 @@ param(
     [ValidateSet('Study', 'Preview', 'Build', 'Develop')][string]$Task = 'Study',
     [string]$NodePath = $env:STUDY_NODE,
     [string]$PythonPath = $env:STUDY_PYTHON,
+    [string]$Root,
     [switch]$PathOnly,
     [switch]$Install,
     [switch]$Json
@@ -93,8 +94,57 @@ function Get-SetupPlan([string]$ForTask, $Node, $Python) {
     return @($missing)
 }
 
+function Get-PackageCheck([string]$Folder, [string]$ForTask) {
+    $folderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Folder)
+    $appFiles = @('index.html','app.js','core.js','storage.js','courses.js','prompts.js','clarity.js','clarity-ui.js','help.js','styles.css','favicon.svg','Start SoS.cmd')
+    $skillFiles = @('SKILL.md','LICENSE','agents/openai.yaml','scripts/create_review.py','scripts/build_review.ps1','scripts/audit_questions.py','scripts/setup.ps1','scripts/serve.py','scripts/serve.cjs','references/intake.md','references/authoring.md','references/source-quality.md','references/research-methodology.md','references/QUESTION_DESIGN.md','references/setup.md','references/first-run-commands.md','assets/review-context.json','assets/review-plan-template.md','assets/review-agent-guide.md','assets/review-readme.md','assets/question-audit-template.md')
+    $kind = 'unknown'; $required = @(); $instructions = @(); $appRoot = $folderPath; $skillRoot = $null
+    if ((Test-Path -LiteralPath (Join-Path $folderPath 'skills/exam-review-designer')) -or (Test-Path -LiteralPath (Join-Path $folderPath 'tools/public-files.json'))) {
+        $kind = 'repository'; $skillRoot = Join-Path $folderPath 'skills/exam-review-designer'
+        $required = @($appFiles) + @('README.md','START_HERE.md','START_WITH_AI.md','AGENTS.md','AGENT_GUIDE.md','docs/guides/SETUP.md','docs/guides/first-run-commands.md','tools/setup.ps1','tools/build_review.ps1','tools/serve.py','tools/serve.cjs','banks/tax.js','banks/example.js') + @($skillFiles | ForEach-Object { 'skills/exam-review-designer/' + $_ }) + @($appFiles | ForEach-Object { 'skills/exam-review-designer/assets/study-app/' + $_ })
+        $instructions = @('START_WITH_AI.md','skills/exam-review-designer/SKILL.md','docs/guides/first-run-commands.md')
+        if ($ForTask -eq 'Develop') { $required += @('tools/package_release.py','tools/public-files.json','tests/engine.test.cjs','tests/setup_test.py') }
+    } elseif ((Test-Path -LiteralPath (Join-Path $folderPath 'SKILL.md')) -or (Test-Path -LiteralPath (Join-Path $folderPath 'assets/study-app'))) {
+        $kind = 'skill'; $skillRoot = $folderPath; $appRoot = Join-Path $folderPath 'assets/study-app'
+        $required = @($skillFiles) + @($appFiles | ForEach-Object { 'assets/study-app/' + $_ })
+        $instructions = @('SKILL.md','references/first-run-commands.md')
+    } elseif (Test-Path -LiteralPath (Join-Path $folderPath 'bank.json')) {
+        $kind = 'review'; $required = @($appFiles) + @('README.md','AGENTS.md','bank.json','banks/course.js','review-context.json','REVIEW_PLAN.md','SOURCES.md','QUESTION_AUDIT.md','ITEM_DESIGN_REPORT.md','tools/setup.ps1','tools/serve.py','tools/serve.cjs')
+        $instructions = @('README.md','AGENTS.md','review-context.json')
+    } else { $required = @('A complete extracted SoS repository, skill folder, or generated review') }
+    $missingFiles = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $folderPath $_) -PathType Leaf) })
+    $routeError = $null
+    if ($kind -eq 'unknown') { $routeError = 'Extract the entire ZIP and select its repository/skill/review folder with -Root.' }
+    elseif ($kind -eq 'skill' -and $ForTask -in @('Study','Preview')) { $routeError = 'This is a builder template, not a course review. Start intake with SKILL.md, then use Build to create a review or import course JSON into the app.' }
+    elseif ($kind -ne 'repository' -and $ForTask -eq 'Develop') { $routeError = 'Full framework tests need the repository ZIP. Use Build or Preview for this package.' }
+    elseif ($kind -eq 'review' -and $ForTask -eq 'Build') { $routeError = 'This is an already built review. Use Study/Preview, or the original skill to build a new sibling output.' }
+    return [pscustomobject]@{kind=$kind;root=$folderPath;appRoot=$appRoot;skillRoot=$skillRoot;checkedFiles=$required.Count;missingFiles=@($missingFiles);instructions=@($instructions | ForEach-Object { Join-Path $folderPath $_ });error=$routeError;ready=($missingFiles.Count -eq 0 -and -not $routeError)}
+}
+
+function Get-Commands($Package, [string]$ForTask, $Node, $Python) {
+    # Only fixed project scripts become executable commands; course content never does.
+    $commands = @()
+    if (-not $Package.ready) { return $commands }
+    if ($ForTask -eq 'Study') { $commands += [pscustomobject]@{id='open-app';executable=(Join-Path $env:WINDIR 'explorer.exe');arguments=@((Join-Path $Package.appRoot 'index.html'));workingDirectory=$Package.root} }
+    if ($ForTask -eq 'Build' -and $Python.available) { $commands += [pscustomobject]@{id='builder';executable=$Python.path;arguments=@((Join-Path $Package.skillRoot 'scripts/create_review.py'));workingDirectory=$Package.root} }
+    if ($ForTask -eq 'Preview') {
+        $prefix = if ($Package.kind -eq 'skill') { 'scripts' } else { 'tools' }
+        if ($Node.available) { $commands += [pscustomobject]@{id='preview';executable=$Node.path;arguments=@((Join-Path $Package.root ($prefix + '/serve.cjs')),'--root',$Package.appRoot,'--port','4173');workingDirectory=$Package.root} }
+        elseif ($Python.available) { $commands += [pscustomobject]@{id='preview';executable=$Python.path;arguments=@((Join-Path $Package.root ($prefix + '/serve.py')),'--root',$Package.appRoot,'--port','4173');workingDirectory=$Package.root} }
+    }
+    if ($ForTask -eq 'Develop' -and $Node.available -and $Python.available) {
+        $commands += [pscustomobject]@{id='package';executable=$Python.path;arguments=@((Join-Path $Package.root 'tools/package_release.py'));workingDirectory=$Package.root}
+        $commands += [pscustomobject]@{id='node-tests';executable=$Node.path;arguments=@('--test') + @(Get-ChildItem -LiteralPath (Join-Path $Package.root 'tests') -Filter '*.test.cjs' | ForEach-Object { $_.FullName });workingDirectory=$Package.root}
+        $commands += [pscustomobject]@{id='python-tests';executable=$Python.path;arguments=@('-m','unittest','discover','-s','tests','-p','*test.py');workingDirectory=$Package.root}
+    }
+    return $commands
+}
+
 # Dot-sourcing exposes only the pure/checking helpers for tests; it does no setup.
 if ($MyInvocation.InvocationName -eq '.') { return }
+
+if (-not $Root) { $Root = Split-Path -Parent $PSScriptRoot }
+$packageCheck = Get-PackageCheck $Root $Task
 
 $node = [pscustomobject]@{name='Node';available=$false;reason='Not required for this task.';explicitPath=$false}
 $python = [pscustomobject]@{name='Python';available=$false;reason='Not required for this task.';explicitPath=$false}
@@ -105,7 +155,8 @@ if ($Task -ne 'Study') {
 $missing = @(Get-SetupPlan $Task $node $python)
 $packages = @($missing | ForEach-Object { if ($_ -eq 'Node') { 'OpenJS.NodeJS.LTS' } else { 'Python.Python.3.14' } })
 $installError = $null
-if ($Install -and $missing.Count -gt 0 -and -not $WhatIfPreference) {
+$installLog = @()
+if ($Install -and $packageCheck.ready -and $missing.Count -gt 0 -and -not $WhatIfPreference) {
     if (($missing -contains 'Node' -and $node.explicitPath) -or ($missing -contains 'Python' -and $python.explicitPath)) {
         $installError = 'The supplied executable path is invalid or incompatible. Correct that path before installing another runtime.'
     } else {
@@ -114,18 +165,27 @@ if ($Install -and $missing.Count -gt 0 -and -not $WhatIfPreference) {
         else {
             foreach ($package in $packages) {
                 if ($PSCmdlet.ShouldProcess($package, 'Install missing runtime from the WinGet community source for this user')) {
-                    & $winget.Source show --exact --id $package --source winget | Out-Host
-                    if ($LASTEXITCODE -ne 0) { $installError = 'Package lookup failed: ' + $package; break }
+                    $output = & $winget.Source show --exact --id $package --source winget 2>&1
+                    $code = $LASTEXITCODE
+                    $installLog += [pscustomobject]@{package=$package;action='show';exitCode=$code;output=(($output -join "`n") | Select-Object -First 1)}
+                    if (-not $Json) { $output | Out-Host }
+                    if ($code -ne 0) { $installError = 'Package lookup failed: ' + $package; break }
                     $installArgs = @('install', '--exact', '--id', $package, '--source', 'winget', '--scope', 'user')
                     if ($package -eq 'OpenJS.NodeJS.LTS') { $installArgs += @('--installer-type', 'zip') }
-                    & $winget.Source @installArgs | Out-Host
-                    if ($LASTEXITCODE -ne 0) { $installError = 'Installation was not completed: ' + $package + '. Do not retry with wider permissions automatically.'; break }
+                    $output = & $winget.Source @installArgs 2>&1
+                    $code = $LASTEXITCODE
+                    $installLog += [pscustomobject]@{package=$package;action='install';exitCode=$code;output=($output -join "`n")}
+                    if (-not $Json) { $output | Out-Host }
+                    if ($code -ne 0) { $installError = 'Installation was not completed: ' + $package + '. Do not retry with wider permissions automatically.'; break }
                 }
             }
             if (-not $installError) {
-                $node = Get-Tool 'Node' $NodePath $false
-                $python = Get-Tool 'Python' $PythonPath $false
+                # New per-user executables can be absent from this process's PATH.
+                # PathOnly remains strict for isolated first-machine tests.
+                if ($Task -ne 'Build') { $node = Get-Tool 'Node' $NodePath ([bool]$PathOnly) }
+                $python = Get-Tool 'Python' $PythonPath ([bool]$PathOnly)
                 $missing = @(Get-SetupPlan $Task $node $python)
+                if ($missing.Count -gt 0) { $installError = 'The installer returned success but a compatible runtime was not verified. Restart the terminal or pass its actual executable path, then rerun this check.' }
             }
         }
     }
@@ -137,16 +197,21 @@ $next = switch ($Task) {
     'Develop' { 'Run Node tests and Python package tests from the repository. No npm install or pip install is required.' }
 }
 $report = [pscustomobject]@{
-    task=$Task; ready=($missing.Count -eq 0 -and -not $installError); tools=@($node,$python)
+    task=$Task; ready=($packageCheck.ready -and $missing.Count -eq 0 -and -not $installError); tools=@($node,$python)
+    package=$packageCheck; commands=@(Get-Commands $packageCheck $Task $node $python)
     missing=@($missing); installPackages=@($packages); installRequested=[bool]$Install
     dryRun=[bool]$WhatIfPreference; installError=$installError; next=$next
+    installLog=@($installLog)
 }
-if ($Json) { $report | ConvertTo-Json -Depth 5 }
+if (-not $report.ready) { $report.commands = @() }
+if ($Json) { $report | ConvertTo-Json -Depth 6 }
 else {
     Write-Output ('SoS setup: ' + $Task)
     if ($report.ready) { Write-Output 'Ready.' } else { Write-Output ('Missing or incompatible: ' + ($missing -join ', ')) }
     foreach ($tool in $report.tools) { Write-Output ($tool.name + ': ' + $tool.reason); if ($tool.path) { Write-Output ('  ' + $tool.path + ' [' + $tool.version + ']') } }
     if ($installError) { Write-Output $installError }
+    if ($packageCheck.error) { Write-Output $packageCheck.error }
+    foreach ($file in $packageCheck.missingFiles) { Write-Output ('Missing package file: ' + $file) }
     Write-Output $next
     if (-not $report.ready) { Write-Output 'Read docs/guides/SETUP.md in the repository (or references/setup.md in the skill). Installation is opt-in with -Install; -Install -WhatIf only shows the plan.' }
 }

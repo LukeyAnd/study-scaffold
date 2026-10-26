@@ -28,6 +28,6 @@ The builder needs **Python 3.10+ with its standard library**. The generated revi
 
 ## Agent setup or developer work
 
-Read [SETUP.md](docs/guides/SETUP.md) for the task-based dependency check, explicit installation option, preview alternatives, and troubleshooting. Start at [AGENTS.md](AGENTS.md) for repository changes. Setup should not replace source review or silently add databases, global npm packages, Docker, or another framework.
+Use [the tested first-run command blocks](docs/guides/first-run-commands.md) and read [SETUP.md](docs/guides/SETUP.md) for the task-based dependency check, explicit installation option, preview alternatives, and troubleshooting. Start at [AGENTS.md](AGENTS.md) for repository changes. Setup should not replace source review or silently add databases, global npm packages, Docker, or another framework.
 
 For upload and correctness guidance, use [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md). For the tested first-run paths and their limits, use [FIRST_RUN_TEST.md](docs/maintenance/FIRST_RUN_TEST.md).

@@ -116,3 +116,9 @@ Keep this overview current when capabilities change; implementation contracts re
 - Secure status requires an observed correct return when due; early repeated correct answers do not extend the schedule.
 - Large clarity backups split into numbered, individually importable parts; malformed notes can be exported for recovery with their stored images.
 - Question-design screening checks both longest and shortest answer cues, including small banks.
+
+## First-run setup
+
+- Windows preflight checks extracted instructions, scripts, templates and required Node/Python versions before offering commands.
+- Agents reuse tested command blocks and structured executable/argument arrays; installation is limited to missing requirements and checked again afterward.
+- Generated reviews include their own setup check and both optional preview servers.

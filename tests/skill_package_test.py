@@ -122,7 +122,8 @@ assert.equal(seen.size,2);"""
         self.assertEqual((SKILL / "references" / "research-methodology.md").read_bytes(), (ROOT / "docs" / "methodology" / "RESEARCH.md").read_bytes())
         self.assertEqual((SKILL / "references" / "source-quality.md").read_bytes(), (ROOT / "docs" / "methodology" / "SOURCE_GUIDE.md").read_bytes())
         self.assertEqual((SKILL / "references" / "setup.md").read_bytes(), (ROOT / "docs" / "guides" / "SETUP.md").read_bytes())
-        for name in ("setup.ps1", "serve.py"):
+        self.assertEqual((SKILL / "references" / "first-run-commands.md").read_bytes(), (ROOT / "docs/guides/first-run-commands.md").read_bytes())
+        for name in ("setup.ps1", "build_review.ps1", "serve.py", "serve.cjs"):
             self.assertEqual((SKILL / "scripts" / name).read_bytes(), (ROOT / "tools" / name).read_bytes())
         for name in builder.TEMPLATE_FILES:
             expected = (ROOT / name).read_bytes()

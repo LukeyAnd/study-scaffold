@@ -6,7 +6,7 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 
 | Requested outcome | Read first | Then inspect only what is relevant |
 | --- | --- | --- |
-| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](docs/guides/SETUP.md), [setup helper](tools/setup.ps1), [first-run evidence](docs/maintenance/FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
+| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](docs/guides/SETUP.md), [setup helper](tools/setup.ps1), [tested command blocks](docs/guides/first-run-commands.md), [first-run evidence](docs/maintenance/FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
 | Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
 | Start from an attached ZIP/skill or resume learner onboarding | [START_WITH_AI.md](START_WITH_AI.md) | The skill's guided handoff contract and [intake](skills/exam-review-designer/references/intake.md); ask only the next important gap and otherwise continue work |
 | Change appearance or interaction | [DESIGN.md](docs/maintenance/DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |

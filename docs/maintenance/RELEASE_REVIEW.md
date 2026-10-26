@@ -2,7 +2,7 @@
 
 ## Current candidate: v1.2.1
 
-October 24, 2026. Claude’s external v1.2.0 audit was treated as evidence to verify, not an instruction to apply its patch. The underlying failures were reproduced independently. The raw audit attachment and private validation outputs stay outside public packages.
+Audit fixes prepared October 24, 2026; first-run setup expanded October 26, 2026. Claude’s external v1.2.0 audit was treated as evidence to verify, not an instruction to apply its patch. The underlying failures were reproduced independently. The raw audit attachment and private validation outputs stay outside public packages.
 
 | Audit finding | Disposition |
 | --- | --- |
@@ -19,7 +19,14 @@ October 24, 2026. Claude’s external v1.2.0 audit was treated as evidence to ve
 | F11: stale localStorage export uses cached text | Stored exports freshly read the current row and preserve malformed text. |
 | F12: stale delivery instructions | Current candidate first; installed templates copied into learner workspace; app methodology link pinned to release; CI adds Node 20 alongside Node 24. |
 
-Candidate verification: **40 Node tests**, **31 Python tests**, the portable skill validator, and a fresh QA source-ZIP extraction/build/browser run passed locally on Windows with Chrome. The browser run covered original-data recovery export, blocked reset before export, failed/retried retirement, removed-ID backup import, malformed-note image recovery, numbered export/reverse-order import, fresh stale-tab export, existing exact-session/exam-deadline behavior, storage failures, and 375/768/1360 px layouts. The frozen floating-point regression produces only 14 unique items under v1.2.0 and all 21 under this candidate. The 200-note multilingual/image fixture round-trips through files within the 50 MiB import limit. Private sentinel injections stayed out of both QA packages, with and without Git metadata. Node 20/Linux and Node 24/Windows CI must still be checked after pushing. Direct-file launch, Firefox/WebKit, live third-party skill activation, actual OS installation, full accessibility conformance and course factual correctness remain outside the completed checks.
+Audit-candidate verification before the October 26 setup update: **40 Node tests**, **31 Python tests**, the portable skill validator, and a fresh QA source-ZIP extraction/build/browser run passed locally on Windows with Chrome. The browser run covered original-data recovery export, blocked reset before export, failed/retried retirement, removed-ID backup import, malformed-note image recovery, numbered export/reverse-order import, fresh stale-tab export, existing exact-session/exam-deadline behavior, storage failures, and 375/768/1360 px layouts. The frozen floating-point regression produces only 14 unique items under v1.2.0 and all 21 under this candidate. The 200-note multilingual/image fixture round-trips through files within the 50 MiB import limit. Private sentinel injections stayed out of both QA packages, with and without Git metadata. Node 20/Linux and Node 24/Windows CI must still be checked after pushing. Direct-file launch, Firefox/WebKit, live third-party skill activation, actual OS installation, full accessibility conformance and course factual correctness remain outside the completed checks.
+
+## First-run setup addition — October 26
+
+- `tools/setup.ps1` now checks complete repository/skill/review packages, returns ordered instruction paths and verified executable/argument arrays, and refuses setup when required files are missing.
+- A bundled `build_review.ps1` runs preflight and the existing builder without relying on state from a prior shell. Exact, copyable preflight/build/install/preview blocks live in `docs/guides/first-run-commands.md` and the portable skill. Generated reviews carry their own setup and Node/Python previews.
+- Machine-readable installer logs and a real post-install executable check prevent false ready reports. Compatible runtimes are reused; browser-only studying still needs no runtime installation.
+- 34 Python tests passed locally, including actual runbook execution and simulated missing-tool installer outcomes. The missing-tool harness changes discovery in isolated child processes and does not install OS software. See [first-run evidence](FIRST_RUN_TEST.md).
 
 ## Historical release evidence
 
