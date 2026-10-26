@@ -14,6 +14,12 @@ Run repository commands from the folder containing `index.html`, not from `docs/
 
 For a new Node installation, choose a supported LTS release from the official site; 20 is the compatibility floor, not the recommended new installation. Use an existing compatible Python rather than replacing a working environment. A PDF/textbook source is attached to the learner's AI, not installed into the app.
 
+## Tested command blocks
+
+[First-run commands](first-run-commands.md) supplies the exact read-only preflight, missing-tool installation, verified builder and delivered-review preview blocks for agents. Reuse them instead of generating a new setup procedure. Windows preflight checks full repository/portable skill/generated review files and returns `package`, `tools`, `missing`, ordered `instructions` paths and executable/argument `commands`. Readiness requires the package and required runtimes; no commands are offered while either is incomplete. The check confirms file presence and executable versions, not model comprehension or source correctness.
+
+For a Windows standalone build, `tools/build_review.ps1` (or `scripts/build_review.ps1` in the skill) checks setup and invokes the existing builder with bank/context/plan/output arguments. It installs nothing and refuses missing requirements. Use the command block linked above; it does not rely on a previous shell’s variables or reconstructed builder code.
+
 ## Agent sequence
 
 1. **Identify the requested route.** Infer it from the request; do not make the learner answer a setup questionnaire when their goal is clear. For studying or prompt/import use, open the app and stop dependency work.
@@ -41,9 +47,9 @@ powershell -NoProfile -File tools/setup.ps1 -Task Build -Install -WhatIf
 powershell -NoProfile -File tools/setup.ps1 -Task Build -Install
 ```
 
-`STUDY_NODE` and `STUDY_PYTHON` can supply the same executable paths. Exit codes: **0** ready, **2** missing/incompatible tools, **1** an installation/path error. `-Json` is useful for read-only machine checks. `-PathOnly` restricts discovery to explicit paths and PATH, useful for isolated tests.
+`STUDY_NODE` and `STUDY_PYTHON` can supply the same executable paths. Exit codes: **0** ready, **2** missing/incompatible tools, **1** an installation/path error. `-Json` returns one machine-readable report, including `installLog` when installation is requested. `-Root` explicitly selects the extracted repository, portable skill or generated review; its default is the helper’s parent folder. `-PathOnly` restricts discovery to explicit paths and PATH, useful for isolated tests.
 
-The installer uses exact WinGet IDs from the community source: `OpenJS.NodeJS.LTS` for Node and `Python.Python.3.14` for a compatible Python. Python is installed alone for Build; Preview reuses either existing runtime and proposes Node LTS only if neither exists. Study never installs anything, even with `-Install`. Existing compatible runtimes are not upgraded. Node selects the package's ZIP/portable installer for user scope; it does not default to the machine-wide MSI. WinGet shows package information and can request its normal agreements; this script does not auto-accept them or request elevation. If the selected installer cannot use user scope, stop and use the official installer/organization-approved process instead of silently broadening scope.
+A successful installer exit is followed by another real version check; failure to discover a compatible executable remains a failure and tells the learner to restart their terminal or provide its actual path. The installer uses exact WinGet IDs from the community source: `OpenJS.NodeJS.LTS` for Node and `Python.Python.3.14` for a compatible Python. Python is installed alone for Build; Preview reuses either existing runtime and proposes Node LTS only if neither exists. Study never installs anything, even with `-Install`. Existing compatible runtimes are not upgraded. Node selects the package's ZIP/portable installer for user scope; it does not default to the machine-wide MSI. WinGet shows package information and can request its normal agreements; this script does not auto-accept them or request elevation. If the selected installer cannot use user scope, stop and use the official installer/organization-approved process instead of silently broadening scope.
 
 If script policy blocks this unsigned helper, **do not change execution policy to use the app**. Open `index.html` for studying. An authorized agent can use the official install/version commands interactively or the normal installer UI for an actually needed runtime. Restart the terminal/agent after an installation if its PATH has not refreshed. Inspect the real Python path if Windows opens the Store instead of printing an interpreter version.
 
@@ -76,7 +82,7 @@ Both previews bind only to loopback, need no extra packages, block hidden/privat
 
 ## Official installation sources
 
-Checked October 24, 2026. Prefer current official installers and supported versions; verify package availability again when an actual installation is needed.
+Checked October 26, 2026. Prefer current official installers and supported versions; verify package availability again when an actual installation is needed.
 
 - [Node.js download and LTS choices](https://nodejs.org/en/download).
 - [Python Windows installation and existing-environment guidance](https://docs.python.org/3/using/windows.html). Python's manager/aliases can behave differently from a direct interpreter.

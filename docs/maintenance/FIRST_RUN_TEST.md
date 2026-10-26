@@ -2,6 +2,14 @@
 
 Checked October 24, 2026 on Windows with Chrome, PowerShell 5.1, and existing host-provided Node/Python executables. The first-run verifier extracts one source ZIP into a new folder with spaces in its name and uses the skill included at `skills/exam-review-designer`. Browser checks use empty, isolated profiles and loopback preview servers. No software is installed and no user browser profile or execution policy is changed. Current release evidence is in [RELEASE_REVIEW.md](RELEASE_REVIEW.md).
 
+## October 26 first-run update
+
+The Windows preflight now checks repository/portable-skill/generated-review completeness before offering executable commands. The tests run with an empty PATH and no inherited SoS runtime overrides; actual host executables are supplied explicitly only when testing reuse/build execution. The new command-block test extracts a fresh public QA ZIP, executes the exact documented discovery/check/build blocks with paths containing spaces, builds a new learner review, checks its Study route without runtimes, then launches both Python and Node previews from their returned executable/argument arrays. The bundled `build_review.ps1` checks setup anew for each build and refuses a missing interpreter without creating output.
+
+A separate fake WinGet test runs the real helper’s installation branch while substituting only command discovery and the installer process. It checks exact package/source/user-scope arguments, successful post-install discovery, cancellation, lookup failure and an installer returning success without a usable runtime. These are simulations of installer control flow; **no OS software installation is performed or claimed**. Missing instruction files block installation, and an unfinished skill template is not reported as a runnable course.
+
+The 34 Python checks passed locally after these changes. A fresh QA extraction/build/Chrome run also passed after adding the delivered helpers. Final GitHub candidate ZIP and CI evidence is recorded on the release PR. The tested command source is [first-run commands](../guides/first-run-commands.md).
+
 ## Checks performed
 
 | Starting point | Result |

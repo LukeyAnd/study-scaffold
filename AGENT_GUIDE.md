@@ -6,7 +6,7 @@ Read [AGENTS.md](AGENTS.md) first. Then choose the route matching the user's out
 
 | Requested outcome | Read first | Then inspect only what is relevant |
 | --- | --- | --- |
-| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](docs/guides/SETUP.md), [setup helper](tools/setup.ps1), [first-run evidence](docs/maintenance/FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
+| First run, missing tools, or setup trouble | [START_HERE.md](START_HERE.md) | [SETUP.md](docs/guides/SETUP.md), [setup helper](tools/setup.ps1), [tested command blocks](docs/guides/first-run-commands.md), [first-run evidence](docs/maintenance/FIRST_RUN_TEST.md); install only a missing tool needed for the selected route |
 | Create a course review, quiz, or exam | [Review skill](skills/exam-review-designer/SKILL.md) | [SOURCE_GUIDE.md](docs/methodology/SOURCE_GUIDE.md), then the numbered workflow; use supplied materials before intake |
 | Start from an attached ZIP/skill or resume learner onboarding | [START_WITH_AI.md](START_WITH_AI.md) | The skill's guided handoff contract and [intake](skills/exam-review-designer/references/intake.md); ask only the next important gap and otherwise continue work |
 | Change appearance or interaction | [DESIGN.md](docs/maintenance/DESIGN.md) | [index.html](index.html), [app.js](app.js), [help.js](help.js), [styles.css](styles.css) |
@@ -48,7 +48,7 @@ For local browser inspection, run `node tools/serve.cjs` or `python tools/serve.
 ## 5. Package and deliver when included in scope
 
 1. Update affected design, storage, methodology, installation, and agent instructions. Keep concrete facts in their owning document; route to them instead of copying them into every guide.
-2. Run `python tools/package_release.py`. It copies canonical runtime files to the skill template, synchronizes research/license/setup resources, and creates ignored local QA archives/checksums in `dist/`. The user-facing download is GitHub's repository ZIP, including the skill folder. Keep archives out of the repository and website.
+2. Run `python tools/package_release.py`. It copies canonical runtime files to the skill template, synchronizes research/license/setup resources, and creates ignored local QA archives/checksums in `dist/`. `tools/public-files.json` explicitly lists permitted package members; review and add each intentional public source there. Unlisted files are excluded even in a source ZIP without Git. Never regenerate this allowlist by scanning a learner’s workspace. The user-facing download is GitHub's repository ZIP, including the skill folder. Keep archives out of the repository and website.
 3. Run the Python package tests **after** packaging. Run `npm test` too when runtime behavior changed. If the host supplies a skill validator, run it when skill instructions change; that optional host tool is not bundled with this project.
 4. Review the diff and archive contents. Private inputs and progress do not belong in the public ZIP. Respect the user's existing publication authorization; preparing a private review does not authorize publishing its materials.
 5. If publishing is authorized and part of the task, push reviewed source, verify the hosted app and a fresh GitHub source ZIP using `python tools/verify_first_run.py --archive PATH`, and report the result. GitHub controls its generated archive bytes; check contents against the intended commit rather than promising a permanent archive checksum. If the task is local only, hand off local paths instead.

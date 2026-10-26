@@ -6,6 +6,7 @@ from those canonical files. No progress, private intake files, or Git data is in
 """
 import argparse
 import hashlib
+import json
 import re
 import shutil
 import zipfile
@@ -15,7 +16,6 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "exam-review-designer"
 TEMPLATE = ("index.html", "app.js", "core.js", "storage.js", "courses.js", "prompts.js", "clarity.js", "clarity-ui.js", "help.js", "styles.css", "favicon.svg", "Start SoS.cmd")
 TOP_FILES = (*TEMPLATE, ".gitignore", ".nojekyll", "package.json", "README.md", "FEATURES.md", "START_HERE.md", "START_WITH_AI.md", "CHANGELOG.md", "AGENTS.md", "AGENT_GUIDE.md", "LICENSE")
-SOURCE_DIRS = ("banks", "tests", "tools", ".github", "skills", "docs", "archive")
 EXTENSIONS = {".js", ".cjs", ".css", ".html", ".svg", ".md", ".json", ".py", ".ps1", ".cmd", ".yaml", ".yml"}
 
 
@@ -32,11 +32,12 @@ def sync_skill():
     for source, dest in ((ROOT / "docs" / "methodology" / "RESEARCH.md", SKILL / "references" / "research-methodology.md"), (ROOT / "docs" / "methodology" / "SOURCE_GUIDE.md", SKILL / "references" / "source-quality.md"), (ROOT / "docs" / "guides" / "SETUP.md", SKILL / "references" / "setup.md"), (ROOT / "LICENSE", SKILL / "LICENSE")):
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
-    for name in ("setup.ps1", "serve.py"):
+    for name in ("setup.ps1", "build_review.ps1", "serve.py", "serve.cjs"):
         source, dest = ROOT / "tools" / name, SKILL / "scripts" / name
         if not dest.exists() or source.read_bytes() != dest.read_bytes():
             shutil.copyfile(source, dest)
     shutil.copyfile(ROOT / "docs" / "methodology" / "QUESTION_DESIGN.md", SKILL / "references" / "QUESTION_DESIGN.md")
+    shutil.copyfile(ROOT / "docs/guides/first-run-commands.md", SKILL / "references/first-run-commands.md")
 
 
 def eligible(path):
@@ -54,13 +55,11 @@ def archive(path, files, prefix, base):
 
 
 def build(output):
+    project_files = public_files()
     sync_skill()
     output.mkdir(parents=True, exist_ok=True)
-    skill_files = [p for p in SKILL.rglob("*") if eligible(p) or p == SKILL / "LICENSE"]
+    skill_files = [p for p in project_files if p.is_relative_to(SKILL)]
     archive(output / "exam-review-designer.zip", skill_files, "exam-review-designer", SKILL)
-    project_files = [ROOT / f for f in TOP_FILES]
-    for directory in SOURCE_DIRS:
-        project_files.extend(p for p in (ROOT / directory).rglob("*") if eligible(p))
     archive(output / "study-scaffold.zip", project_files, "study-scaffold", ROOT)
     hashes = []
     for name in ("exam-review-designer.zip", "study-scaffold.zip"):
@@ -70,12 +69,39 @@ def build(output):
     (output / "SHA256SUMS.txt").write_text("\n".join(hashes) + "\n", encoding="utf-8")
 
 
+def public_files():
+    """Explicit allowlist also works in an extracted source ZIP without Git."""
+    names = json.loads((ROOT / "tools/public-files.json").read_text(encoding="utf-8"))
+    if not isinstance(names, list) or not names:
+        raise ValueError("Public-file manifest must be a nonempty list.")
+    files, seen = [], set()
+    for name in names:
+        if not isinstance(name, str) or not name or "\\" in name or name.startswith("/") or ":" in name:
+            raise ValueError(f"Unsafe public-file path: {name!r}")
+        parts = name.split("/")
+        if any(p in {"", ".", ".."} for p in parts) or name.casefold() in seen:
+            raise ValueError(f"Duplicate or unsafe public-file path: {name}")
+        if any(p.startswith(".") and not (i == 0 and p in {".gitignore", ".nojekyll", ".github"}) for i, p in enumerate(parts)):
+            raise ValueError(f"Hidden public-file path: {name}")
+        path = ROOT / name
+        if any(p.is_symlink() or getattr(p.lstat(), "st_file_attributes", 0) & 0x400 for p in (ROOT.joinpath(*parts[:i+1]) for i in range(len(parts))) if p.exists()) or not path.resolve().is_relative_to(ROOT.resolve()) or not path.is_file():
+            raise ValueError(f"Missing, linked, or external public file: {name}")
+        if name not in TOP_FILES and not eligible(path):
+            raise ValueError(f"Unsupported public file: {name}")
+        seen.add(name.casefold());files.append(path)
+    required = set(TOP_FILES) | {"tools/public-files.json"}
+    if not required.issubset(names):
+        raise ValueError("Public-file manifest omits a required app file.")
+    return files
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist", help="Local, ignored QA artifacts; never publish under the website")
     parser.add_argument("--sync-only", action="store_true", help="Refresh portable skill snapshots without creating archives")
     args = parser.parse_args()
     if args.sync_only:
+        public_files()
         sync_skill()
     else:
         build(args.output_dir.resolve())

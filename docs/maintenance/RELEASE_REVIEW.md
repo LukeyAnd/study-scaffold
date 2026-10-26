@@ -1,6 +1,36 @@
-# First release review
+# Release review
 
-Target: **SoS! v1.0.0**, October 24, 2026. The release is a reusable, local-first MCQ study framework with an optional agent authoring workflow. Proposed future features remain listed separately in [RESEARCH.md](../methodology/RESEARCH.md).
+## Current candidate: v1.2.1
+
+Audit fixes prepared October 24, 2026; first-run setup expanded October 26, 2026. Claude’s external v1.2.0 audit was treated as evidence to verify, not an instruction to apply its patch. The underlying failures were reproduced independently. The raw audit attachment and private validation outputs stay outside public packages.
+
+| Audit finding | Disposition |
+| --- | --- |
+| F1: removed families block progress and primary export can be empty | Stored-copy primary export; export required before replacing unreadable data; explicit validated retirement preserves matching history, closes affected sessions and keeps unaffected deadlines. Failed commits retain original data. |
+| F2: rapid repetition inflates intervals | Early correct repeats update practice statistics without moving due dates, interval, ease or scheduling streak. Existing imported due dates remain. |
+| F3: Secure overstates immediate/overdue evidence | Requires an observed correct return when due, three attempts, a last correct answer, ≥80% practice estimate and a future due date; summary/list share that rule. Legacy intervals alone do not qualify. |
+| F4: floating-point sampling residue repeats families | Descent cannot enter an empty right subtree; frozen 63-family reproduction and independent probability checks supplement seeded replay. |
+| F5: shortest/small-bank answer cues escape screening | Both strategies screened; ≥5-family strong-cue trigger, larger-bank threshold retained, balanced controls checked. Heuristics remain advisory. |
+| F6: builder/browser validators diverge | Shared Unicode whitespace, review-status and 5,000-entry limits; cross-language positive/negative cases. |
+| F7: QA archive can include private/untracked files | Explicit public manifest works with or without Git; hidden, duplicate, missing, external and linked entries refused. Public additions require deliberate manifest edits. |
+| F8: valid notes export larger than import limit | Exact UTF-8 file-size checks and numbered parts, additive imports, duplicate-ID refusal; original text and image bytes round-trip. |
+| F9: autosave duplicates deep cloning | Autosave builds a shallow envelope; the storage queue takes the detached copy synchronously. Export APIs retain detached snapshots. No claim of browser-jank elimination. |
+| F10: malformed clarity rows have no recovery export | Raw stored recovery JSON preserves malformed metadata and Blob bytes; editing stays blocked. This diagnostic needs agent-assisted recovery, not normal import. |
+| F11: stale localStorage export uses cached text | Stored exports freshly read the current row and preserve malformed text. |
+| F12: stale delivery instructions | Current candidate first; installed templates copied into learner workspace; app methodology link pinned to release; CI adds Node 20 alongside Node 24. |
+
+Audit-candidate verification before the October 26 setup update: **40 Node tests**, **31 Python tests**, the portable skill validator, and a fresh QA source-ZIP extraction/build/browser run passed locally on Windows with Chrome. The browser run covered original-data recovery export, blocked reset before export, failed/retried retirement, removed-ID backup import, malformed-note image recovery, numbered export/reverse-order import, fresh stale-tab export, existing exact-session/exam-deadline behavior, storage failures, and 375/768/1360 px layouts. The frozen floating-point regression produces only 14 unique items under v1.2.0 and all 21 under this candidate. The 200-note multilingual/image fixture round-trips through files within the 50 MiB import limit. Private sentinel injections stayed out of both QA packages, with and without Git metadata. Node 20/Linux and Node 24/Windows CI must still be checked after pushing. Direct-file launch, Firefox/WebKit, live third-party skill activation, actual OS installation, full accessibility conformance and course factual correctness remain outside the completed checks.
+
+## First-run setup addition — October 26
+
+- `tools/setup.ps1` now checks complete repository/skill/review packages, returns ordered instruction paths and verified executable/argument arrays, and refuses setup when required files are missing.
+- A bundled `build_review.ps1` runs preflight and the existing builder without relying on state from a prior shell. Exact, copyable preflight/build/install/preview blocks live in `docs/guides/first-run-commands.md` and the portable skill. Generated reviews carry their own setup and Node/Python previews.
+- Machine-readable installer logs and a real post-install executable check prevent false ready reports. Compatible runtimes are reused; browser-only studying still needs no runtime installation.
+- 34 Python tests passed locally, including actual runbook execution and simulated missing-tool installer outcomes. The missing-tool harness changes discovery in isolated child processes and does not install OS software. See [first-run evidence](FIRST_RUN_TEST.md).
+
+## Historical release evidence
+
+Historical target: **SoS! v1.0.0**, October 24, 2026. The release is a reusable, local-first MCQ study framework with an optional agent authoring workflow. Proposed future features remain listed separately in [RESEARCH.md](../methodology/RESEARCH.md).
 
 ## Scope and disposition
 

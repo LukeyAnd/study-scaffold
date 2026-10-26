@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.1 — release candidate
+
+First-run setup update, October 26, 2026: validate package completeness, return verified command arrays, preserve structured installer logs, recheck installed executables, provide tested agent code blocks, and deliver setup/Node preview helpers with generated reviews.
+
+Audit fixes prepared October 24, 2026:
+
+- Preserve unreadable progress exports; require a recovery copy before replacement, and explicitly reconcile unavailable question families. Read stored exports afresh after other-tab changes.
+- Prevent early correct repetition from inflating review intervals. Require observed delayed success for Secure status and exclude overdue items consistently.
+- Prevent duplicate scenarios at floating-point sampling boundaries. Remove redundant autosave cloning while preserving queued snapshot ownership.
+- Align builder/browser Unicode, metadata and count validation; screen both shortest and longest answer cues in smaller banks.
+- Split oversized clarity backups into numbered parts; provide raw malformed-note recovery including image bytes.
+- Package only explicit public manifest entries, including outside Git; clarify learner-workspace templates and pin app methodology to this release.
+- Add regression, privacy, validator parity and browser recovery checks.
+
+
 ## 1.2.0 — October 24, 2026
 
 - Grouped longer guides under `docs/guides`, `docs/methodology` and `docs/maintenance`; moved the historical prototype/adapter into `archive`. Kept the app, launchers, README and short agent entry points at the root, with updated routes and package tests.

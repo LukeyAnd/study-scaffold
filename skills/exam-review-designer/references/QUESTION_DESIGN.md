@@ -41,8 +41,8 @@ The screen inspects **every authored variant**:
 - Count Unicode word tokens and non-whitespace characters for all four options. For short/numeric or unsegmented text use character length; otherwise use word counts. This remains a rough proxy, not a language or rendered-width model.
 - Flag a uniquely longest or shortest key when its length differs from the other options' median by at least **35% and four words** (or **18 characters**).
 - Flag overall max/min length spread above **1.6** with that minimum absolute gap, and normalized case/spacing/punctuation duplicates.
-- Compute the success of choosing a longest option, selecting uniformly among ties. Average variants within each family, then families equally; extra variants cannot drown out another family. Four equal lengths yield a 25% reference, rather than four supposed wins.
-- Flag a bank-wide cue above **40% across at least 12 families**. This is a descriptive editorial trigger, not a significance test or proof of bias. Shorter banks still get individual warnings.
+- Compute the success of choosing a longest and a shortest option, selecting uniformly among ties. Average variants within each family, then families equally; extra variants cannot drown out another family. Four equal lengths yield a 25% reference, rather than four supposed wins.
+- Flag either bank-wide length strategy above **40% across at least 12 families**, or at **80% or more across at least five families**. These are descriptive editorial triggers, not significance tests or proof of bias. Smaller sets still get individual warnings; passing a screen does not approve the items.
 
 Thresholds are explicit project heuristics. A warning asks for inspection; passing does not establish fair choices. Numerical answers can be equivalent despite different text; grammar, repeated wording, plausibility and visual salience still need manual review. The audit does not inspect compiled generator JavaScript. For such banks, author a reviewable JSON set of representative/edge-case variants and clearly record what was not sampled.
 

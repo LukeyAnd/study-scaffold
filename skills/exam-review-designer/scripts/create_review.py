@@ -20,8 +20,12 @@ def require(condition, message):
         raise ValueError(message)
 
 
+# Match ECMAScript String.trim rather than Python's broader whitespace set.
+JS_SPACE = "\u0009\u000a\u000b\u000c\u000d\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
+
+
 def text(value):
-    return isinstance(value, str) and bool(value.strip())
+    return isinstance(value, str) and bool(value.strip(JS_SPACE))
 
 
 def identifier(value):
@@ -37,10 +41,11 @@ def read_json(path):
 def validate_bank(bank):
     require(isinstance(bank, dict) and identifier(bank.get("id")) and text(bank.get("title")), "Bank needs a stable id and title.")
     require("subject" not in bank or text(bank["subject"]), "Subject must be nonempty text when supplied.")
+    require("reviewStatus" not in bank or text(bank["reviewStatus"]), "Review status must be nonempty text when supplied.")
     sets = {}
     for field in ("topics", "objectives", "sources", "questions"):
         entries = bank.get(field)
-        require(isinstance(entries, list) and bool(entries), f"Bank needs a nonempty {field} list.")
+        require(isinstance(entries, list) and 1 <= len(entries) <= 5000, f"Bank needs 1–5,000 {field} entries.")
         ids = []
         for entry in entries:
             require(isinstance(entry, dict) and identifier(entry.get("id")), f"Every {field} entry needs a safe, stable id.")
@@ -72,7 +77,7 @@ def validate_bank(bank):
             wrong, why = variant.get("distractors"), variant.get("whyWrong")
             require(isinstance(wrong, list) and len(wrong) == 3 and all(text(x) for x in wrong), f"{label}: exactly three distractors are required.")
             require(isinstance(why, list) and len(why) == 3 and all(text(x) for x in why), f"{label}: explain all three distractors.")
-            require(len({x.strip().casefold() for x in [variant["correct"], *wrong]}) == 4, f"{label}: duplicate answer choices.")
+            require(len({x.strip(JS_SPACE).lower() for x in [variant["correct"], *wrong]}) == 4, f"{label}: duplicate answer choices.")
             require("math" not in variant or isinstance(variant["math"], str), f"{label}: math must be text.")
     return bank
 
@@ -116,7 +121,7 @@ def create_review(bank_path, context_path, plan_path, output):
     audit_template = SKILL_ROOT / "assets" / "question-audit-template.md"
     human_readme = SKILL_ROOT / "assets" / "review-readme.md"
     preview = SKILL_ROOT / "scripts" / "serve.py"
-    require(all((template / f).is_file() for f in TEMPLATE_FILES) and all(p.is_file() for p in (agent_guide, audit_template, human_readme, preview)), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
+    require(all((template / f).is_file() for f in TEMPLATE_FILES) and all(p.is_file() for p in (agent_guide, audit_template, human_readme, preview, SKILL_ROOT / 'scripts/setup.ps1', SKILL_ROOT / 'scripts/serve.cjs')), "Bundled app template is incomplete. Restore the complete skills/exam-review-designer folder from the GitHub ZIP.")
     compiled = compile_bank(bank)
     screen = runpy.run_path(str(SKILL_ROOT / "scripts" / "audit_questions.py"))
     design_report = screen["markdown"](screen["audit"](bank))
@@ -129,6 +134,8 @@ def create_review(bank_path, context_path, plan_path, output):
     shutil.copyfile(human_readme, target / "README.md")
     (target / "tools").mkdir()
     shutil.copyfile(preview, target / "tools" / "serve.py")
+    for name in ('setup.ps1', 'serve.cjs'):
+        shutil.copyfile(SKILL_ROOT / 'scripts' / name, target / 'tools' / name)
     (target / "banks").mkdir()
     (target / "banks" / "course.js").write_text(compiled, encoding="utf-8")
     (target / "bank.json").write_text(json.dumps(bank, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

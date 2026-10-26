@@ -13,7 +13,7 @@
     return q.isMath ? 'Calculation' : 'Concepts';
   }
   const empty = bankId => ({ version: 1, bankId, records: {}, events: [], sessions: [] });
-  const freshRecord = () => ({ attempts: 0, correct: 0, recent: [], streak: 0, lastAt: 0, due: 0, interval: 0, ease: 2, totalMs: 0 });
+  const freshRecord = () => ({ attempts: 0, correct: 0, recent: [], streak: 0, lastAt: 0, due: 0, interval: 0, ease: 2, totalMs: 0, delayedCorrects: 0 });
   const recordFor = (state, id) => Object.hasOwn(state.records, id) ? state.records[id] : null;
   function mastery(r, now = Date.now()) {
     if (!r || !r.attempts) return 0;
@@ -30,7 +30,12 @@
     return { attempts, correct, accuracy: attempts ? Math.round(correct / attempts * 100) : null,
       mastery: questions.length ? Math.round(rs.reduce((n, r) => n + mastery(r, now), 0) / questions.length) : 0,
       seen: rs.filter(r => r.attempts).length, due: rs.filter(r => r.attempts && r.due <= now).length,
-      secure: rs.filter(r => r.attempts >= 3 && mastery(r, now) >= 80).length, total: questions.length };
+      secure: rs.filter(r => secure(r, now)).length, total: questions.length };
+  }
+  // Legacy intervals alone cannot prove a spaced return: older builds could
+  // inflate them in one sitting. Require a return observed by this scheduler.
+  function secure(r, now = Date.now()) {
+    return !!r && r.attempts >= 3 && r.recent.at(-1) === true && r.delayedCorrects >= 1 && r.due > now && mastery(r, now) >= 80;
   }
   function priority(q, state, now = Date.now()) {
     const r = recordFor(state, q.id);
@@ -45,7 +50,7 @@
     if (r.recent.at(-1) === false) return 'Recent mistake · try a fresh variation';
     if (r.due <= now) return 'Review due · strengthen recall';
     if (mastery(r, now) < 80) return 'Developing recall · more evidence needed';
-    return 'Retention check · keep this skill fresh';
+    return secure(r, now) ? 'Retention check · keep this skill fresh' : 'Practice estimate · return when due';
   }
   function choose(pool, state, recent = [], rng = Math.random, now = Date.now()) {
     if (!pool.length) return null;
@@ -79,7 +84,7 @@
       let draw = Math.max(0, Math.min(1 - Number.EPSILON, rng())) * tree[1], node = 1;
       while (node < size) {
         const left = node * 2;
-        if (tree[left] > 0 && (draw < tree[left] || !uniform && draw === tree[left])) node = left;
+        if (tree[left] > 0 && (draw < tree[left] || tree[left + 1] === 0 || !uniform && draw === tree[left])) node = left;
         else { draw -= tree[left]; node = left + 1; }
       }
       chosen.push(candidates[node - size]);
@@ -90,14 +95,23 @@
   }
   function record(state, q, correct, confidence, ms, mode, now = Date.now(), timing = null) {
     const r = recordFor(state, q.id) || freshRecord();
+    const lastCorrect = r.recent.at(-1) === true;
+    const early = correct && r.attempts > 0 && lastCorrect && now < r.due;
+    const delayed = correct && r.attempts > 0 && lastCorrect && now >= r.due;
     r.attempts++; r.correct += Number(correct); r.recent = [...r.recent, !!correct].slice(-8);
-    r.streak = correct ? r.streak + 1 : 0;
-    if (correct) {
-      r.interval = r.streak === 1 ? 0.5 : r.streak === 2 ? 2 : Math.min(90, r.interval * r.ease);
-      if (confidence === 'unsure') r.interval = Math.max(0.125, r.interval * 0.5);
-      r.ease = Math.min(2.8, r.ease + (confidence === 'sure' ? 0.1 : 0));
-    } else { r.interval = 10 / 1440; r.ease = Math.max(1.3, r.ease - 0.2); }
-    r.lastAt = now; r.due = now + r.interval * DAY; r.totalMs += Math.max(0, ms);
+    if (!Number.isInteger(r.delayedCorrects)) r.delayedCorrects = 0;
+    if (delayed) r.delayedCorrects++;
+    if (!correct) r.delayedCorrects = 0;
+    if (!early) {
+      r.streak = correct ? r.streak + 1 : 0;
+      if (correct) {
+        r.interval = r.streak === 1 ? 0.5 : r.streak === 2 ? 2 : Math.min(90, r.interval * r.ease);
+        if (confidence === 'unsure') r.interval = Math.max(0.125, r.interval * 0.5);
+        r.ease = Math.min(2.8, r.ease + (confidence === 'sure' ? 0.1 : 0));
+      } else { r.interval = 10 / 1440; r.ease = Math.max(1.3, r.ease - 0.2); }
+      r.due = now + r.interval * DAY;
+    }
+    r.lastAt = now; r.totalMs += Math.max(0, ms);
     Object.defineProperty(state.records, q.id, {value:r, writable:true, enumerable:true, configurable:true});
     state.events.push({ id: q.id, topic: q.topic, skill: skill(q), correct: !!correct, confidence, ms: Math.max(0, ms), at: now, mode,
       ...(timing ? {timingVersion:1, selectionMs:timing.selectionMs, changes:timing.changes, interrupted:timing.interrupted} : {}) });
@@ -128,12 +142,13 @@
     const ids = new Set(bank.questions.map(q => q.id));
     for (const [id, r] of Object.entries(data.records)) {
       if (!ids.has(id) || !r || !['attempts','correct','streak','lastAt','due','interval','ease','totalMs'].every(k => Number.isFinite(r[k]) && r[k] >= 0) || !Number.isInteger(r.attempts) || r.correct > r.attempts || !Array.isArray(r.recent) || r.recent.length > 8 || r.recent.some(v => typeof v !== 'boolean') || (r.attempts > 0 && !r.recent.length)) throw Error('Backup contains invalid learning records.');
+      if (r.delayedCorrects !== undefined && (!Number.isInteger(r.delayedCorrects) || r.delayedCorrects < 0 || r.delayedCorrects > r.correct)) throw Error('Backup contains invalid delayed-return evidence.');
     }
     if (data.events.length > 5000 || data.sessions.length > 100 || data.events.some(e => !e || !ids.has(e.id) || !Number.isFinite(e.at) || !Number.isFinite(e.ms) || e.ms < 0 || typeof e.correct !== 'boolean' || !['auto','unsure','okay','sure'].includes(e.confidence) || e.timingVersion!==undefined && (e.timingVersion!==1 || !Number.isFinite(e.selectionMs) || e.selectionMs<0 || e.selectionMs>e.ms || !Number.isInteger(e.changes) || e.changes<0 || typeof e.interrupted!=='boolean'))) throw Error('Backup contains invalid activity history.');
     if (data.sessions.some(s => !s || !Number.isFinite(s.at) || !Number.isInteger(s.correct) || !Number.isInteger(s.total) || s.correct < 0 || s.total < 1 || s.total < s.correct || typeof s.mode !== 'string')) throw Error('Backup contains invalid sessions.');
     return data;
   }
-  const api = { DAY, SKILLS, skill, empty, recordFor, mastery, summary, priority, reason, choose, plan, record, validateBank, materialize, validateState };
+  const api = { DAY, SKILLS, skill, empty, recordFor, mastery, secure, summary, priority, reason, choose, plan, record, validateBank, materialize, validateState };
   root.StudyEngine = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

@@ -36,7 +36,7 @@ SoS! helps students turn their own course material into a review, practice it in
 
 ## Adaptive practice and feedback
 
-- AI authoring prompts plan a mix of foundational, application and explicit best-answer questions, independently varying option-length profiles. An optional Python screen flags conspicuous key lengths and bank-wide longest-answer clues; the builder includes its report. These are editorial heuristics, not calibrated difficulty or factual verification. See [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md).
+- AI authoring prompts plan a mix of foundational, application and explicit best-answer questions, independently varying option-length profiles. An optional Python screen flags conspicuous key lengths and bank-wide longest- and shortest-answer clues; the builder includes its report. These are editorial heuristics, not calibrated difficulty or factual verification. See [QUESTION_DESIGN.md](docs/methodology/QUESTION_DESIGN.md).
 
 - Answer four-option multiple-choice questions, with randomized answer order and authored/generated variations where available.
 - Practice across the class or focus on a category and thinking skill.
@@ -109,3 +109,16 @@ SoS! helps students turn their own course material into a review, practice it in
 These are recommendations, not implemented features. See the [researched priorities and evidence limits](docs/methodology/RESEARCH.md#suggested-next-steps-for-students).
 
 Keep this overview current when capabilities change; implementation contracts remain in [COURSES.md](docs/guides/COURSES.md) and [STORAGE.md](docs/guides/STORAGE.md).
+
+## Recovery and review safeguards
+
+- Export unreadable progress before explicitly retiring missing question families; matching history and unaffected exam deadlines survive.
+- Secure status requires an observed correct return when due; early repeated correct answers do not extend the schedule.
+- Large clarity backups split into numbered, individually importable parts; malformed notes can be exported for recovery with their stored images.
+- Question-design screening checks both longest and shortest answer cues, including small banks.
+
+## First-run setup
+
+- Windows preflight checks extracted instructions, scripts, templates and required Node/Python versions before offering commands.
+- Agents reuse tested command blocks and structured executable/argument arrays; installation is limited to missing requirements and checked again afterward.
+- Generated reviews include their own setup check and both optional preview servers.

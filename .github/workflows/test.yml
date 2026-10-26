@@ -9,14 +9,16 @@ jobs:
         include:
           - os: ubuntu-latest
             python: '3.10'
+            node: '20'
           - os: windows-latest
             python: '3.14'
+            node: '24'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ matrix.node }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}

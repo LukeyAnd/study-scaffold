@@ -83,7 +83,7 @@ Do not report a probability of passing, an intelligence score, or psychometric a
 | Submitted-answer retrieval, explanatory feedback, randomized choice order, repeated scenario practice | Recognition-based MCQs only; no automatic grading of constructed responses |
 | Per-scenario history, mistake weighting, due reviews, and automatic active timing | Current review intervals and selection weights are hand-tuned, not a replication of ARTS, FSRS, or the cited experiments; timing does not change the schedule |
 | Category and thinking-skill drill-downs, coverage counts, session summaries | Categories and heuristic skill labels do not replace a course-specific objective blueprint |
-| “Secure” requires repeated evidence and can fall after mistakes | Three attempts may occur in one sitting; secure status is not evidence of multi-day retention or an 80% chance of passing |
+| “Secure” requires at least three attempts, a correct return observed when due, at least 80% practice estimate, a last correct answer, and a future due date | This is a heuristic label, not proof of durable retention or an 80% chance of passing; overdue scenarios leave the Secure count and list |
 | Fixed, unique-scenario quiz plans and feedback deferred in exam mode | A mock exam built from previously practiced items is not held out unless the author deliberately reserves items |
 | Bank replacement and source-linked explanations from the packaged authoring script | The agent or instructor must verify course correctness, source currency, scoring, and assessment alignment |
 
@@ -172,3 +172,9 @@ The new clarity-note workflow supports saving a question-linked doubt for later 
 **R14.** Bastani, H., Bastani, O., Sungu, A., Ge, H., Kabakcı, Ö., & Mariman, R. (2025). *Generative AI without guardrails can harm learning: Evidence from high school mathematics*. PNAS, 122, e2422633122. [Original open-access article](https://www.pnas.org/doi/10.1073/pnas.2422633122). Access: original abstract, intervention description and results. A field experiment involving nearly 1,000 high-school students; the particular GPT-4 interfaces and context do not represent all AI uses or subjects. No study materials or student data are redistributed here.
 
 **R15.** W3C. *WCAG 2.2* and supporting Understanding documents. [Normative standard](https://www.w3.org/TR/WCAG22/), [text spacing](https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html), [adjustable timing](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html). Access: official standard and guidance, checked October 24, 2026. Spacing guidance requires supporting user overrides without loss; it does not prescribe one mandatory default line spacing. An accessibility recommendation is not a claim that the current app has passed a complete conformance audit.
+
+### Scheduling correction in v1.2.1
+
+Correct practice before an existing correct item is due still updates attempts, accuracy, recent performance and timing, but does not extend its interval, streak, ease or due date. A correct return when due advances the schedule. A mistake resets delayed-success evidence and schedules an earlier repair. The initial 12-hour return, later two-day return and subsequent ease multiplier remain product heuristics; the cited spacing studies do not validate those exact values.
+
+Earlier backups remain readable and their stored due dates are preserved, including previously inflated intervals. Old interval length alone cannot establish spaced practice: the Secure label now requires a delayed correct return observed by the corrected scheduler. The displayed practice estimate may still rise during immediate repetition; it is not a retention probability.

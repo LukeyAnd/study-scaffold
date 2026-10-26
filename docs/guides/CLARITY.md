@@ -37,3 +37,9 @@
 - [clarity.js](../../clarity.js) owns capture, validation, backup and persistence.
 - [clarity-ui.js](../../clarity-ui.js) owns the drawer and queue.
 - [Model tests](../../tests/clarity.test.cjs) and [browser checks](../../tools/clarity_browser.cjs) cover persistence, images, backup, conflicts, class isolation and save failures.
+
+## Large backups and unreadable notes
+
+Export normally creates one JSON file. If encoded text and images would exceed the 50 MiB import limit, the app offers numbered **Save part** links. Save every part before leaving the page. Load each part on the destination in any order; parts add notes and refuse existing note IDs rather than replacing them. The app reports each loaded part; it does not synchronize devices or track a complete batch across sessions. Full single-file imports still replace the class’s notes after confirmation.
+
+Unreadable notes block editing and offer **Export stored recovery copy**. This diagnostic JSON preserves current stored rows and embedded Blob bytes, or the exact localStorage text. Keep that file and browser profile for an agent-assisted recovery; the diagnostic file is deliberately not accepted as a normal notes import. No malformed row is silently deleted.

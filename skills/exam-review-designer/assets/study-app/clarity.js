@@ -27,7 +27,9 @@
     requireValue(Number.isFinite(note.createdAt)&&note.createdAt>0&&Number.isFinite(note.updatedAt)&&note.updatedAt>=note.createdAt&&Number.isInteger(note.revision)&&note.revision>=0,'Invalid note dates or revision.');
     requireValue(Array.isArray(note.images)&&note.images.length<=LIMITS.images&&new Set(note.images.map(i=>i?.id)).size===note.images.length,'Keep up to three distinct images per note.');
     for(const image of note.images)requireValue(image&&key(image.id)&&text(image.name,120)&&TYPES.has(image.type)&&image.blob instanceof Blob&&image.blob.type===image.type&&image.blob.size>0&&image.blob.size<=LIMITS.imageBytes,'Choose PNG, JPEG or WebP images up to 4 MB each.');
-    const context={};for(const name of ['bankId','classTitle','questionId','topicId','topicName','concept','skill','prompt','options','objectives','sources'])context[name]=copy(c[name]);
+    const context={};for(const name of ['bankId','classTitle','questionId','topicId','topicName','concept','skill','prompt','options'])context[name]=copy(c[name]);
+    context.objectives=c.objectives.map(o=>({id:o.id,description:o.description}));
+    context.sources=c.sources.map(s=>({title:s.title,locator:s.locator,version:s.version}));
     return {id:note.id,context,text:note.text,explanation:note.explanation,resolved:note.resolved,createdAt:note.createdAt,updatedAt:note.updatedAt,revision:note.revision,images:note.images.map(i=>({id:i.id,name:i.name,type:i.type,blob:i.blob}))};
   }
   async function checkImage(blob){
@@ -59,8 +61,26 @@
     for(const row of notes){const note=normalize(row,bankId);result.push({...note,images:await Promise.all(note.images.map(encodeImage))});}
     return {format:'sos-clarity-notes',version:1,bankId,savedAt:Date.now(),notes:result};
   }
+  async function archiveParts(notes,bankId){
+    // Bound each actual UTF-8 file, including escaped text and base64 images.
+    // Collections from earlier versions remain exportable without truncation.
+    checkCollection(notes);
+    const base={format:'sos-clarity-notes',version:1,bankId,savedAt:Date.now()},groups=[];
+    let group=[],bytes=new Blob([JSON.stringify({...base,notes:[]},null,2)]).size;
+    for(const note of notes){
+      const row=(await archive([note],bankId)).notes[0],size=new Blob([JSON.stringify(row,null,2).replace(/^/gm,'    ')]).size+2;
+      requireValue(size+1000<LIMITS.importBytes,'This note exceeds the backup file limit. Export a stored recovery copy.');
+      if(bytes+size+1000>LIMITS.importBytes){groups.push(group);group=[];bytes=1000;}
+      group.push(row);bytes+=size;
+    }
+    groups.push(group);
+    const batchId=uid();
+    const parts=groups.map((rows,index)=>({...base,notes:rows,...(groups.length>1?{part:{batchId,index:index+1,total:groups.length}}:{})}));
+    requireValue(parts.every(part=>new Blob([JSON.stringify(part,null,2)]).size<=LIMITS.importBytes),'Backup exceeds the file limit. Export a stored recovery copy.');return parts;
+  }
   async function readArchive(data,bankId){
     requireValue(data?.format==='sos-clarity-notes'&&data.version===1&&data.bankId===bankId&&Array.isArray(data.notes)&&data.notes.length<=LIMITS.notes,'Choose a clarity-notes backup for this class.');
+    if(data.part!==undefined)requireValue(key(data.part?.batchId)&&Number.isInteger(data.part.index)&&Number.isInteger(data.part.total)&&data.part.index>=1&&data.part.index<=data.part.total&&data.part.total<=LIMITS.notes,'Invalid multipart backup.');
     const notes=[];
     for(const row of data.notes){
       requireValue(Array.isArray(row?.images)&&row.images.length<=LIMITS.images,'Invalid image list.');
@@ -83,7 +103,7 @@
     try{rows=db?await getRows():local?JSON.parse(local.getItem(localKey)||'[]'):[];requireValue(Array.isArray(rows),'Invalid notes');rows=rows.map(n=>normalize(n,bankId));checkCollection(rows);}catch(_){blocked=true;rows=[];}
     const signature=items=>JSON.stringify(items.map(n=>[n.id,n.revision]).sort(([a],[b])=>a.localeCompare(b)));
     function applyChange(fresh,operation,note){
-      if(operation==='replace'){requireValue(signature(fresh)===signature(rows),'Notes changed in another tab. Reload before loading a backup.');return note.map(n=>({...n,revision:(fresh.find(old=>old.id===n.id)?.revision||0)+1}));}
+      if(operation==='replace'){requireValue(signature(fresh)===signature(rows),'Notes changed in another tab. Reload before loading a backup.');checkCollection(note);return note.map(n=>({...n,revision:(fresh.find(old=>old.id===n.id)?.revision||0)+1}));}
       const existing=fresh.find(n=>n.id===note.id);requireValue((existing?.revision||0)===note.revision,'This note changed in another tab. Reload before saving.');
       const remaining=fresh.filter(n=>n.id!==note.id);if(operation==='save')remaining.push({...note,revision:note.revision+1,updatedAt:Math.max(Date.now(),note.createdAt)});checkCollection(remaining);return remaining;
     }
@@ -102,11 +122,21 @@
       }
       rows=next;return operation==='save'?copy(rows.find(n=>n.id===note.id)):true;
     }
-    return {readable:!blocked,mode:db?'Local database':local?'Browser storage':'Memory only',images:!!db,warning:blocked?'Saved notes could not be read. Reload before editing.':!db&&!local?'Notes are not being saved; storage is unavailable.':'',
+    async function rawValue(value,ancestors=new Set()){
+      if(value instanceof Blob){const encoded=await encodeImage({blob:value,type:value.type});return {$sosBlob:{type:value.type,data:encoded.data}};}
+      if(value===null||typeof value!=='object')return value;
+      requireValue(!ancestors.has(value),'Stored notes contain a circular value; keep this browser profile for recovery.');
+      const next=new Set(ancestors).add(value);
+      if(Array.isArray(value)){const out=[];for(const item of value)out.push(await rawValue(item,next));return out;}
+      const out=Object.create(null);for(const [name,item]of Object.entries(value))out[name]=await rawValue(item,next);return out;
+    }
+    return {readable:!blocked,mode:db?'Local database':local?'Browser storage':'Memory only',images:!!db,warning:blocked?'Saved notes could not be read. Export a stored recovery copy; editing is blocked to preserve them.':!db&&!local?'Notes are not being saved; storage is unavailable.':'',
+      async readStored(){requireValue(db||local,'No stored notes are available.');return {format:'sos-clarity-recovery',version:1,bankId,savedAt:Date.now(),...(db?{storage:'IndexedDB',rows:await rawValue(await getRows())}:{storage:'localStorage',rawText:local.getItem(localKey)})};},
       list:()=>rows.map(copy).sort((a,b)=>b.updatedAt-a.updatedAt),
       async save(note){note=normalize(note,bankId);requireValue(note.text.trim()||note.explanation.trim()||note.images.length,'Add a question, an image, or an explanation first.');await Promise.all(note.images.map(i=>checkImage(i.blob)));return change('save',note);},
       remove:note=>change('delete',normalize(note,bankId)),
-      async replace(notes){notes=notes.map(note=>normalize(note,bankId));checkCollection(notes);await Promise.all(notes.flatMap(note=>note.images.map(i=>checkImage(i.blob))));return change('replace',notes);},close:()=>db?.close()};
+      async replace(notes){notes=notes.map(note=>normalize(note,bankId));checkCollection(notes);await Promise.all(notes.flatMap(note=>note.images.map(i=>checkImage(i.blob))));return change('replace',notes);},
+      async merge(notes){notes=notes.map(note=>normalize(note,bankId));requireValue(!notes.some(n=>rows.some(old=>old.id===n.id)),'A note in this part is already loaded. Skip this part; no notes were replaced.');const combined=[...rows,...notes];checkCollection(combined);await Promise.all(notes.flatMap(n=>n.images.map(i=>checkImage(i.blob))));return change('replace',combined);},close:()=>db?.close()};
   }
-  const api={LIMITS,capture,draft,normalize,checkImage,image,helpPrompt,archive,readArchive,open};root.StudyClarity=api;if(typeof module!=='undefined')module.exports=api;
+  const api={LIMITS,capture,draft,normalize,checkImage,image,helpPrompt,archive,archiveParts,readArchive,open};root.StudyClarity=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
